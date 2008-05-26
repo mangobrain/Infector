@@ -1,0 +1,12 @@
+infector
+========
+This program exists for one reason: GAtaxx was dropped from the GNOME games
+package, and I'm not aware of a good replacement for it*.  Also, I wrote an
+Ataxx clone in Delphi whilst at university, which contained my first - and, at
+time of writing, only - attempt at board game AI, so the game holds some
+sentimental value for me.  You can probably guess what the program was called.
+	Enjoy.  :)
+
+- Phil
+
+* I must admit I haven't looked especially hard.
