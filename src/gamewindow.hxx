@@ -23,9 +23,11 @@ class GameWindow: public Gtk::Window
 	public:
 		GameWindow();
 	private:
-		Gtk::RefPtr<Gtk::ActionGroup> m_refActionGroup;
-		Gtk::RefPtr<Gtk::UIManager> m_refUIManager;
+		Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
+		Glib::RefPtr<Gtk::UIManager> m_refUIManager;
 		Gtk::VBox m_vbox;
+		Gtk::Statusbar m_statusbar;
+		Gtk::DrawingArea m_playfield;
 };
 
 #endif
