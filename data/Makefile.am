@@ -15,4 +15,4 @@
 #    You should have received a copy of the GNU General Public License
 #    along with infector.  If not, see <http://www.gnu.org/licenses/>.
 
-dist_pkgdata_DATA = infector.glade about.glade newgame.glade
+dist_pkgdata_DATA = infector.glade
