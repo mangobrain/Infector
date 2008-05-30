@@ -38,15 +38,16 @@ AC_CONFIG_HEADERS([config.h])
 dnl # Output the command-line options given to this script
 AC_DEFINE_UNQUOTED([CONFIGURE_OPTS],["$ac_configure_args"],[Options given to ./configure])
 
-dnl # infector uses gtkmm.
+dnl # infector uses gtkmm and glademm.
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4 >= 2.10])
+PKG_CHECK_MODULES([GLADEMM], [libglademm-2.4 >= 2.6])
 
 dnl # All done.  Spit out the result.
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
+	data/Makefile
 ])
-dnl	data/Makefile
 dnl	doc/Makefile
 AC_OUTPUT
