@@ -29,6 +29,7 @@
 
 // Library headers
 #include <gtkmm.h>
+#include <libglademm.h>
 
 // System headers
 
@@ -43,8 +44,14 @@
 int main(int argc, char *argv[])
 {
 	Gtk::Main kit(argc, argv);
-	GameWindow gw;
-	Gtk::Main::run(gw);
+	
+	Glib::RefPtr<Gnome::Glade::Xml> refXml = Gnome::Glade::Xml::create(PKGDATADIR "/infector.glade");
+	
+	GameWindow *pGw;
+	refXml->get_widget_derived("mainwindow", pGw);
+	kit.run(*pGw);
+	
+	delete pGw;
 	return 0;
 }
 
@@ -53,48 +60,7 @@ int main(int argc, char *argv[])
 // GameWindow class
 //
 
-GameWindow::GameWindow()
-	: m_refActionGroup(Gtk::ActionGroup::create()), m_refUIManager(Gtk::UIManager::create())
+GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
+	: Gtk::Window(cobject), m_refXml(refXml)
 {
-	// Create menu actions inside the action group
-	m_refActionGroup->add(Gtk::Action::create("MenuGame", "_Game"));
-	m_refActionGroup->add(Gtk::Action::create("NewGame", Gtk::Stock::NEW));
-	m_refActionGroup->add(Gtk::Action::create("Quit", Gtk::Stock::QUIT), sigc::mem_fun(*this, &GameWindow::hide));
-	
-	// Add the action group to a UI manager
-	m_refUIManager->insert_action_group(m_refActionGroup);
-	
-	// Get the window to respond to keyboard shortcuts
-	add_accel_group(m_refUIManager->get_accel_group());
-	
-	// Describe the visual layout of the menu
-	Glib::ustring ui_info = 
-		"<ui>"
-		"	<menubar name='Menubar'>"
-		"		<menu action='MenuGame'>"
-		"			<menuitem action='NewGame' />"
-		"			<separator />"
-		"			<menuitem action='Quit' />"
-		"		</menu>"
-		"	</menubar>"
-		"	<toolbar name='Toolbar'>"
-		"		<toolitem action='NewGame' />"
-		"	</toolbar>"
-		"</ui>";
-	m_refUIManager->add_ui_from_string(ui_info);
-	
-	// Add the root vbox to the window
-	add(m_vbox);
-	
-	// Add the menu & tool bars to the top of the vbox
-	m_vbox.pack_start(*(m_refUIManager->get_widget("/Menubar")), Gtk::PACK_SHRINK);
-	m_vbox.pack_start(*(m_refUIManager->get_widget("/Toolbar")), Gtk::PACK_SHRINK);
-	
-	// Then add the playfield
-	m_vbox.pack_start(m_playfield);
-	
-	// Finally the status bar
-	m_vbox.pack_start(m_statusbar, Gtk::PACK_SHRINK);
-	
-	show_all_children();
 }

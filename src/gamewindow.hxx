@@ -21,13 +21,9 @@
 class GameWindow: public Gtk::Window
 {
 	public:
-		GameWindow();
+		GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
 	private:
-		Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
-		Glib::RefPtr<Gtk::UIManager> m_refUIManager;
-		Gtk::VBox m_vbox;
-		Gtk::Statusbar m_statusbar;
-		Gtk::DrawingArea m_playfield;
+		Glib::RefPtr<Gnome::Glade::Xml> m_refXml;
 };
 
 #endif

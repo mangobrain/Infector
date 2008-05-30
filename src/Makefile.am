@@ -18,6 +18,6 @@
 bin_PROGRAMS = infector
 
 infector_SOURCES = infector.cxx
-infector_CXXFLAGS = $(GTKMM_CFLAGS) $(AM_CXXFLAGS)
-infector_LDADD = $(GTKMM_LIBS)
+infector_CXXFLAGS = $(GTKMM_CFLAGS) $(GLADEMM_CFLAGS) $(AM_CXXFLAGS)
+infector_LDADD = $(GTKMM_LIBS) $(GLADEMM_LIBS) $(AM_LIBS)
 infector_CPPFLAGS = -DPKGDATADIR='"$(pkgdatadir)"' $(AM_CPPFLAGS)
