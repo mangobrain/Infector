@@ -40,7 +40,7 @@ AC_DEFINE_UNQUOTED([CONFIGURE_OPTS],["$ac_configure_args"],[Options given to ./c
 
 dnl # infector uses gtkmm and glademm.
 PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4 >= 2.10])
+PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4 >= 2.12])
 PKG_CHECK_MODULES([GLADEMM], [libglademm-2.4 >= 2.6])
 
 dnl # All done.  Spit out the result.

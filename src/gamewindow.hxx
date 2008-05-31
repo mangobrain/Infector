@@ -24,6 +24,8 @@ class GameWindow: public Gtk::Window
 		GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
 	private:
 		Glib::RefPtr<Gnome::Glade::Xml> m_refXml;
+		std::auto_ptr<Gtk::AboutDialog> m_pAboutDialog;
+		void onAbout();
 };
 
 #endif

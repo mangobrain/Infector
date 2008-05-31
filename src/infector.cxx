@@ -26,6 +26,8 @@
 #endif
 
 // Language headers
+#include <memory>
+#include <cstdlib>
 
 // Library headers
 #include <gtkmm.h>
@@ -40,13 +42,40 @@
 // Implementation
 //
 
+void onAboutURL(Gtk::AboutDialog &d, const Glib::ustring &url)
+{
+	// XXX This is really, really hackish.
+	// Try to open the clicked URL with xdg-open then gnome-open.
+	Glib::ustring command("xdg-open ");
+	command += url;
+	command += " || gnome-open ";
+	command += url;
+	system(command.c_str());
+}
+
+void onAboutEmail(Gtk::AboutDialog &d, const Glib::ustring &addr)
+{
+	// XXX This is also really, really hackish.
+	// Try to open an email client with xdg-email.
+	Glib::ustring command("xdg-email \"");
+	command += addr;
+	command += "\"";
+	system(command.c_str());
+}
+
 // Entry point
 int main(int argc, char *argv[])
 {
 	Gtk::Main kit(argc, argv);
-	
+
+	// Install hooks for clicked URLs and email addresses in about dialogues
+	Gtk::AboutDialog::set_url_hook(sigc::ptr_fun(onAboutURL));
+	Gtk::AboutDialog::set_email_hook(sigc::ptr_fun(onAboutEmail));
+
+	// Load main Glade file
 	Glib::RefPtr<Gnome::Glade::Xml> refXml = Gnome::Glade::Xml::create(PKGDATADIR "/infector.glade");
 	
+	// Instantiate main window & run Glib main loop
 	GameWindow *pGw;
 	refXml->get_widget_derived("mainwindow", pGw);
 	kit.run(*pGw);
@@ -61,6 +90,24 @@ int main(int argc, char *argv[])
 //
 
 GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::Window(cobject), m_refXml(refXml)
+	: Gtk::Window(cobject), m_refXml(refXml), m_pAboutDialog(NULL)
 {
+	// Link the "About" menu item to the onAbout method
+	Gtk::MenuItem *pAbout;
+	m_refXml->get_widget("aboutmenuitem", pAbout);
+	pAbout->signal_activate().connect(sigc::mem_fun(*this, &GameWindow::onAbout));
+}
+
+void GameWindow::onAbout()
+{
+	// Instantiate the about dialogue if not already done
+	if (m_pAboutDialog.get() == NULL)
+	{
+		Gtk::AboutDialog *pAboutDialog;
+		m_refXml->get_widget("aboutdialog", pAboutDialog);
+		m_pAboutDialog.reset(pAboutDialog);
+	}
+	// Block whilst showing the dialogue, then hide it when it's dismissed
+	m_pAboutDialog->run();
+	m_pAboutDialog->hide();
 }
