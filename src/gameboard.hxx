@@ -15,23 +15,15 @@
 //    You should have received a copy of the GNU General Public License
 //    along with infector.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef __INFECTOR_GAMEWINDOW_HXX__
-#define __INFECTOR_GAMEWINDOW_HXX__
+#ifndef __INFECTOR_GAMEBOARD_HXX__
+#define __INFECTOR_GAMEBOARD_HXX__
 
-class GameWindow: public Gtk::Window
+class GameBoard: public Gtk::DrawingArea
 {
 	public:
-		GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
+		GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
 	private:
-		Glib::RefPtr<Gnome::Glade::Xml> m_refXml;
-
-		std::auto_ptr<Gtk::AboutDialog> m_pAboutDialog;
-		std::auto_ptr<Gtk::Dialog> m_pNewGameDialog;
-
-		GameBoard *m_pBoard;
-
-		void onAbout();
-		void onNewGame();
+		bool on_expose_event(GdkEventExpose *event);
 };
 
 #endif

@@ -36,6 +36,7 @@
 // System headers
 
 // Project headers
+#include "gameboard.hxx"
 #include "gamewindow.hxx"
 
 //
@@ -104,6 +105,9 @@ GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade:
 	Gtk::ToolButton *pNewGameButton;
 	m_refXml->get_widget("newtoolbutton", pNewGameButton);
 	pNewGameButton->signal_clicked().connect(sigc::mem_fun(*this, &GameWindow::onNewGame));
+
+	// Grab pointer to the widget on which the board is drawn
+	m_refXml->get_widget_derived("drawingarea", m_pBoard);
 }
 
 void GameWindow::onAbout()
@@ -117,6 +121,7 @@ void GameWindow::onAbout()
 		m_refXml->get_widget("aboutdialog", pAboutDialog);
 		m_pAboutDialog.reset(pAboutDialog);
 	}
+	
 	// Block whilst showing the dialogue, then hide it when it's dismissed
 	m_pAboutDialog->run();
 	m_pAboutDialog->hide();
@@ -146,6 +151,7 @@ void GameWindow::onNewGame()
 		m_refXml->get_widget("yellowcombo", pComboBox);
 		pComboBox->set_active(0);
 	}
+	
 	// Block whilst showing the dialogue, then hide it when it's dismissed
 	m_pNewGameDialog->run();
 	m_pNewGameDialog->hide();
