@@ -90,17 +90,27 @@ int main(int argc, char *argv[])
 //
 
 GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::Window(cobject), m_refXml(refXml), m_pAboutDialog(NULL)
+	: Gtk::Window(cobject), m_refXml(refXml), m_pAboutDialog(NULL), m_pNewGameDialog(NULL)
 {
 	// Link the "About" menu item to the onAbout method
 	Gtk::MenuItem *pAbout;
 	m_refXml->get_widget("aboutmenuitem", pAbout);
 	pAbout->signal_activate().connect(sigc::mem_fun(*this, &GameWindow::onAbout));
+
+	// Link the "New" menu item & button to the onNewGame method
+	Gtk::MenuItem *pNewGame;
+	m_refXml->get_widget("newgamemenuitem", pNewGame);
+	pNewGame->signal_activate().connect(sigc::mem_fun(*this, &GameWindow::onNewGame));
+	Gtk::ToolButton *pNewGameButton;
+	m_refXml->get_widget("newtoolbutton", pNewGameButton);
+	pNewGameButton->signal_clicked().connect(sigc::mem_fun(*this, &GameWindow::onNewGame));
 }
 
 void GameWindow::onAbout()
 {
 	// Instantiate the about dialogue if not already done
+	// XXX Not 100% sure I should do this once and keep the instance,
+	// but calling get_widget multiple times doesn't seem to work.
 	if (m_pAboutDialog.get() == NULL)
 	{
 		Gtk::AboutDialog *pAboutDialog;
@@ -110,4 +120,33 @@ void GameWindow::onAbout()
 	// Block whilst showing the dialogue, then hide it when it's dismissed
 	m_pAboutDialog->run();
 	m_pAboutDialog->hide();
+}
+
+void GameWindow::onNewGame()
+{
+	// Instantiate the about dialogue if not already done
+	if (m_pNewGameDialog.get() == NULL)
+	{
+		Gtk::Dialog *pNewGameDialog;
+		m_refXml->get_widget("newgamedialog", pNewGameDialog);
+		m_pNewGameDialog.reset(pNewGameDialog);
+		// XXX Set default items for our ComboBoxes.
+		// Doing this in the Glade XML itself causes errors.
+		Gtk::ComboBox *pComboBox;
+		m_refXml->get_widget("numplayerscombo", pComboBox);
+		pComboBox->set_active(0);	// 2 players
+		m_refXml->get_widget("boardsizecombo", pComboBox);
+		pComboBox->set_active(0);	// 8x8 board
+		m_refXml->get_widget("redcombo", pComboBox);
+		pComboBox->set_active(0);	// one human..
+		m_refXml->get_widget("greencombo", pComboBox);
+		pComboBox->set_active(1);	// ..versus the AI
+		m_refXml->get_widget("bluecombo", pComboBox);
+		pComboBox->set_active(0);	// others are human if enabled
+		m_refXml->get_widget("yellowcombo", pComboBox);
+		pComboBox->set_active(0);
+	}
+	// Block whilst showing the dialogue, then hide it when it's dismissed
+	m_pNewGameDialog->run();
+	m_pNewGameDialog->hide();
 }
