@@ -110,6 +110,7 @@ GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade:
 	m_refXml->get_widget_derived("drawingarea", m_pBoard);
 }
 
+// "About" event handler 
 void GameWindow::onAbout()
 {
 	// Instantiate the about dialogue if not already done
@@ -127,6 +128,7 @@ void GameWindow::onAbout()
 	m_pAboutDialog->hide();
 }
 
+// New game event handler
 void GameWindow::onNewGame()
 {
 	// Instantiate the about dialogue if not already done

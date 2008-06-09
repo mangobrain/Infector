@@ -21,15 +21,20 @@
 class GameWindow: public Gtk::Window
 {
 	public:
+		// Constructor - called by glademm by get_widget_derived
 		GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
 	private:
+		// Reference to the Glade XML we were created from
 		Glib::RefPtr<Gnome::Glade::Xml> m_refXml;
 
+		// Pointers to various dialogues, instantiated as needed
 		std::auto_ptr<Gtk::AboutDialog> m_pAboutDialog;
 		std::auto_ptr<Gtk::Dialog> m_pNewGameDialog;
 
+		// Game board display (derived widget)
 		GameBoard *m_pBoard;
 
+		// Event handlers
 		void onAbout();
 		void onNewGame();
 };

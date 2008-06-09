@@ -18,12 +18,38 @@
 #ifndef __INFECTOR_GAMEBOARD_HXX__
 #define __INFECTOR_GAMEBOARD_HXX__
 
+// Enumerated type for board square states
+enum piece
+{
+	none,
+	player_1,
+	player_2,
+	player_3,
+	player_4
+};
+
 class GameBoard: public Gtk::DrawingArea
 {
 	public:
+		// Constructor - called by glademm by get_widget_derived
 		GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
+
+		// Signals we can emit
+		sigc::signal<void, const int, const int> square_clicked;
+
 	private:
+		// Callbacks for GTK/GDK events
 		bool on_expose_event(GdkEventExpose *event);
+		bool onClick(GdkEventButton *event);
+
+		// Callbacks for various game events
+		/*void onNewGame(const int board_width, const int board_height, const bool fourplayers);
+		void onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y);
+		void onInvalidMove();
+		void onSelectPiece(const int x, const int y);*/
+
+		// Current state of game board
+		std::vector<std::vector<piece> > pieces;
 };
 
 #endif
