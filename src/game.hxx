@@ -15,31 +15,22 @@
 //    You should have received a copy of the GNU General Public License
 //    along with infector.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef __INFECTOR_GAMEWINDOW_HXX__
-#define __INFECTOR_GAMEWINDOW_HXX__
+#ifndef __INFECTOR_GAME_HXX__
+#define __INFECTOR_GAME_HXX__
 
-class GameWindow: public Gtk::Window
+// Class for main game logic, tying together players and the GUI
+class Game: public sigc::trackable
 {
 	public:
-		// Constructor - called by glademm by get_widget_derived
-		GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
+		Game(GameBoard* b);
+	
 	private:
-		// Reference to the Glade XML we were created from
-		Glib::RefPtr<Gnome::Glade::Xml> m_refXml;
-
-		// Pointers to various dialogues, instantiated as needed
-		std::auto_ptr<Gtk::AboutDialog> m_pAboutDialog;
-		std::auto_ptr<Gtk::Dialog> m_pNewGameDialog;
-
-		// Game board display (derived widget)
-		GameBoard *m_pBoard;
-
-		// Current running game
-		std::auto_ptr<Game> m_pGame;
+		// Pointer to game board
+		GameBoard* m_pBoard;
 
 		// Event handlers
-		void onAbout();
-		void onNewGame();
+		// Board clicked
+		void onSquareClicked(const int x, const int y);
 };
 
 #endif

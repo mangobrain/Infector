@@ -37,6 +37,7 @@
 
 // Project headers
 #include "gameboard.hxx"
+#include "game.hxx"
 #include "gamewindow.hxx"
 
 //
@@ -91,7 +92,8 @@ int main(int argc, char *argv[])
 //
 
 GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::Window(cobject), m_refXml(refXml), m_pAboutDialog(NULL), m_pNewGameDialog(NULL)
+	: Gtk::Window(cobject), m_refXml(refXml), m_pAboutDialog(NULL), m_pNewGameDialog(NULL),
+	m_pGame(NULL)
 {
 	// Link the "About" menu item to the onAbout method
 	Gtk::MenuItem *pAbout;
@@ -155,6 +157,14 @@ void GameWindow::onNewGame()
 	}
 	
 	// Block whilst showing the dialogue, then hide it when it's dismissed
-	m_pNewGameDialog->run();
+	int response = m_pNewGameDialog->run();
 	m_pNewGameDialog->hide();
+
+	// Process the response from the dialogue
+	if (response == Gtk::RESPONSE_OK)
+	{
+		// Stop the current running game and start a new one
+		delete m_pGame.get();
+		m_pGame.reset(new Game(m_pBoard));
+	}
 }
