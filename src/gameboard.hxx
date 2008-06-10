@@ -21,7 +21,7 @@
 // Enumerated type for board square states
 enum piece
 {
-	none,
+	player_none,
 	player_1,
 	player_2,
 	player_3,
@@ -37,16 +37,19 @@ class GameBoard: public Gtk::DrawingArea
 		// Signals we can emit
 		sigc::signal<void, const int, const int> square_clicked;
 
+		// Call this when a new game is started - will grab initial details
+		// and connect game event handlers to the instance's signals.
+		void newGame(Game* g);
+
 	private:
 		// Callbacks for GTK/GDK events
 		bool on_expose_event(GdkEventExpose *event);
 		bool onClick(GdkEventButton *event);
 
 		// Callbacks for various game events
-		/*void onNewGame(const int board_width, const int board_height, const bool fourplayers);
 		void onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y);
 		void onInvalidMove();
-		void onSelectPiece(const int x, const int y);*/
+		void onSelectPiece(const int x, const int y);
 
 		// Current state of game board
 		std::vector<std::vector<piece> > pieces;

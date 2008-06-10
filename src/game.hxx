@@ -18,12 +18,22 @@
 #ifndef __INFECTOR_GAME_HXX__
 #define __INFECTOR_GAME_HXX__
 
+class GameBoard;
+
 // Class for main game logic, tying together players and the GUI
 class Game: public sigc::trackable
 {
 	public:
+		// Constructor - pass in game board so we can pick up
+		// on emitted signals when it is clicked
 		Game(GameBoard* b);
 	
+		// Signals we can emit
+		sigc::signal<void, const int, const int, const int, const int>
+			move_made;
+		sigc::signal<void> invalid_move;
+		sigc::signal<void, const int, const int> select_piece;
+
 	private:
 		// Pointer to game board
 		GameBoard* m_pBoard;

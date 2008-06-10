@@ -36,8 +36,8 @@
 // System headers
 
 // Project headers
-#include "gameboard.hxx"
 #include "game.hxx"
+#include "gameboard.hxx"
 #include "gamewindow.hxx"
 
 //
@@ -166,5 +166,6 @@ void GameWindow::onNewGame()
 		// Stop the current running game and start a new one
 		delete m_pGame.get();
 		m_pGame.reset(new Game(m_pBoard));
+		m_pBoard->newGame(m_pGame.get());
 	}
 }

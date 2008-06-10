@@ -34,6 +34,7 @@
 // System headers
 
 // Project headers
+#include "game.hxx"
 #include "gameboard.hxx"
 
 //
@@ -46,6 +47,12 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::X
 {
 	// Connect mouse click events to the onClick handler
 	signal_button_press_event().connect(sigc::mem_fun(*this, &GameBoard::onClick));
+	// Resize the board to the default 8x8
+	pieces.resize(8);
+	for (std::vector<std::vector<piece> >::iterator i = pieces.begin(); i != pieces.end(); ++i)
+	{
+		i->resize(8);
+	}
 }
 
 // Expose (redraw) event handler
@@ -75,17 +82,33 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 		{
 			for (int j = 0; j < 8; ++j)
 			{
-				if (i % 2)
+				switch (pieces.at(j).at(i))
 				{
-					if (j % 2)
-						cr->set_source_rgb(0.8, 0.8, 0.8);
-					else
-						cr->set_source_rgb(0.5, 0.5, 0.5);
-				} else {
-					if (j % 2)
-						cr->set_source_rgb(0.5, 0.5, 0.5);
-					else
-						cr->set_source_rgb(0.8, 0.8, 0.8);
+					case player_1:
+						cr->set_source_rgb(1, 0, 0);
+						break;
+					case player_2:
+						cr->set_source_rgb(0, 1, 0);
+						break;
+					case player_3:
+						cr->set_source_rgb(0, 0, 1);
+						break;
+					case player_4:
+						cr->set_source_rgb(1, 1, 0);
+						break;
+					case player_none:
+						if (i % 2)
+						{
+							if (j % 2)
+								cr->set_source_rgb(0.8, 0.8, 0.8);
+							else
+								cr->set_source_rgb(0.5, 0.5, 0.5);
+						} else {
+							if (j % 2)
+								cr->set_source_rgb(0.5, 0.5, 0.5);
+							else
+								cr->set_source_rgb(0.8, 0.8, 0.8);
+						}
 				}
 				cr->rectangle(x, y, xinc, yinc);
 				cr->fill();
@@ -119,4 +142,30 @@ bool GameBoard::onClick(GdkEventButton *event)
 	square_clicked(x, y);
 	
 	return true;
+}
+
+// Call this when a new game is started - will grab initial details
+// and connect game event handlers to the instance's signals.
+void GameBoard::newGame(Game* g)
+{
+	// TODO - Implement signal handlers and uncomment this
+	/*g->move_made.connect(sigc::mem_fun(*this, &GameBoard::onMoveMade));
+	g->invalid_move.connect(sigc::mem_fun(*this, &GameBoard::onInvalidMove));
+	g->select_piece.connect(sigc::mem_fun(*this, &GameBoard::onSelectPiece));*/
+
+	// Resize board - TODO: grab size from Game instance
+	for (std::vector<std::vector<piece> >::iterator i = pieces.begin(); i != pieces.end(); ++i)
+	{
+		for (std::vector<piece>::iterator j = i->begin(); j != i->end(); ++j)
+			*j = player_none;
+	}
+
+	// Set default board state
+	pieces[0][7] = player_1;
+	pieces[7][0] = player_1;
+	pieces[0][0] = player_2;
+	pieces[7][7] = player_2;
+
+	// Refresh the board
+	queue_draw();
 }

@@ -35,8 +35,8 @@
 // System headers
 
 // Project headers
-#include "gameboard.hxx"
 #include "game.hxx"
+#include "gameboard.hxx"
 
 //
 // Implementation
