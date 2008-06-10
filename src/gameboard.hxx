@@ -45,11 +45,15 @@ class GameBoard: public Gtk::DrawingArea
 		// Callbacks for GTK/GDK events
 		bool on_expose_event(GdkEventExpose *event);
 		bool onClick(GdkEventButton *event);
+		bool onResize(GdkEventConfigure *event);
 
 		// Callbacks for various game events
 		void onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y);
 		void onInvalidMove();
 		void onSelectPiece(const int x, const int y);
+		
+		// Set the background pixmap of the widget to the empty board
+		void setBackground();
 
 		// Current state of game board
 		std::vector<std::vector<piece> > pieces;
