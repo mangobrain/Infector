@@ -107,6 +107,11 @@ GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade:
 	Gtk::ToolButton *pNewGameButton;
 	m_refXml->get_widget("newtoolbutton", pNewGameButton);
 	pNewGameButton->signal_clicked().connect(sigc::mem_fun(*this, &GameWindow::onNewGame));
+	
+	// Link the "Quit" menu item to the hide method
+	Gtk::MenuItem *pQuit;
+	m_refXml->get_widget("quitmenuitem", pQuit);
+	pQuit->signal_activate().connect(sigc::ptr_fun(&Gtk::Main::quit));
 
 	// Grab pointer to the widget on which the board is drawn
 	m_refXml->get_widget_derived("drawingarea", m_pBoard);
