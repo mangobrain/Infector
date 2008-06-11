@@ -35,6 +35,7 @@
 // System headers
 
 // Project headers
+#include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"
 
@@ -44,7 +45,8 @@
 
 // Constructor
 GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::DrawingArea(cobject), xsel(-1), ysel(-1)
+	: Gtk::DrawingArea(cobject), xsel(-1), ysel(-1), m_DefaultBoardState(player_2, 8, 8),
+	m_pBoardState(NULL)
 {
 	// Connect mouse click events to the onClick handler
 	signal_button_press_event().connect(sigc::mem_fun(*this, &GameBoard::onClick));
@@ -52,13 +54,6 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::X
 	// The widget is painted directly by us, but we'll leave the library
 	// to do its own double buffering, thanks.
 	set_app_paintable(true);
-
-	// Resize the board to the default 8x8
-	pieces.resize(8);
-	for (std::vector<std::vector<piece> >::iterator i = pieces.begin(); i != pieces.end(); ++i)
-	{
-		i->resize(8);
-	}
 	
 	// Set the widget's background to the emtpy checkerboard so that
 	// we don't have to redraw it in every single expose event.
@@ -101,7 +96,8 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 			for (int j = 0; j < 8; ++j)
 			{
 				bool draw = true;
-				switch (pieces.at(j).at(i))
+				const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
+				switch (current->getPieceAt(j, i))
 				{
 					case player_1:
 						cr->set_source_rgb(1, 0, 0);
@@ -183,25 +179,16 @@ bool GameBoard::onClick(GdkEventButton *event)
 
 // Call this when a new game is started - will grab initial details
 // and connect game event handlers to the instance's signals.
-void GameBoard::newGame(Game* g)
+void GameBoard::newGame(Game *g, const BoardState *b)
 {
 	// TODO - Implement signal handlers and uncomment this
 	//g->move_made.connect(sigc::mem_fun(*this, &GameBoard::onMoveMade));
 	//g->invalid_move.connect(sigc::mem_fun(*this, &GameBoard::onInvalidMove));
 	g->select_piece.connect(sigc::mem_fun(*this, &GameBoard::onSelectPiece));
 
-	// Resize board - TODO: grab size from Game instance
-	for (std::vector<std::vector<piece> >::iterator i = pieces.begin(); i != pieces.end(); ++i)
-	{
-		for (std::vector<piece>::iterator j = i->begin(); j != i->end(); ++j)
-			*j = player_none;
-	}
-
-	// Set default board state
-	pieces[0][7] = player_1;
-	pieces[7][0] = player_1;
-	pieces[0][0] = player_2;
-	pieces[7][7] = player_2;
+	// Store pointer to shared board state
+	m_pBoardState = b;
+	xsel = -1; ysel = -1;
 
 	// Refresh the board
 	queue_draw();

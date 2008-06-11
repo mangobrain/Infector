@@ -35,6 +35,7 @@
 // System headers
 
 // Project headers
+#include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"
 
@@ -43,8 +44,8 @@
 //
 
 // Constructor
-Game::Game(GameBoard* b)
-	:m_pBoard(b)
+Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh)
+	: m_BoardState(lastplayer, bw, bh)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother
@@ -52,15 +53,16 @@ Game::Game(GameBoard* b)
 
 	// Connect square clicked handler to game board instance
 	b->square_clicked.connect(sigc::mem_fun(*this, &Game::onSquareClicked));
-
-	std::cout << "New game" << std::endl;
+	
+	b->newGame(this, &m_BoardState);
 }
 
 // Board square clicked
 void Game::onSquareClicked(const int x, const int y)
 {
-	// TODO - Check who's turn it is and verify that they're clicking
-	// on one of their own squares.  At this point shared board state
-	// between Game and GameBoard is probably a good idea.
-	select_piece(x, y);
+	// Check who's turn it is and verify that they're clicking
+	if (m_BoardState.getPieceAt(x, y) == m_BoardState.getPlayer())
+		select_piece(x, y);
+	else
+		invalid_move();
 }

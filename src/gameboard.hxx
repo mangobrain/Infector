@@ -18,16 +18,6 @@
 #ifndef __INFECTOR_GAMEBOARD_HXX__
 #define __INFECTOR_GAMEBOARD_HXX__
 
-// Enumerated type for board square states
-enum piece
-{
-	player_none,
-	player_1,
-	player_2,
-	player_3,
-	player_4
-};
-
 class GameBoard: public Gtk::DrawingArea
 {
 	public:
@@ -39,7 +29,7 @@ class GameBoard: public Gtk::DrawingArea
 
 		// Call this when a new game is started - will grab initial details
 		// and connect game event handlers to the instance's signals.
-		void newGame(Game* g);
+		void newGame(Game *g, const BoardState *b);
 
 	private:
 		// Callbacks for GTK/GDK events
@@ -54,12 +44,13 @@ class GameBoard: public Gtk::DrawingArea
 		
 		// Set the background pixmap of the widget to the empty board
 		void setBackground();
-
-		// Current state of game board
-		std::vector<std::vector<piece> > pieces;
 		
 		// Current selected square
 		int xsel, ysel;
+
+		// Default & current state of game board
+		BoardState m_DefaultBoardState;
+		const BoardState *m_pBoardState;
 };
 
 #endif

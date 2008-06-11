@@ -36,6 +36,7 @@
 // System headers
 
 // Project headers
+#include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"
 #include "gamewindow.hxx"
@@ -169,8 +170,6 @@ void GameWindow::onNewGame()
 	if (response == Gtk::RESPONSE_OK)
 	{
 		// Stop the current running game and start a new one
-		delete m_pGame.get();
-		m_pGame.reset(new Game(m_pBoard));
-		m_pBoard->newGame(m_pGame.get());
+		m_pGame.reset(new Game(m_pBoard, player_4, 8, 8));
 	}
 }
