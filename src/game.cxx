@@ -59,5 +59,8 @@ Game::Game(GameBoard* b)
 // Board square clicked
 void Game::onSquareClicked(const int x, const int y)
 {
-	std::cout << "Clicked: x " << x << ", y " << y << std::endl;
+	// TODO - Check who's turn it is and verify that they're clicking
+	// on one of their own squares.  At this point shared board state
+	// between Game and GameBoard is probably a good idea.
+	select_piece(x, y);
 }

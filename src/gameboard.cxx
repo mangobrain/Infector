@@ -26,6 +26,7 @@
 #endif
 
 // Language headers
+#include <cstdlib>
 
 // Library headers
 #include <gtkmm.h>
@@ -43,7 +44,7 @@
 
 // Constructor
 GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::DrawingArea(cobject)
+	: Gtk::DrawingArea(cobject), xsel(-1), ysel(-1)
 {
 	// Connect mouse click events to the onClick handler
 	signal_button_press_event().connect(sigc::mem_fun(*this, &GameBoard::onClick));
@@ -92,11 +93,14 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 		double x = 0, y = 0;
 		double xinc = (const double)w/8.0;
 		double yinc = (const double)h/8.0;
+		double hxinc = xinc / 2.0;
+		double hyinc = yinc / 2.0;
 
 		for (int i = 0; i < 8; ++i)
 		{
 			for (int j = 0; j < 8; ++j)
 			{
+				bool draw = true;
 				switch (pieces.at(j).at(i))
 				{
 					case player_1:
@@ -112,11 +116,44 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 						cr->set_source_rgb(1, 1, 0);
 						break;
 					case player_none:
-						x += xinc;
-						continue;
+						draw = false;
 				}
-				cr->rectangle(x, y, xinc, yinc);
-				cr->fill();
+				if (draw)
+				{
+					cr->rectangle(x, y, xinc, yinc);
+					cr->fill();
+				}
+				
+				// Highlight currently selected square and possible moves
+				draw = false;
+				if (i == ysel && j == xsel)
+				{
+					cr->set_source_rgb(1, 1, 1);
+					draw = true;
+				}
+				else if (xsel != -1 && ysel != -1)
+				{
+					if (abs(xsel - j) <= 1 && abs(ysel - i) <= 1)
+					{
+						cr->set_source_rgb(1, 0.5, 1);
+						draw = true;
+					}
+					else if (abs(xsel - j) <= 2 && abs(ysel - i) <= 2)
+					{
+						cr->set_source_rgb(1, 0, 1);
+						draw = true;
+					}
+				}
+				if (draw)
+				{
+					std::vector<double> dashes;
+					dashes.push_back(2);
+					cr->set_dash(dashes, 0);
+					cr->set_antialias(Cairo::ANTIALIAS_DEFAULT);
+					cr->arc(x + hxinc, y + hyinc, hxinc / 2.0, 0, 2 * M_PI);
+					cr->stroke();
+				}
+				
 				x += xinc;
 			}
 			y += yinc;
@@ -149,9 +186,9 @@ bool GameBoard::onClick(GdkEventButton *event)
 void GameBoard::newGame(Game* g)
 {
 	// TODO - Implement signal handlers and uncomment this
-	/*g->move_made.connect(sigc::mem_fun(*this, &GameBoard::onMoveMade));
-	g->invalid_move.connect(sigc::mem_fun(*this, &GameBoard::onInvalidMove));
-	g->select_piece.connect(sigc::mem_fun(*this, &GameBoard::onSelectPiece));*/
+	//g->move_made.connect(sigc::mem_fun(*this, &GameBoard::onMoveMade));
+	//g->invalid_move.connect(sigc::mem_fun(*this, &GameBoard::onInvalidMove));
+	g->select_piece.connect(sigc::mem_fun(*this, &GameBoard::onSelectPiece));
 
 	// Resize board - TODO: grab size from Game instance
 	for (std::vector<std::vector<piece> >::iterator i = pieces.begin(); i != pieces.end(); ++i)
@@ -227,4 +264,10 @@ bool GameBoard::onResize(GdkEventConfigure *event)
 {
 	setBackground();
 	return true;
+}
+
+void GameBoard::onSelectPiece(const int x, const int y)
+{
+	xsel = x; ysel = y;
+	queue_draw();
 }

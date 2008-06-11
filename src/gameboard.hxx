@@ -57,6 +57,9 @@ class GameBoard: public Gtk::DrawingArea
 
 		// Current state of game board
 		std::vector<std::vector<piece> > pieces;
+		
+		// Current selected square
+		int xsel, ysel;
 };
 
 #endif

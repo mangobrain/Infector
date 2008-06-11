@@ -32,6 +32,7 @@ class Game: public sigc::trackable
 		sigc::signal<void, const int, const int, const int, const int>
 			move_made;
 		sigc::signal<void> invalid_move;
+		sigc::signal<void> invalid_piece_selection;
 		sigc::signal<void, const int, const int> select_piece;
 
 	private:
