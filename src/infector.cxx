@@ -39,6 +39,7 @@
 #include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"
+#include "newgamedialog.hxx"
 #include "gamewindow.hxx"
 
 //
@@ -142,8 +143,8 @@ void GameWindow::onNewGame()
 	// Instantiate the about dialogue if not already done
 	if (m_pNewGameDialog.get() == NULL)
 	{
-		Gtk::Dialog *pNewGameDialog;
-		m_refXml->get_widget("newgamedialog", pNewGameDialog);
+		NewGameDialog *pNewGameDialog;
+		m_refXml->get_widget_derived("newgamedialog", pNewGameDialog);
 		m_pNewGameDialog.reset(pNewGameDialog);
 		// XXX Set default items for our ComboBoxes.
 		// Doing this in the Glade XML itself causes errors.
@@ -170,6 +171,8 @@ void GameWindow::onNewGame()
 	if (response == Gtk::RESPONSE_OK)
 	{
 		// Stop the current running game and start a new one
-		m_pGame.reset(new Game(m_pBoard, player_4, 8, 8));
+		int w, h;
+		m_pNewGameDialog->getBoardSize(w, h);
+		m_pGame.reset(new Game(m_pBoard, m_pNewGameDialog->getLastPlayer(), w, h));
 	}
 }
