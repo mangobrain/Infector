@@ -27,7 +27,6 @@
 
 // Language headers
 #include <cstdlib>
-#include <iostream>
 
 // Library headers
 #include <gtkmm.h>
@@ -82,23 +81,95 @@ void Game::onSquareClicked(const int x, const int y)
 			// destination square isn't empty.
 			invalid_move();
 		else {
+			bool clone = false;
 			if ((abs(xsel - x) <= 1) && (abs(ysel - y) <= 1))
-			{
 				// Yes - they moved one square, so clone it.
-				m_BoardState.setPieceAt(x, y, m_BoardState.getPlayer());
-				m_BoardState.clearSelection();
-				m_BoardState.nextPlayer();
-				move_made(xsel, ysel, x, y);
-			}
+				clone = true;
 			else if ((abs(xsel - x) <= 2) && (abs(ysel - y) <= 2))
+				// Yes - they moved two squares, so jump it.
+				clone = false;
+			else
 			{
-				// Yes - they moved two squares.
-				m_BoardState.setPieceAt(x, y, m_BoardState.getPlayer());
-				m_BoardState.setPieceAt(xsel, ysel, player_none);
-				m_BoardState.clearSelection();
-				m_BoardState.nextPlayer();
-				move_made(xsel, ysel, x, y);
+				// Nope - the square's empty, but it's out of range.
+				invalid_move();
+				return;
 			}
+			// If we get here, a valid move was chosen, so update the board
+			// and advance the state of the game.
+			m_BoardState.setPieceAt(x, y, m_BoardState.getPlayer());
+			if (!clone)
+				m_BoardState.setPieceAt(xsel, ysel, player_none);
+			m_BoardState.clearSelection();
+			
+			// Capture enemy pieces
+			for (int xx = x - 1; xx <= x + 1; ++xx)
+			{
+				for (int yy = y - 1; yy <= y + 1; ++yy)
+				{
+					if ((xx < 0) || (xx >= m_BoardState.getWidth()) || (yy < 0) || (yy >= m_BoardState.getHeight()))
+						continue;
+					if (m_BoardState.getPieceAt(xx, yy) == player_none)
+						continue;
+					m_BoardState.setPieceAt(xx, yy, m_BoardState.getPlayer());
+				}
+			}
+			
+			// Can the next player actually move?
+			// If not, skip until we find someone who can.
+			// If we come full circle, the game has ended.
+			piece endplayer = m_BoardState.getPlayer();
+			piece nextplayer = m_BoardState.nextPlayer();
+			bool gameover = false;
+			while (!canMove(nextplayer))
+			{
+				nextplayer = m_BoardState.nextPlayer();
+				if (nextplayer == endplayer)
+				{
+					gameover = true;
+					break;
+				}
+			}
+			
+			move_made(xsel, ysel, x, y, gameover);
 		}
 	}
+}
+
+// Can the given player actually move?
+// A player can move if there is an empty square within 2 squares
+// of one of their pieces.
+bool Game::canMove(const piece player) const
+{
+	bool result = false;
+	int bw, bh;
+	bw = m_BoardState.getWidth();
+	bh = m_BoardState.getHeight();
+	for (int x = 0; x < bw; ++x)
+	{
+		for (int y = 0; y < bh; ++y)
+		{
+			if (m_BoardState.getPieceAt(x, y) != player)
+				continue;
+			for (int xx = x - 2; xx <= x + 2; ++xx)
+			{
+				for (int yy = y - 2; yy <= y + 2; ++yy)
+				{
+					if ((xx < 0) || (xx >= bw) || (yy < 0) || (yy >= bh))
+						continue;
+					if (m_BoardState.getPieceAt(xx, yy) == player_none)
+					{
+						result = true;
+						break;
+					}
+				}
+				if (result)
+					break;
+			}
+			if (result)
+				break;
+		}
+		if (result)
+			break;
+	}
+	return result;
 }

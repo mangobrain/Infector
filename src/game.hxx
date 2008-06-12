@@ -30,7 +30,7 @@ class Game: public sigc::trackable
 		Game(GameBoard* b, const piece lastplayer, const int bw, const int bh);
 	
 		// Signals we can emit
-		sigc::signal<void, const int, const int, const int, const int>
+		sigc::signal<void, const int, const int, const int, const int, const bool>
 			move_made;
 		sigc::signal<void> invalid_move;
 		sigc::signal<void> invalid_piece_selection;
@@ -43,6 +43,9 @@ class Game: public sigc::trackable
 		// Event handlers
 		// Board clicked
 		void onSquareClicked(const int x, const int y);
+		
+		// Can the given player actually move?
+		bool canMove(const piece player) const;
 };
 
 #endif

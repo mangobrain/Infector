@@ -45,8 +45,8 @@
 
 // Constructor
 GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::DrawingArea(cobject), m_DefaultBoardState(player_2, 8, 8),
-	m_pBoardState(NULL)
+	: Gtk::DrawingArea(cobject), m_DefaultBoardState(player_2, 8, 8), m_pBoardState(NULL),
+	bw(8), bh(8)
 {
 	// Connect mouse click events to the onClick handler
 	signal_button_press_event().connect(sigc::mem_fun(*this, &GameBoard::onClick));
@@ -81,7 +81,6 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 	{
 		// Create a Cairo context for drawing onto the window
 		Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
-		cr->set_antialias(Cairo::ANTIALIAS_NONE);
 
 		// Set clip region for the context so we only really repaint
 		// the area which needs to be redrawn
@@ -90,20 +89,21 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 
 		// Draw checkerboard pattern scaled up to widget's current size
 		Gtk::Allocation alloc = get_allocation();
-		const int w(alloc.get_width());
-		const int h(alloc.get_height());
+		int w(alloc.get_width());
+		int h(alloc.get_height());
 		double x = 0, y = 0;
-		double xinc = (const double)w/8.0;
-		double yinc = (const double)h/8.0;
+		double xinc = (double)w/bw;
+		double yinc = (double)h/bh;
 		double hxinc = xinc / 2.0;
 		double hyinc = yinc / 2.0;
 
-		for (int i = 0; i < 8; ++i)
+		const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
+		
+		for (int i = 0; i < bh; ++i)
 		{
-			for (int j = 0; j < 8; ++j)
+			for (int j = 0; j < bw; ++j)
 			{
 				bool draw = true;
-				const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
 				switch (current->getPieceAt(j, i))
 				{
 					case player_1:
@@ -123,6 +123,7 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 				}
 				if (draw)
 				{
+					cr->set_antialias(Cairo::ANTIALIAS_NONE);
 					cr->rectangle(x, y, xinc, yinc);
 					cr->fill();
 				}
@@ -131,10 +132,12 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 				int xsel, ysel;
 				current->getSelectedPiece(xsel, ysel);
 				draw = false;
+				bool self = false;
 				if (i == ysel && j == xsel)
 				{
 					cr->set_source_rgb(1, 1, 1);
 					draw = true;
+					self = true;
 				}
 				else if (xsel != -1 && ysel != -1)
 				{
@@ -149,7 +152,7 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 						draw = true;
 					}
 				}
-				if (draw)
+				if (self || (draw && (current->getPieceAt(j, i) == player_none)))
 				{
 					std::vector<double> dashes;
 					dashes.push_back(2);
@@ -175,8 +178,8 @@ bool GameBoard::onClick(GdkEventButton *event)
 	Gtk::Allocation alloc = get_allocation();
 	const int w(alloc.get_width());
 	const int h(alloc.get_height());
-	double xinc = (const double)w/8.0;
-	double yinc = (const double)h/8.0;
+	double xinc = (const double)w/bw;
+	double yinc = (const double)h/bh;
 	int x = (int)(event->x / xinc);
 	int y = (int)(event->y / yinc);
 
@@ -197,9 +200,15 @@ void GameBoard::newGame(Game *g, const BoardState *b)
 
 	// Store pointer to shared board state
 	m_pBoardState = b;
+	bw = b->getWidth();
+	bh = b->getHeight();
 
 	// Refresh the board
+	setBackground();
 	queue_draw();
+	
+	// Enable user interaction
+	set_sensitive(true);
 }
 
 // Set the widget's background pixmap to the empty board
@@ -218,12 +227,12 @@ void GameBoard::setBackground()
 	
 	// Draw board on pixmap
 	double x = 0, y = 0;
-	double xinc = (double)w/8.0;
-	double yinc = (double)h/8.0;
+	double xinc = (double)w/bw;
+	double yinc = (double)h/bh;
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < bh; ++i)
 	{
-		for (int j = 0; j < 8; ++j)
+		for (int j = 0; j < bw; ++j)
 		{
 			if (i % 2)
 			{
@@ -261,8 +270,12 @@ bool GameBoard::onResize(GdkEventConfigure *event)
 	return true;
 }
 
-void GameBoard::onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y)
+void GameBoard::onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y, const bool gameover)
 {
 	// TODO - Some form of animation
 	queue_draw();
+	
+	// Disable clicking when game is over - until next game starts
+	if (gameover)
+		set_sensitive(false);
 }

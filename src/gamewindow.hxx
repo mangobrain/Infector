@@ -29,7 +29,7 @@ class GameWindow: public Gtk::Window
 
 		// Pointers to various dialogues, instantiated as needed
 		std::auto_ptr<Gtk::AboutDialog> m_pAboutDialog;
-		std::auto_ptr<Gtk::Dialog> m_pNewGameDialog;
+		std::auto_ptr<NewGameDialog> m_pNewGameDialog;
 
 		// Game board display (derived widget)
 		GameBoard *m_pBoard;

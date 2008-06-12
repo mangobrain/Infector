@@ -38,7 +38,7 @@ class GameBoard: public Gtk::DrawingArea
 		bool onResize(GdkEventConfigure *event);
 
 		// Callbacks for various game events
-		void onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y);
+		void onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y, const bool gameover);
 		void onInvalidMove();
 		
 		// Set the background pixmap of the widget to the empty board
@@ -47,6 +47,9 @@ class GameBoard: public Gtk::DrawingArea
 		// Default & current state of game board
 		BoardState m_DefaultBoardState;
 		const BoardState *m_pBoardState;
+		
+		// Size of current game board
+		int bw, bh;
 };
 
 #endif
