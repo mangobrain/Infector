@@ -18,6 +18,8 @@
 #ifndef __INFECTOR_BOARDSTATE_HXX__
 #define __INFECTOR_BOARDSTATE_HXX__
 
+class Game;
+
 // Enumerated type for board square states
 enum piece
 {
@@ -35,9 +37,13 @@ class BoardState
 		
 		// Property accessors
 		piece getPieceAt(const int x, const int y) const;
+		void setPieceAt(const int x, const int y, const piece p);
 		int getWidth() const;
 		int getHeight() const;
 		piece getPlayer() const;
+		void getSelectedPiece(int &x, int &y) const;
+		void setSelectedPiece(const int x, const int y);
+		void clearSelection();
 		
 		// Advance to the next player's turn and return the new current player
 		piece nextPlayer();
@@ -47,6 +53,7 @@ class BoardState
 		piece current_player;
 		piece m_lastplayer;
 		std::vector<std::vector<piece> > pieces;
+		int xsel, ysel;
 };
 
 #endif

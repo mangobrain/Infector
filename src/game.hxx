@@ -34,7 +34,7 @@ class Game: public sigc::trackable
 			move_made;
 		sigc::signal<void> invalid_move;
 		sigc::signal<void> invalid_piece_selection;
-		sigc::signal<void, const int, const int> select_piece;
+		sigc::signal<void> select_piece;
 
 	private:
 		// Board state

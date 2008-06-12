@@ -38,7 +38,7 @@
 //
 
 BoardState::BoardState(const piece lastplayer, const int width, const int height)
-	: current_player(player_1), m_lastplayer(lastplayer)
+	: current_player(player_1), m_lastplayer(lastplayer), xsel(-1), ysel(-1)
 {
 	pieces.resize(width);
 	for (std::vector<std::vector<piece> >::iterator i = pieces.begin(); i != pieces.end(); ++i)
@@ -67,6 +67,11 @@ piece BoardState::getPieceAt(const int x, const int y) const
 	return pieces.at(x).at(y);
 }
 
+void BoardState::setPieceAt(const int x, const int y, const piece p)
+{
+	pieces[x][y] = p;
+}
+
 int BoardState::getWidth() const
 {
 	return pieces.size();
@@ -80,6 +85,24 @@ int BoardState::getHeight() const
 piece BoardState::getPlayer() const
 {
 	return current_player;
+}
+
+void BoardState::getSelectedPiece(int &x, int &y) const
+{
+	x = xsel;
+	y = ysel;
+}
+
+void BoardState::setSelectedPiece(const int x, const int y)
+{
+	xsel = x;
+	ysel = y;
+}
+
+void BoardState::clearSelection()
+{
+	xsel = -1;
+	ysel = -1;
 }
 
 // Advance to the next player's turn and return the new current player

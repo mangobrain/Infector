@@ -45,7 +45,7 @@
 
 // Constructor
 GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::DrawingArea(cobject), xsel(-1), ysel(-1), m_DefaultBoardState(player_2, 8, 8),
+	: Gtk::DrawingArea(cobject), m_DefaultBoardState(player_2, 8, 8),
 	m_pBoardState(NULL)
 {
 	// Connect mouse click events to the onClick handler
@@ -63,6 +63,13 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::X
 	
 	// The background will need to be redrawn whenever the widget is resized
 	signal_configure_event().connect(sigc::mem_fun(*this, &GameBoard::onResize), true);
+	
+	// Don't put pieces on the default board - it looks like a game is in play
+	m_DefaultBoardState.setPieceAt(0, 0, player_none);
+	m_DefaultBoardState.setPieceAt(0, 7, player_none);
+	m_DefaultBoardState.setPieceAt(7, 0, player_none);
+	m_DefaultBoardState.setPieceAt(7, 7, player_none);
+	m_DefaultBoardState.clearSelection();
 }
 
 // Expose (redraw) event handler
@@ -121,6 +128,8 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 				}
 				
 				// Highlight currently selected square and possible moves
+				int xsel, ysel;
+				current->getSelectedPiece(xsel, ysel);
 				draw = false;
 				if (i == ysel && j == xsel)
 				{
@@ -182,13 +191,12 @@ bool GameBoard::onClick(GdkEventButton *event)
 void GameBoard::newGame(Game *g, const BoardState *b)
 {
 	// TODO - Implement signal handlers and uncomment this
-	//g->move_made.connect(sigc::mem_fun(*this, &GameBoard::onMoveMade));
+	g->move_made.connect(sigc::mem_fun(*this, &GameBoard::onMoveMade));
 	//g->invalid_move.connect(sigc::mem_fun(*this, &GameBoard::onInvalidMove));
-	g->select_piece.connect(sigc::mem_fun(*this, &GameBoard::onSelectPiece));
+	g->select_piece.connect(sigc::mem_fun(*this, &GameBoard::queue_draw));
 
 	// Store pointer to shared board state
 	m_pBoardState = b;
-	xsel = -1; ysel = -1;
 
 	// Refresh the board
 	queue_draw();
@@ -253,8 +261,8 @@ bool GameBoard::onResize(GdkEventConfigure *event)
 	return true;
 }
 
-void GameBoard::onSelectPiece(const int x, const int y)
+void GameBoard::onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y)
 {
-	xsel = x; ysel = y;
+	// TODO - Some form of animation
 	queue_draw();
 }

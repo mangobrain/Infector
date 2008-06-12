@@ -26,6 +26,7 @@
 #endif
 
 // Language headers
+#include <cstdlib>
 #include <iostream>
 
 // Library headers
@@ -60,9 +61,44 @@ Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh)
 // Board square clicked
 void Game::onSquareClicked(const int x, const int y)
 {
-	// Check who's turn it is and verify that they're clicking
+	// If the current player is clicking on their own piece, highlight it.
 	if (m_BoardState.getPieceAt(x, y) == m_BoardState.getPlayer())
-		select_piece(x, y);
-	else
+	{
+		m_BoardState.setSelectedPiece(x, y);
+		select_piece();
+		return;
+	}
+	
+	// Is a piece currently highlighted?
+	int xsel, ysel;
+	m_BoardState.getSelectedPiece(xsel, ysel);
+	if (xsel == -1 || ysel == -1)
+		// Nope, and they haven't clicked one of their own.
 		invalid_move();
+	else {
+		// Yes! Is it a valid move?
+		if (((xsel == x) && (ysel == y)) || (m_BoardState.getPieceAt(x, y) != player_none))
+			// Nope - they tried to move the piece onto itself, or the
+			// destination square isn't empty.
+			invalid_move();
+		else {
+			if ((abs(xsel - x) <= 1) && (abs(ysel - y) <= 1))
+			{
+				// Yes - they moved one square, so clone it.
+				m_BoardState.setPieceAt(x, y, m_BoardState.getPlayer());
+				m_BoardState.clearSelection();
+				m_BoardState.nextPlayer();
+				move_made(xsel, ysel, x, y);
+			}
+			else if ((abs(xsel - x) <= 2) && (abs(ysel - y) <= 2))
+			{
+				// Yes - they moved two squares.
+				m_BoardState.setPieceAt(x, y, m_BoardState.getPlayer());
+				m_BoardState.setPieceAt(xsel, ysel, player_none);
+				m_BoardState.clearSelection();
+				m_BoardState.nextPlayer();
+				move_made(xsel, ysel, x, y);
+			}
+		}
+	}
 }
