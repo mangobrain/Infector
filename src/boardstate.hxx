@@ -33,7 +33,7 @@ enum piece
 class BoardState
 {
 	public:
-		BoardState(const piece lastplayer, const int width, const int height);
+		BoardState(const piece lastplayer, const int width, const int height, const bool hexagonal);
 		
 		// Property accessors
 		piece getPieceAt(const int x, const int y) const;
@@ -41,8 +41,8 @@ class BoardState
 		int getWidth() const;
 		int getHeight() const;
 		piece getPlayer() const;
-		void getSelectedPiece(int &x, int &y) const;
-		void setSelectedPiece(const int x, const int y);
+		void getSelectedSquare(int &x, int &y) const;
+		void setSelectedSquare(const int x, const int y);
 		void clearSelection();
 		
 		// Advance to the next player's turn and return the new current player
@@ -52,7 +52,9 @@ class BoardState
 		// Game info
 		piece current_player;
 		piece m_lastplayer;
-		std::vector<std::vector<piece> > pieces;
+		// Board state - store each column with an explicit vertical offset (for
+		// supporting hexagonal boards)
+		std::vector<std::pair<unsigned int, std::vector<piece> > > pieces;
 		int xsel, ysel;
 };
 

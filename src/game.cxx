@@ -45,7 +45,7 @@
 
 // Constructor
 Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh)
-	: m_BoardState(lastplayer, bw, bh)
+	: m_BoardState(lastplayer, bw, bh, false)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother
@@ -63,14 +63,14 @@ void Game::onSquareClicked(const int x, const int y)
 	// If the current player is clicking on their own piece, highlight it.
 	if (m_BoardState.getPieceAt(x, y) == m_BoardState.getPlayer())
 	{
-		m_BoardState.setSelectedPiece(x, y);
+		m_BoardState.setSelectedSquare(x, y);
 		select_piece();
 		return;
 	}
 	
 	// Is a piece currently highlighted?
 	int xsel, ysel;
-	m_BoardState.getSelectedPiece(xsel, ysel);
+	m_BoardState.getSelectedSquare(xsel, ysel);
 	if (xsel == -1 || ysel == -1)
 		// Nope, and they haven't clicked one of their own.
 		invalid_move();

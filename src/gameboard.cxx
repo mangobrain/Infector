@@ -45,7 +45,7 @@
 
 // Constructor
 GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::DrawingArea(cobject), m_DefaultBoardState(player_2, 8, 8), m_pBoardState(NULL),
+	: Gtk::DrawingArea(cobject), m_DefaultBoardState(player_2, 8, 8, false), m_pBoardState(NULL),
 	bw(8), bh(8)
 {
 	// Connect mouse click events to the onClick handler
@@ -130,7 +130,7 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 				
 				// Highlight currently selected square and possible moves
 				int xsel, ysel;
-				current->getSelectedPiece(xsel, ysel);
+				current->getSelectedSquare(xsel, ysel);
 				draw = false;
 				bool self = false;
 				if (i == ysel && j == xsel)

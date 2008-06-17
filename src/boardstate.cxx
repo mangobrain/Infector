@@ -26,6 +26,7 @@
 #endif
 
 // Language headers
+#include <utility>
 #include <vector>
 
 // System headers
@@ -37,39 +38,82 @@
 // Implementation
 //
 
-BoardState::BoardState(const piece lastplayer, const int width, const int height)
+BoardState::BoardState(const piece lastplayer, const int width, const int height, const bool hexagonal)
 	: current_player(player_1), m_lastplayer(lastplayer), xsel(-1), ysel(-1)
 {
-	pieces.resize(width);
-	for (std::vector<std::vector<piece> >::iterator i = pieces.begin(); i != pieces.end(); ++i)
+	if (hexagonal)
 	{
-		i->resize(height);
-	}
-	switch (lastplayer)
-	{
-		case player_2:
-			pieces[0][0] = player_2;
-			pieces[width - 1][height - 1] = player_2;
-			pieces[0][height - 1] = player_1;
-			pieces[width - 1][0] = player_1;
-			break;
-		case player_4:
-			pieces[0][0] = player_3;
-			pieces[width - 1][height - 1] = player_2;
-			pieces[0][height - 1] = player_1;
-			pieces[width - 1][0] = player_4;
+		// Hexagonal board
+		// Store each column with its own unique length and vertical offset, so
+		// that we don't waste any memory.
+		
+		// Number or columns
+		pieces.resize((width + height) - 1);
+		// First column is w squares heigh - "height" refers to length of diagonal
+		int current_height = width;
+		// Columns get longer, until the midpoint, then start shrinking again
+		bool growing = true;
+		// When we get past the midpoint, we also start having a vertical offset
+		int current_offset = 0;
+		
+		for (std::vector<std::pair<unsigned int, std::vector<piece> > >::iterator i = pieces.begin(); i != pieces.end(); ++i)
+		{
+			i->first = current_offset;
+			i->second.resize(current_height);
+			if (growing)
+			{
+				++current_height;
+				if (current_height == (width + height) -1)
+					growing = false;
+			} else {
+				--current_height;
+				++current_offset;
+			}
+		}
+	} else {
+		// Traditional square board with a player at each corner
+		pieces.resize(width);
+		for (std::vector<std::pair<unsigned int, std::vector<piece> > >::iterator i = pieces.begin(); i != pieces.end(); ++i)
+		{
+			i->second.resize(height);
+			i->first = 0;
+		}
+		switch (lastplayer)
+		{
+			case player_2:
+				pieces[0].second[0] = player_2;
+				pieces[width - 1].second[height - 1] = player_2;
+				pieces[0].second[height - 1] = player_1;
+				pieces[width - 1].second[0] = player_1;
+				break;
+			case player_4:
+				pieces[0].second[0] = player_3;
+				pieces[width - 1].second[height - 1] = player_2;
+				pieces[0].second[height - 1] = player_1;
+				pieces[width - 1].second[0] = player_4;
+		}
 	}
 }
 
 // Property accessors
 piece BoardState::getPieceAt(const int x, const int y) const
 {
-	return pieces.at(x).at(y);
+	// Take into account unallocated squares in hexagonal board
+	int offset_y = y - pieces.at(x).first;
+	if ((offset_y < 0) || (offset_y >= pieces.at(x).second.size()))
+		return player_none;
+
+	return pieces.at(x).second.at(offset_y);
 }
 
 void BoardState::setPieceAt(const int x, const int y, const piece p)
 {
-	pieces[x][y] = p;
+	// Take into account unallocated squares in hexagonal board
+	int offset_y = y - pieces.at(x).first;
+	if ((offset_y < 0) || (offset_y >= pieces.at(x).second.size()))
+		return;
+
+	pieces[x].second[offset_y] = p;
 }
 
 int BoardState::getWidth() const
@@ -79,7 +123,9 @@ int BoardState::getWidth() const
 
 int BoardState::getHeight() const
 {
-	return pieces.at(0).size();
+	// In memory, a hexagonal board is always square, just with some unallocated spaces
+	// - so this isn't "correct", but that doesn't matter much, as it isn't used during rendering.
+	return pieces.at(0).second.size();
 }
 
 piece BoardState::getPlayer() const
@@ -87,13 +133,13 @@ piece BoardState::getPlayer() const
 	return current_player;
 }
 
-void BoardState::getSelectedPiece(int &x, int &y) const
+void BoardState::getSelectedSquare(int &x, int &y) const
 {
 	x = xsel;
 	y = ysel;
 }
 
-void BoardState::setSelectedPiece(const int x, const int y)
+void BoardState::setSelectedSquare(const int x, const int y)
 {
 	xsel = x;
 	ysel = y;
