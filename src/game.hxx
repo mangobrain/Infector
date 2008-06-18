@@ -27,7 +27,7 @@ class Game: public sigc::trackable
 		// Constructor - pass in game board so we can pick up
 		// on emitted signals when it is clicked, and pass in
 		// game properties (board size & number of players)
-		Game(GameBoard* b, const piece lastplayer, const int bw, const int bh);
+		Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, const bool hexagonal);
 	
 		// Signals we can emit
 		sigc::signal<void, const int, const int, const int, const int, const bool>

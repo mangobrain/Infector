@@ -47,11 +47,37 @@ NewGameDialog::NewGameDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::
 	refXml->get_widget("numplayerscombo", m_pNumPlayers);
 	m_pNumPlayers->signal_changed().connect(sigc::mem_fun(*this, &NewGameDialog::onChangePlayers));
 	
+	// When the board shape is changed, show/hide the player 3 & 4 type controls
+	// and the number-of-players controls
+	refXml->get_widget("boardshapecombo", m_pBoardShape);
+	m_pBoardShape->signal_changed().connect(sigc::mem_fun(*this, &NewGameDialog::onChangeShape));	
+	
 	refXml->get_widget("bluelabel", m_pPlayer3Label);
 	refXml->get_widget("yellowlabel", m_pPlayer4Label);
+	refXml->get_widget("playernumlabel", m_pPlayerNumLabel);
 	refXml->get_widget("bluecombo", m_pPlayer3Box);
 	refXml->get_widget("yellowcombo", m_pPlayer4Box);
 	refXml->get_widget("boardsizecombo", m_pBoardSize);
+
+	// XXX Set default items for our ComboBoxes.
+	// Doing this in the Glade XML itself causes errors.
+	
+	// Default board size to 8x8, shape square
+	m_pBoardSize->set_active(1);
+	m_pBoardShape->set_active(0);
+
+	// 2 players	
+	m_pNumPlayers->set_active(0);
+	
+	// Red, blue & yellow: human, green: computer
+	m_pPlayer3Box->set_active(0);
+	m_pPlayer4Box->set_active(0);
+	Gtk::ComboBox *pPlayer1Box;
+	Gtk::ComboBox *pPlayer2Box;
+	refXml->get_widget("redcombo", pPlayer1Box);
+	refXml->get_widget("greencombo", pPlayer2Box);	
+	pPlayer1Box->set_active(0);
+	pPlayer2Box->set_active(1);
 }
 
 void NewGameDialog::onChangePlayers()
@@ -67,9 +93,30 @@ void NewGameDialog::onChangePlayers()
 		show_all();
 }
 
+void NewGameDialog::onChangeShape()
+{
+	if (m_pBoardShape->get_active_row_number() == 0)
+	{
+		// Square
+		m_pBoardSize->set_active(1);
+		m_pNumPlayers->show();
+		m_pPlayerNumLabel->show();
+		onChangePlayers();
+	} else {
+		// Hexagonal
+		m_pBoardSize->set_active(0);
+		m_pNumPlayers->hide();
+		m_pPlayerNumLabel->hide();
+		m_pPlayer3Label->hide();
+		m_pPlayer4Label->hide();
+		m_pPlayer3Box->hide();
+		m_pPlayer4Box->hide();
+	}
+}
+
 piece NewGameDialog::getLastPlayer() const
 {
-	if (m_pNumPlayers->get_active_row_number() == 0)
+	if ((m_pNumPlayers->get_active_row_number() == 0) || (m_pBoardShape->get_active_row_number() == 1))
 		return player_2;
 	else
 		return player_4;
@@ -80,15 +127,23 @@ void NewGameDialog::getBoardSize(int &w, int &h) const
 	switch (m_pBoardSize->get_active_row_number())
 	{
 		case 0:
-			w = 8; h = 8;
+			w = 5; h = 5;
 			break;
 		case 1:
-			w = 10; h = 10;
+			w = 8; h = 8;
 			break;
 		case 2:
-			w = 14; h = 14;
+			w = 10; h = 10;
 			break;
 		case 3:
+			w = 14; h = 14;
+			break;
+		default:
 			w = 20; h = 20;
 	}
+}
+
+bool NewGameDialog::isBoardHexagonal() const
+{
+	return m_pBoardShape->get_active_row_number() == 1;
 }

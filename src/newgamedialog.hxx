@@ -27,17 +27,21 @@ class NewGameDialog: public Gtk::Dialog
 		// Game property accessors
 		piece getLastPlayer() const;
 		void getBoardSize(int &w, int &h) const;
+		bool isBoardHexagonal() const;
 
 	private:
 		Gtk::ComboBox *m_pNumPlayers;
 		Gtk::ComboBox *m_pBoardSize;
+		Gtk::ComboBox *m_pBoardShape;
 		Gtk::Label *m_pPlayer3Label;
 		Gtk::Label *m_pPlayer4Label;
+		Gtk::Label *m_pPlayerNumLabel;
 		Gtk::ComboBox *m_pPlayer3Box;
 		Gtk::ComboBox *m_pPlayer4Box;
 
 		// Event handlers
 		void onChangePlayers();
+		void onChangeShape();
 };
 
 #endif

@@ -44,8 +44,8 @@
 //
 
 // Constructor
-Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh)
-	: m_BoardState(lastplayer, bw, bh, true)
+Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, const bool hexagonal)
+	: m_BoardState(lastplayer, bw, bh, hexagonal)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother

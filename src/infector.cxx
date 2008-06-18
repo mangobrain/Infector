@@ -146,21 +146,6 @@ void GameWindow::onNewGame()
 		NewGameDialog *pNewGameDialog;
 		m_refXml->get_widget_derived("newgamedialog", pNewGameDialog);
 		m_pNewGameDialog.reset(pNewGameDialog);
-		// XXX Set default items for our ComboBoxes.
-		// Doing this in the Glade XML itself causes errors.
-		Gtk::ComboBox *pComboBox;
-		m_refXml->get_widget("numplayerscombo", pComboBox);
-		pComboBox->set_active(0);	// 2 players
-		m_refXml->get_widget("boardsizecombo", pComboBox);
-		pComboBox->set_active(0);	// 8x8 board
-		m_refXml->get_widget("redcombo", pComboBox);
-		pComboBox->set_active(0);	// one human..
-		m_refXml->get_widget("greencombo", pComboBox);
-		pComboBox->set_active(1);	// ..versus the AI
-		m_refXml->get_widget("bluecombo", pComboBox);
-		pComboBox->set_active(0);	// others are human if enabled
-		m_refXml->get_widget("yellowcombo", pComboBox);
-		pComboBox->set_active(0);
 	}
 	
 	// Block whilst showing the dialogue, then hide it when it's dismissed
@@ -173,6 +158,6 @@ void GameWindow::onNewGame()
 		// Stop the current running game and start a new one
 		int w, h;
 		m_pNewGameDialog->getBoardSize(w, h);
-		m_pGame.reset(new Game(m_pBoard, m_pNewGameDialog->getLastPlayer(), w, h));
+		m_pGame.reset(new Game(m_pBoard, m_pNewGameDialog->getLastPlayer(), w, h, m_pNewGameDialog->isBoardHexagonal()));
 	}
 }

@@ -183,14 +183,17 @@ int BoardState::getWidth() const
 
 int BoardState::getHeight() const
 {
-	// In memory, a hexagonal board is always square, just with some unallocated spaces
-	// - so this isn't "correct", but that doesn't matter much, as it isn't used during rendering.
 	return bh;
 }
 
 piece BoardState::getPlayer() const
 {
 	return current_player;
+}
+
+bool BoardState::getHexagonal() const
+{
+	return m_hexagonal;
 }
 
 void BoardState::getSelectedSquare(int &x, int &y) const

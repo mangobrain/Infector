@@ -42,6 +42,7 @@ class BoardState
 		int getWidth() const;
 		int getHeight() const;
 		piece getPlayer() const;
+		bool getHexagonal() const;
 		void getSelectedSquare(int &x, int &y) const;
 		void setSelectedSquare(const int x, const int y);
 		void clearSelection();
