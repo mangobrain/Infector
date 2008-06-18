@@ -45,7 +45,7 @@
 
 // Constructor
 Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh)
-	: m_BoardState(lastplayer, bw, bh, false)
+	: m_BoardState(lastplayer, bw, bh, true)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother
@@ -78,14 +78,15 @@ void Game::onSquareClicked(const int x, const int y)
 		// Yes! Is it a valid move?
 		if (((xsel == x) && (ysel == y)) || (m_BoardState.getPieceAt(x, y) != player_none))
 			// Nope - they tried to move the piece onto itself, or the
-			// destination square isn't empty.
+			// destination square isn't empty/doesn't exist.
 			invalid_move();
 		else {
 			bool clone = false;
-			if ((abs(xsel - x) <= 1) && (abs(ysel - y) <= 1))
+			unsigned int distance = m_BoardState.getAdjacency(x, y, xsel, ysel);
+			if (distance == 1)
 				// Yes - they moved one square, so clone it.
 				clone = true;
-			else if ((abs(xsel - x) <= 2) && (abs(ysel - y) <= 2))
+			else if (distance == 2)
 				// Yes - they moved two squares, so jump it.
 				clone = false;
 			else
@@ -106,11 +107,14 @@ void Game::onSquareClicked(const int x, const int y)
 			{
 				for (int yy = y - 1; yy <= y + 1; ++yy)
 				{
-					if ((xx < 0) || (xx >= m_BoardState.getWidth()) || (yy < 0) || (yy >= m_BoardState.getHeight()))
+					// BoardState does range checking for us
+					piece capturesquare = m_BoardState.getPieceAt(xx, yy);
+					if ((capturesquare == player_none) || (capturesquare == no_such_square))
 						continue;
-					if (m_BoardState.getPieceAt(xx, yy) == player_none)
-						continue;
-					m_BoardState.setPieceAt(xx, yy, m_BoardState.getPlayer());
+					// Ask BoardState whether or not the piece is adjacent
+					// - it abstracts away the board shape for us
+					if (m_BoardState.getAdjacency(x, y, xx, yy) == 1)
+						m_BoardState.setPieceAt(xx, yy, m_BoardState.getPlayer());
 				}
 			}
 			
@@ -136,8 +140,8 @@ void Game::onSquareClicked(const int x, const int y)
 }
 
 // Can the given player actually move?
-// A player can move if there is an empty square within 2 squares
-// of one of their pieces.
+// A player can move if there is an empty square within a
+// distance of 2 from one of their pieces.
 bool Game::canMove(const piece player) const
 {
 	bool result = false;
@@ -154,9 +158,9 @@ bool Game::canMove(const piece player) const
 			{
 				for (int yy = y - 2; yy <= y + 2; ++yy)
 				{
-					if ((xx < 0) || (xx >= bw) || (yy < 0) || (yy >= bh))
-						continue;
-					if (m_BoardState.getPieceAt(xx, yy) == player_none)
+					
+					if ((m_BoardState.getAdjacency(x, y, xx, yy) > 0)
+						&& (m_BoardState.getPieceAt(xx, yy) == player_none))
 					{
 						result = true;
 						break;

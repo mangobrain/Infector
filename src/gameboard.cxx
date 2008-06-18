@@ -118,7 +118,7 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 					case player_4:
 						cr->set_source_rgb(1, 1, 0);
 						break;
-					case player_none:
+					default:
 						draw = false;
 				}
 				if (draw)
@@ -141,12 +141,13 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 				}
 				else if (xsel != -1 && ysel != -1)
 				{
-					if (abs(xsel - j) <= 1 && abs(ysel - i) <= 1)
+					unsigned int distance = current->getAdjacency(xsel, ysel, j, i);
+					if (distance == 1)
 					{
 						cr->set_source_rgb(1, 0.5, 1);
 						draw = true;
 					}
-					else if (abs(xsel - j) <= 2 && abs(ysel - i) <= 2)
+					else if (distance == 2)
 					{
 						cr->set_source_rgb(1, 0, 1);
 						draw = true;
