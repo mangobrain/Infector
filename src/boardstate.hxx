@@ -27,7 +27,8 @@ enum piece
 	player_1,
 	player_2,
 	player_3,
-	player_4
+	player_4,
+	no_such_square
 };
 
 class BoardState
@@ -48,6 +49,10 @@ class BoardState
 		// Advance to the next player's turn and return the new current player
 		piece nextPlayer();
 		
+		// Calculate whether one square is adjacent to another within 1 or 2 squares
+		// Return 0 (not adjacent), 1 ("clone" distance) or 2 ("jump" distance)
+		unsigned int getAdjacency(const int ax, const int ay, const int bx, const int by) const;
+		
 	private:
 		// Game info
 		piece current_player;
@@ -56,6 +61,8 @@ class BoardState
 		// supporting hexagonal boards)
 		std::vector<std::pair<unsigned int, std::vector<piece> > > pieces;
 		int xsel, ysel;
+		int bw, bh;
+		bool m_hexagonal;
 };
 
 #endif
