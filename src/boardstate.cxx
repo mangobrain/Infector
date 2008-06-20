@@ -83,7 +83,7 @@ BoardState::BoardState(const piece lastplayer, const int width, const int height
 		// Until we get past the midpoint, we also have a vertical offset
 		int current_offset = bh - 1;
 		
-		for (std::vector<std::pair<unsigned int, std::vector<piece> > >::iterator i = pieces.begin(); i != pieces.end(); ++i)
+		for (std::vector<std::pair<int, std::vector<piece> > >::iterator i = pieces.begin(); i != pieces.end(); ++i)
 		{
 			i->first = current_offset;
 			i->second.resize(current_height);
@@ -120,7 +120,7 @@ BoardState::BoardState(const piece lastplayer, const int width, const int height
 
 		// Traditional square board with a player at each corner
 		pieces.resize(bw);
-		for (std::vector<std::pair<unsigned int, std::vector<piece> > >::iterator i = pieces.begin(); i != pieces.end(); ++i)
+		for (std::vector<std::pair<int, std::vector<piece> > >::iterator i = pieces.begin(); i != pieces.end(); ++i)
 		{
 			i->second.resize(bh);
 			i->first = 0;
@@ -191,7 +191,7 @@ piece BoardState::getPlayer() const
 	return current_player;
 }
 
-bool BoardState::getHexagonal() const
+bool BoardState::isHexagonal() const
 {
 	return m_hexagonal;
 }
@@ -200,6 +200,11 @@ void BoardState::getSelectedSquare(int &x, int &y) const
 {
 	x = xsel;
 	y = ysel;
+}
+
+int BoardState::getInitialOffset() const
+{
+	return pieces.at(0).first;
 }
 
 void BoardState::setSelectedSquare(const int x, const int y)

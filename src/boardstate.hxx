@@ -42,10 +42,12 @@ class BoardState
 		int getWidth() const;
 		int getHeight() const;
 		piece getPlayer() const;
-		bool getHexagonal() const;
+		bool isHexagonal() const;
 		void getSelectedSquare(int &x, int &y) const;
 		void setSelectedSquare(const int x, const int y);
 		void clearSelection();
+		
+		int getInitialOffset() const;
 		
 		// Advance to the next player's turn and return the new current player
 		piece nextPlayer();
@@ -60,7 +62,7 @@ class BoardState
 		piece m_lastplayer;
 		// Board state - store each column with an explicit vertical offset (for
 		// supporting hexagonal boards)
-		std::vector<std::pair<unsigned int, std::vector<piece> > > pieces;
+		std::vector<std::pair<int, std::vector<piece> > > pieces;
 		int xsel, ysel;
 		int bw, bh;
 		bool m_hexagonal;

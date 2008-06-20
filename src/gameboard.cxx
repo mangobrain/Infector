@@ -123,7 +123,6 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 				}
 				if (draw)
 				{
-					cr->set_antialias(Cairo::ANTIALIAS_NONE);
 					cr->rectangle(x, y, xinc, yinc);
 					cr->fill();
 				}
@@ -158,7 +157,6 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 					std::vector<double> dashes;
 					dashes.push_back(2);
 					cr->set_dash(dashes, 0);
-					cr->set_antialias(Cairo::ANTIALIAS_DEFAULT);
 					cr->arc(x + hxinc, y + hyinc, hxinc / 2.0, 0, 2 * M_PI);
 					cr->stroke();
 				}
@@ -224,41 +222,99 @@ void GameBoard::setBackground()
 	Glib::RefPtr<Gdk::Pixmap> pixmap = Gdk::Pixmap::create(window, w, h, -1);
 	// Get Cairo context for drawing on the pixmap
 	Cairo::RefPtr<Cairo::Context> cr = pixmap->create_cairo_context();
-	cr->set_antialias(Cairo::ANTIALIAS_NONE);
-	
+	//cr->set_antialias(Cairo::ANTIALIAS_NONE);
+
 	// Draw board on pixmap
-	double x = 0, y = 0;
-	double xinc = (double)w/bw;
-	double yinc = (double)h/bh;
-
-	for (int i = 0; i < bh; ++i)
+	const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
+	if (current->isHexagonal())
 	{
-		for (int j = 0; j < bw; ++j)
-		{
-			if (i % 2)
-			{
-				if (j % 2)
-					cr->set_source_rgb(0.8, 0.8, 0.8);
-				else
-					cr->set_source_rgb(0.5, 0.5, 0.5);
-			} else {
-				if (j % 2)
-					cr->set_source_rgb(0.5, 0.5, 0.5);
-				else
-					cr->set_source_rgb(0.8, 0.8, 0.8);
-			}
-			cr->rectangle(x, y, xinc, yinc);
-			cr->fill();
-			x += xinc;
-		}
-		y += yinc;
-		x = 0;
-	}
+		// Horrid hexagonal board
+		Glib::RefPtr<const Gtk::Style> style = get_style();
+		Gdk::Color bg = style->get_background(Gtk::STATE_NORMAL);
+		cr->set_source_rgb(bg.get_red_p(), bg.get_green_p(), bg.get_blue_p());
+		cr->rectangle(0, 0, w, h);
+		cr->fill();
 
-	// Board outline
-	cr->set_source_rgb(0, 0, 0);
-	cr->rectangle(0, 0, w, h);
-	cr->stroke();
+		double x = 0;
+		double y = (double)h / 2;
+		double xinc = (double)w / ((bw - current->getInitialOffset()) * 2);
+		double yinc = xinc;
+		double txinc = xinc / 2;
+		double hyinc = yinc / 2;
+		
+		for (int i = 0; i < bh; ++i)
+		{
+			y = ((double) h / 2) + (i * hyinc);
+			x = ((txinc * 2) * (i - current->getInitialOffset())) + (txinc / 2);
+			for (int j = 0; j < bw; ++j)
+			{
+				if (current->getPieceAt(j, i) != no_such_square)
+				{
+					if (i % 2)
+					{
+						if (j % 2)
+							cr->set_source_rgb(0.8, 0.8, 0.8);
+						else
+							cr->set_source_rgb(0.5, 0.5, 0.5);
+					} else {
+						if (j % 2)
+							cr->set_source_rgb(0.25, 0.25, 0.25);
+						else
+							cr->set_source_rgb(0.4, 0.4, 0.4);
+					}
+					
+					cr->move_to(x, y);
+					cr->rel_line_to(txinc, hyinc);
+					cr->rel_line_to(txinc, 0);
+					cr->rel_line_to(txinc, -hyinc);
+					cr->rel_line_to(-txinc, -hyinc);
+					cr->rel_line_to(-txinc, 0);
+					
+					cr->close_path();
+					cr->fill();
+				}
+				x += (txinc * 2);
+				y -= hyinc;
+			}
+		}
+	} else {
+		// Traditional square board	
+		double x = 0, y = 0;
+		double xinc = (double)w/bw;
+		double yinc = (double)h/bh;
+		
+		cr->set_source_rgb(0.8, 0.8, 0.8);
+		cr->rectangle(0, 0, w, h);
+		cr->fill();
+
+		for (int i = 0; i < bh; ++i)
+		{
+			for (int j = 0; j < bw; ++j)
+			{
+				bool draw = true;
+				if (i % 2)
+				{
+					if (j % 2)
+						draw = false;
+					else
+						cr->set_source_rgb(0.5, 0.5, 0.5);
+				} else {
+					if (j % 2)
+						cr->set_source_rgb(0.5, 0.5, 0.5);
+					else
+						draw = false;
+				}
+				if (draw)
+				{
+					cr->rectangle(x, y, xinc, yinc);
+					cr->fill();
+				}
+				x += xinc;
+			}
+			y += yinc;
+			x = 0;
+		}
+	}
 	
 	// Set pixmap as widget background
 	window->set_back_pixmap(pixmap, false);
