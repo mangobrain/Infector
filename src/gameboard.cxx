@@ -265,13 +265,71 @@ bool GameBoard::onClick(GdkEventButton *event)
 	Gtk::Allocation alloc = get_allocation();
 	const int w(alloc.get_width());
 	const int h(alloc.get_height());
-	double xinc = (const double)w/bw;
-	double yinc = (const double)h/bh;
-	int x = (int)(event->x / xinc);
-	int y = (int)(event->y / yinc);
+	
+	const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
+	if (current->isHexagonal())
+	{
+		// Horrid hexagonal board
+		double x = 0;
+		double y = (double)h / 2;
+		double xinc = (double)w / ((bw - current->getInitialOffset()) * 2);
+		double yinc = xinc;
+		double hxinc = xinc / 2;
+		double hyinc = yinc / 2;
+		
+		for (int i = 0; i < bh; ++i)
+		{
+			y = ((double) h / 2) + (i * hyinc);
+			x = ((hxinc * 2) * (i - current->getInitialOffset())) + (hxinc / 2);
+			for (int j = 0; j < bw; ++j)
+			{
+				if (current->getPieceAt(j, i) != no_such_square)
+				{
+					// Point-in-hexagon test is split into three parts:
+					// - if relative x coord is between (hxinc) and (2 * hxinc), point in rectangle
+					// - if relative x coord is between 0 and hxinc, we're testing the left-hand diagonals
+					// - if relative x coord is between (2 * hxinc) and (3 * hxinc), we're testing
+					//   the right-hand diagonals
+					// Diagonals are at 45 degrees, so testing for being between the lines is easy.
+					int relx = event->x - x;
+					int rely = event->y - y;
+					if (relx >= hxinc && relx <= (hxinc * 2))
+					{
+						if (rely <= hyinc && rely => -hyinc)
+						{
+							square_clicked(j, i);
+							return true;
+						}
+					}
+					else if (relx > 0 && relx < hxinc)
+					{
+						if (abs(rely) <= relx)
+						{
+							square_clicked(j, i);
+							return true;
+						}
+					}
+					else if (relx > (hxinc * 2) && relx <= (hxinc * 3))
+					{
+						if (abs(rely) <= ((hxinc * 3) - relx))
+						{
+							square_clicked(j, i);
+							return true;
+						}
+					}
+				}
+			}
+		}
+	} else {
+		// Traditional square board
+		double xinc = (const double)w/bw;
+		double yinc = (const double)h/bh;
+		int x = (int)(event->x / xinc);
+		int y = (int)(event->y / yinc);
 
-	// Emit the square_clicked signal with these coordinates
-	square_clicked(x, y);
+		// Emit the square_clicked signal with these coordinates
+		square_clicked(x, y);
+	}
 	
 	return true;
 }
