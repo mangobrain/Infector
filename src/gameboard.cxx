@@ -70,7 +70,6 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::X
 	m_DefaultBoardState.setPieceAt(7, 0, player_none);
 	m_DefaultBoardState.setPieceAt(7, 7, player_none);
 	m_DefaultBoardState.clearSelection();
-	// TEST
 }
 
 // Expose (redraw) event handler
