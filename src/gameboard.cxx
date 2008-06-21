@@ -171,7 +171,7 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 							std::vector<double> dashes;
 							dashes.push_back(2);
 							cr->set_dash(dashes, 0);
-							cr->arc(x + hxinc, y + hyinc, hxinc / 2.0, 0, 2 * M_PI);
+							cr->arc(x + (hxinc * 1.5), y, hxinc / 2.0, 0, 2 * M_PI);
 							cr->stroke();
 						}
 					}
