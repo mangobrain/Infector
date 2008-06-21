@@ -291,11 +291,11 @@ bool GameBoard::onClick(GdkEventButton *event)
 					// - if relative x coord is between (2 * hxinc) and (3 * hxinc), we're testing
 					//   the right-hand diagonals
 					// Diagonals are at 45 degrees, so testing for being between the lines is easy.
-					int relx = event->x - x;
-					int rely = event->y - y;
+					int relx = (int)(event->x) - x;
+					int rely = (int)(event->y) - y;
 					if (relx >= hxinc && relx <= (hxinc * 2))
 					{
-						if (rely <= hyinc && rely => -hyinc)
+						if (rely <= hyinc && rely >= -hyinc)
 						{
 							square_clicked(j, i);
 							return true;
