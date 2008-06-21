@@ -91,80 +91,168 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 		Gtk::Allocation alloc = get_allocation();
 		int w(alloc.get_width());
 		int h(alloc.get_height());
-		double x = 0, y = 0;
-		double xinc = (double)w/bw;
-		double yinc = (double)h/bh;
-		double hxinc = xinc / 2.0;
-		double hyinc = yinc / 2.0;
 
 		const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
-		
-		for (int i = 0; i < bh; ++i)
+		if (current->isHexagonal())
 		{
-			for (int j = 0; j < bw; ++j)
+			// Horrid hexagonal board
+			double x = 0;
+			double y = (double)h / 2;
+			double xinc = (double)w / ((bw - current->getInitialOffset()) * 2);
+			double yinc = xinc;
+			double hxinc = xinc / 2;
+			double hyinc = yinc / 2;
+			
+			for (int i = 0; i < bh; ++i)
 			{
-				bool draw = true;
-				switch (current->getPieceAt(j, i))
+				y = ((double) h / 2) + (i * hyinc);
+				x = ((hxinc * 2) * (i - current->getInitialOffset())) + (hxinc / 2);
+				for (int j = 0; j < bw; ++j)
 				{
-					case player_1:
-						cr->set_source_rgb(1, 0, 0);
-						break;
-					case player_2:
-						cr->set_source_rgb(0, 1, 0);
-						break;
-					case player_3:
-						cr->set_source_rgb(0, 0, 1);
-						break;
-					case player_4:
-						cr->set_source_rgb(1, 1, 0);
-						break;
-					default:
+					if (current->getPieceAt(j, i) != no_such_square)
+					{
+						bool draw = true;
+						switch (current->getPieceAt(j, i))
+						{
+							case player_1:
+								cr->set_source_rgb(1, 0, 0);
+								break;
+							case player_2:
+								cr->set_source_rgb(0, 1, 0);
+								break;
+							case player_3:
+								cr->set_source_rgb(0, 0, 1);
+								break;
+							case player_4:
+								cr->set_source_rgb(1, 1, 0);
+								break;
+							default:
+								draw = false;
+						}
+						if (draw)
+						{
+							cr->move_to(x, y);
+							cr->rel_line_to(hxinc, hyinc);
+							cr->rel_line_to(hxinc, 0);
+							cr->rel_line_to(hxinc, -hyinc);
+							cr->rel_line_to(-hxinc, -hyinc);
+							cr->rel_line_to(-hxinc, 0);
+							
+							cr->close_path();
+							cr->fill();
+						}
+						// Highlight currently selected square and possible moves
+						int xsel, ysel;
+						current->getSelectedSquare(xsel, ysel);
 						draw = false;
-				}
-				if (draw)
-				{
-					cr->rectangle(x, y, xinc, yinc);
-					cr->fill();
-				}
-				
-				// Highlight currently selected square and possible moves
-				int xsel, ysel;
-				current->getSelectedSquare(xsel, ysel);
-				draw = false;
-				bool self = false;
-				if (i == ysel && j == xsel)
-				{
-					cr->set_source_rgb(1, 1, 1);
-					draw = true;
-					self = true;
-				}
-				else if (xsel != -1 && ysel != -1)
-				{
-					unsigned int distance = current->getAdjacency(xsel, ysel, j, i);
-					if (distance == 1)
-					{
-						cr->set_source_rgb(1, 0.5, 1);
-						draw = true;
+						bool self = false;
+						if (i == ysel && j == xsel)
+						{
+							cr->set_source_rgb(1, 1, 1);
+							draw = true;
+							self = true;
+						}
+						else if (xsel != -1 && ysel != -1)
+						{
+							unsigned int distance = current->getAdjacency(xsel, ysel, j, i);
+							if (distance == 1)
+							{
+								cr->set_source_rgb(1, 0.5, 1);
+								draw = true;
+							}
+							else if (distance == 2)
+							{
+								cr->set_source_rgb(1, 0, 1);
+								draw = true;
+							}
+						}
+						if (self || (draw && (current->getPieceAt(j, i) == player_none)))
+						{
+							std::vector<double> dashes;
+							dashes.push_back(2);
+							cr->set_dash(dashes, 0);
+							cr->arc(x + hxinc, y + hyinc, hxinc / 2.0, 0, 2 * M_PI);
+							cr->stroke();
+						}
 					}
-					else if (distance == 2)
-					{
-						cr->set_source_rgb(1, 0, 1);
-						draw = true;
-					}
+					x += (hxinc * 2);
+					y -= hyinc;
 				}
-				if (self || (draw && (current->getPieceAt(j, i) == player_none)))
-				{
-					std::vector<double> dashes;
-					dashes.push_back(2);
-					cr->set_dash(dashes, 0);
-					cr->arc(x + hxinc, y + hyinc, hxinc / 2.0, 0, 2 * M_PI);
-					cr->stroke();
-				}
-				
-				x += xinc;
 			}
-			y += yinc;
-			x = 0;
+		} else {
+			// Traditional square board
+			double x = 0, y = 0;
+			double xinc = (double)w/bw;
+			double yinc = (double)h/bh;
+			double hxinc = xinc / 2.0;
+			double hyinc = yinc / 2.0;
+			for (int i = 0; i < bh; ++i)
+			{
+				for (int j = 0; j < bw; ++j)
+				{
+					bool draw = true;
+					switch (current->getPieceAt(j, i))
+					{
+						case player_1:
+							cr->set_source_rgb(1, 0, 0);
+							break;
+						case player_2:
+							cr->set_source_rgb(0, 1, 0);
+							break;
+						case player_3:
+							cr->set_source_rgb(0, 0, 1);
+							break;
+						case player_4:
+							cr->set_source_rgb(1, 1, 0);
+							break;
+						default:
+							draw = false;
+					}
+					if (draw)
+					{
+						cr->rectangle(x, y, xinc, yinc);
+						cr->fill();
+					}
+					
+					// Highlight currently selected square and possible moves
+					int xsel, ysel;
+					current->getSelectedSquare(xsel, ysel);
+					draw = false;
+					bool self = false;
+					if (i == ysel && j == xsel)
+					{
+						cr->set_source_rgb(1, 1, 1);
+						draw = true;
+						self = true;
+					}
+					else if (xsel != -1 && ysel != -1)
+					{
+						unsigned int distance = current->getAdjacency(xsel, ysel, j, i);
+						if (distance == 1)
+						{
+							cr->set_source_rgb(1, 0.5, 1);
+							draw = true;
+						}
+						else if (distance == 2)
+						{
+							cr->set_source_rgb(1, 0, 1);
+							draw = true;
+						}
+					}
+					if (self || (draw && (current->getPieceAt(j, i) == player_none)))
+					{
+						std::vector<double> dashes;
+						dashes.push_back(2);
+						cr->set_dash(dashes, 0);
+						cr->arc(x + hxinc, y + hyinc, hxinc / 2.0, 0, 2 * M_PI);
+						cr->stroke();
+					}
+					
+					x += xinc;
+				}
+				y += yinc;
+				x = 0;
+			}
 		}
 	}
 	return true;
@@ -239,13 +327,13 @@ void GameBoard::setBackground()
 		double y = (double)h / 2;
 		double xinc = (double)w / ((bw - current->getInitialOffset()) * 2);
 		double yinc = xinc;
-		double txinc = xinc / 2;
+		double hxinc = xinc / 2;
 		double hyinc = yinc / 2;
 		
 		for (int i = 0; i < bh; ++i)
 		{
 			y = ((double) h / 2) + (i * hyinc);
-			x = ((txinc * 2) * (i - current->getInitialOffset())) + (txinc / 2);
+			x = ((hxinc * 2) * (i - current->getInitialOffset())) + (hxinc / 2);
 			for (int j = 0; j < bw; ++j)
 			{
 				if (current->getPieceAt(j, i) != no_such_square)
@@ -264,16 +352,16 @@ void GameBoard::setBackground()
 					}
 					
 					cr->move_to(x, y);
-					cr->rel_line_to(txinc, hyinc);
-					cr->rel_line_to(txinc, 0);
-					cr->rel_line_to(txinc, -hyinc);
-					cr->rel_line_to(-txinc, -hyinc);
-					cr->rel_line_to(-txinc, 0);
+					cr->rel_line_to(hxinc, hyinc);
+					cr->rel_line_to(hxinc, 0);
+					cr->rel_line_to(hxinc, -hyinc);
+					cr->rel_line_to(-hxinc, -hyinc);
+					cr->rel_line_to(-hxinc, 0);
 					
 					cr->close_path();
 					cr->fill();
 				}
-				x += (txinc * 2);
+				x += (hxinc * 2);
 				y -= hyinc;
 			}
 		}
