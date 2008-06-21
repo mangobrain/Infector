@@ -45,7 +45,7 @@
 
 // Constructor
 Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, const bool hexagonal)
-	: m_BoardState(lastplayer, bw, bh, hexagonal)
+	: m_BoardState(lastplayer, bw, bh, hexagonal), m_Score1(-1), m_Score2(-1), m_Score3(-1), m_Score4(-1)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother
@@ -55,6 +55,24 @@ Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, con
 	b->square_clicked.connect(sigc::mem_fun(*this, &Game::onSquareClicked));
 	
 	b->newGame(this, &m_BoardState);
+	
+	// Set initial scores
+	if (!hexagonal)
+	{
+		if (lastplayer == player_2)
+		{
+			m_Score1 = 2;
+			m_Score2 = 2;
+		} else {
+			m_Score1 = 1;
+			m_Score2 = 1;
+			m_Score3 = 1;
+			m_Score4 = 1;
+		}
+	} else {
+		m_Score1 = 3;
+		m_Score2 = 3;
+	}
 }
 
 // Board square clicked
@@ -84,8 +102,25 @@ void Game::onSquareClicked(const int x, const int y)
 			bool clone = false;
 			unsigned int distance = m_BoardState.getAdjacency(x, y, xsel, ysel);
 			if (distance == 1)
-				// Yes - they moved one square, so clone it.
+			{
+				// Yes - they moved one square, so clone it and update score.
 				clone = true;
+				switch (m_BoardState.getPlayer())
+				{
+					case player_1:
+						m_Score1++;
+						break;
+					case player_2:
+						m_Score2++;
+						break;
+					case player_3:
+						m_Score3++;
+						break;
+					default:
+						m_Score4++;
+						break;
+				}
+			}
 			else if (distance == 2)
 				// Yes - they moved two squares, so jump it.
 				clone = false;
@@ -114,7 +149,42 @@ void Game::onSquareClicked(const int x, const int y)
 					// Ask BoardState whether or not the piece is adjacent
 					// - it abstracts away the board shape for us
 					if (m_BoardState.getAdjacency(x, y, xx, yy) == 1)
-						m_BoardState.setPieceAt(xx, yy, m_BoardState.getPlayer());
+					{
+						// It is. Capture it and update scores.
+						piece oldplayer = m_BoardState.getPieceAt(xx, yy);
+						piece newplayer = m_BoardState.getPlayer();
+						m_BoardState.setPieceAt(xx, yy, newplayer);
+						switch (oldplayer)
+						{
+							case player_1:
+								m_Score1--;
+								break;
+							case player_2:
+								m_Score2--;
+								break;
+							case player_3:
+								m_Score3--;
+								break;
+							default:
+								m_Score4--;
+								break;
+						}
+						switch (newplayer)
+						{
+							case player_1:
+								m_Score1++;
+								break;
+							case player_2:
+								m_Score2++;
+								break;
+							case player_3:
+								m_Score3++;
+								break;
+							default:
+								m_Score4++;
+								break;
+						}
+					}
 				}
 			}
 			
@@ -176,4 +246,17 @@ bool Game::canMove(const piece player) const
 			break;
 	}
 	return result;
+}
+
+void Game::getScores(int& p1, int& p2, int& p3, int& p4) const
+{
+	p1 = m_Score1;
+	p2 = m_Score2;
+	p3 = m_Score3;
+	p4 = m_Score4;
+}
+
+const BoardState& Game::getBoardState() const
+{
+	return m_BoardState;
 }

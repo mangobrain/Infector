@@ -36,10 +36,20 @@ class GameWindow: public Gtk::Window
 
 		// Current running game
 		std::auto_ptr<Game> m_pGame;
+		
+		// Statusbars for game scores
+		Gtk::Statusbar *m_pRedStatusbar;
+		Gtk::Statusbar *m_pGreenStatusbar;
+		Gtk::Statusbar *m_pBlueStatusbar;
+		Gtk::Statusbar *m_pYellowStatusbar;
+		
+		// Statusbar for general info
+		Gtk::Statusbar *m_pStatusbar;
 
 		// Event handlers
 		void onAbout();
 		void onNewGame();
+		void onMoveMade(const int ax, const int ay, const int bx, const int by, const bool gameover);
 };
 
 #endif

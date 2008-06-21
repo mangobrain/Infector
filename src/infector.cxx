@@ -28,6 +28,8 @@
 // Language headers
 #include <memory>
 #include <cstdlib>
+#include <sstream>
+#include <algorithm>
 
 // Library headers
 #include <gtkmm.h>
@@ -117,6 +119,13 @@ GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade:
 
 	// Grab pointer to the widget on which the board is drawn
 	m_refXml->get_widget_derived("drawingarea", m_pBoard);
+	
+	// Get bars for showing scores during play
+	m_refXml->get_widget("redscorebar", m_pRedStatusbar);
+	m_refXml->get_widget("greenscorebar", m_pGreenStatusbar);
+	m_refXml->get_widget("bluescorebar", m_pBlueStatusbar);
+	m_refXml->get_widget("yellowscorebar", m_pYellowStatusbar);
+	m_refXml->get_widget("statusbar", m_pStatusbar);
 }
 
 // "About" event handler 
@@ -159,5 +168,94 @@ void GameWindow::onNewGame()
 		int w, h;
 		m_pNewGameDialog->getBoardSize(w, h);
 		m_pGame.reset(new Game(m_pBoard, m_pNewGameDialog->getLastPlayer(), w, h, m_pNewGameDialog->isBoardHexagonal()));
+		onMoveMade(0, 0, 0, 0, false);
+		m_pGame->move_made.connect(sigc::mem_fun(this, &GameWindow::onMoveMade));
+	}
+}
+
+// Move made - update status bar, and show popup if game has ended
+void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int by, const bool gameover)
+{
+	int s1, s2, s3, s4;
+	m_pGame->getScores(s1, s2, s3, s4);
+	m_pRedStatusbar->pop();
+	m_pGreenStatusbar->pop();
+	m_pBlueStatusbar->pop();
+	m_pYellowStatusbar->pop();
+	m_pStatusbar->pop();
+	if (s1 >= 0)
+	{
+		std::ostringstream os; os << "R: " << s1;
+		m_pRedStatusbar->push(os.str());
+	} else
+		m_pRedStatusbar->push("N/A");
+	if (s2 >= 0)
+	{
+		std::ostringstream os; os << "G: " << s2;
+		m_pGreenStatusbar->push(os.str());
+	} else
+		m_pGreenStatusbar->push("N/A");
+	if (s3 >= 0)
+	{
+		std::ostringstream os; os << "B: " << s3;
+		m_pBlueStatusbar->push(os.str());
+	} else
+		m_pBlueStatusbar->push("N/A");
+	if (s4 >= 0)
+	{
+		std::ostringstream os; os << "Y: " << s4;
+		m_pYellowStatusbar->push(os.str());
+	} else
+		m_pYellowStatusbar->push("N/A");
+	
+	if (gameover)
+	{
+		m_pStatusbar->push("Game over");
+		Glib::ustring message("Tie: ");
+		
+		if (s1 > s2 && s1 > s3 && s1 > s4)
+			message = "Red wins!";
+		else if (s2 > s1 && s2 > s3 && s2 > s4)
+			message = "Green wins!";
+		else if (s3 > s2 && s3 > s1 && s3 > s4)
+			message = "Blue wins!";
+		else if (s4 > s2 && s4 > s3 && s4 > s1)
+			message = "Yellow wins!";
+		else {
+			// Work out who the tie is between
+			int max = std::max(std::max(s1, s2), std::max(s3, s4));
+			std::ostringstream tiemsg;
+			if (s1 == max)
+				tiemsg << "red, ";
+			if (s2 == max)
+				tiemsg << "green, ";
+			if (s3 == max)
+				tiemsg << "yellow, ";
+			if (s4 == max)
+				tiemsg << "blue, ";
+			message.append(tiemsg.str().substr(0, tiemsg.str().length() - 2));
+		}
+			
+		Gtk::MessageDialog *m = new Gtk::MessageDialog(*this, message, false,
+			Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
+		m->run();
+		m->hide();
+		delete m;
+	} else {
+		switch (m_pGame->getBoardState().getPlayer())
+		{
+			case player_1:
+				m_pStatusbar->push("Red to play");
+				break;
+			case player_2:
+				m_pStatusbar->push("Green to play");
+				break;
+			case player_3:
+				m_pStatusbar->push("Blue to play");
+				break;
+			default:
+				m_pStatusbar->push("Yellow to play");
+				break;
+		}
 	}
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.4 on Wed Jun 18 23:15:51 2008 -->
+<!--Generated with glade3 3.4.4 on Sat Jun 21 21:07:21 2008 -->
 <glade-interface>
   <widget class="GtkWindow" id="mainwindow">
     <property name="title">Infector</property>
@@ -107,9 +107,59 @@
           </packing>
         </child>
         <child>
-          <widget class="GtkStatusbar" id="statusbar">
+          <widget class="GtkHBox" id="statushbox">
             <property name="visible">True</property>
-            <property name="spacing">2</property>
+            <child>
+              <widget class="GtkStatusbar" id="statusbar">
+                <property name="visible">True</property>
+                <property name="spacing">2</property>
+                <property name="has_resize_grip">False</property>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkHBox" id="scorehbox">
+                <property name="visible">True</property>
+                <child>
+                  <widget class="GtkStatusbar" id="redscorebar">
+                    <property name="visible">True</property>
+                    <property name="spacing">2</property>
+                    <property name="has_resize_grip">False</property>
+                  </widget>
+                </child>
+                <child>
+                  <widget class="GtkStatusbar" id="greenscorebar">
+                    <property name="visible">True</property>
+                    <property name="spacing">2</property>
+                    <property name="has_resize_grip">False</property>
+                  </widget>
+                  <packing>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkStatusbar" id="bluescorebar">
+                    <property name="visible">True</property>
+                    <property name="spacing">2</property>
+                    <property name="has_resize_grip">False</property>
+                  </widget>
+                  <packing>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkStatusbar" id="yellowscorebar">
+                    <property name="visible">True</property>
+                    <property name="spacing">2</property>
+                  </widget>
+                  <packing>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
           </widget>
           <packing>
             <property name="expand">False</property>

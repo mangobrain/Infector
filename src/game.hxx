@@ -33,8 +33,12 @@ class Game: public sigc::trackable
 		sigc::signal<void, const int, const int, const int, const int, const bool>
 			move_made;
 		sigc::signal<void> invalid_move;
-		sigc::signal<void> invalid_piece_selection;
 		sigc::signal<void> select_piece;
+		
+		// Get current scores
+		void getScores(int& p1, int& p2, int& p3, int& p4) const;
+		
+		const BoardState& getBoardState() const;
 
 	private:
 		// Board state
@@ -46,6 +50,9 @@ class Game: public sigc::trackable
 		
 		// Can the given player actually move?
 		bool canMove(const piece player) const;
+		
+		// Scores
+		int m_Score1, m_Score2, m_Score3, m_Score4;
 };
 
 #endif
