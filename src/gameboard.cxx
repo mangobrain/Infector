@@ -318,6 +318,8 @@ bool GameBoard::onClick(GdkEventButton *event)
 						}
 					}
 				}
+				x += (hxinc * 2);
+				y -= hyinc;
 			}
 		}
 	} else {
