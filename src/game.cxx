@@ -44,8 +44,8 @@
 //
 
 // Constructor
-Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, const bool hexagonal)
-	: m_BoardState(lastplayer, bw, bh, hexagonal), m_Score1(-1), m_Score2(-1), m_Score3(-1), m_Score4(-1)
+Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, const bool hexagonal, const std::bitset<4> aiplayers)
+	: m_BoardState(lastplayer, bw, bh, hexagonal), m_Score1(-1), m_Score2(-1), m_Score3(-1), m_Score4(-1), m_pAI(NULL)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother
@@ -72,6 +72,13 @@ Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, con
 	} else {
 		m_Score1 = 3;
 		m_Score2 = 3;
+	}
+	
+	// Create an AI object if necessary
+	if (aiplayers.any())
+	{
+		m_pAI.reset(new AI(this, &m_BoardState, aiplayers));
+		m_pAI->square_clicked.connect(sigc::mem_fun(*this, &Game::onSquareClicked));
 	}
 }
 
@@ -194,7 +201,7 @@ void Game::onSquareClicked(const int x, const int y)
 			piece endplayer = m_BoardState.getPlayer();
 			piece nextplayer = m_BoardState.nextPlayer();
 			bool gameover = false;
-			while (!canMove(nextplayer))
+			while (!m_BoardState.canMove(nextplayer))
 			{
 				nextplayer = m_BoardState.nextPlayer();
 				if (nextplayer == endplayer)
@@ -207,45 +214,6 @@ void Game::onSquareClicked(const int x, const int y)
 			move_made(xsel, ysel, x, y, gameover);
 		}
 	}
-}
-
-// Can the given player actually move?
-// A player can move if there is an empty square within a
-// distance of 2 from one of their pieces.
-bool Game::canMove(const piece player) const
-{
-	bool result = false;
-	int bw, bh;
-	bw = m_BoardState.getWidth();
-	bh = m_BoardState.getHeight();
-	for (int x = 0; x < bw; ++x)
-	{
-		for (int y = 0; y < bh; ++y)
-		{
-			if (m_BoardState.getPieceAt(x, y) != player)
-				continue;
-			for (int xx = x - 2; xx <= x + 2; ++xx)
-			{
-				for (int yy = y - 2; yy <= y + 2; ++yy)
-				{
-					
-					if ((m_BoardState.getAdjacency(x, y, xx, yy) > 0)
-						&& (m_BoardState.getPieceAt(xx, yy) == player_none))
-					{
-						result = true;
-						break;
-					}
-				}
-				if (result)
-					break;
-			}
-			if (result)
-				break;
-		}
-		if (result)
-			break;
-	}
-	return result;
 }
 
 void Game::getScores(int& p1, int& p2, int& p3, int& p4) const

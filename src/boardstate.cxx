@@ -288,3 +288,41 @@ unsigned int BoardState::getAdjacency(const int ax, const int ay, const int bx, 
 			return 0;
 	}
 }
+
+// Enumerate available moves for the given player
+// Set "stop" to true to stop as soon as one move is found
+std::vector<move> BoardState::getPossibleMoves(const piece player, const bool stop) const
+{
+	std::vector<move> results;
+	for (int x = 0; x < bw; ++x)
+	{
+		for (int y = 0; y < bh; ++y)
+		{
+			if (getPieceAt(x, y) != player)
+				continue;
+			for (int xx = x - 2; xx <= x + 2; ++xx)
+			{
+				for (int yy = y - 2; yy <= y + 2; ++yy)
+				{
+					
+					if ((getAdjacency(x, y, xx, yy) > 0)
+						&& (getPieceAt(xx, yy) == player_none))
+					{
+						results.push_back(move(x, y, xx, yy));
+						if (stop)
+							return results;
+					}
+				}
+			}
+		}
+	}
+	return results;
+}
+
+// Can the given player actually move?
+// A player can move if there is an empty square within a
+// distance of 2 from one of their pieces.
+bool BoardState::canMove(const piece player) const
+{
+	return (getPossibleMoves(player, true).size() > 0);
+}

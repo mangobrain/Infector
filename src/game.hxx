@@ -19,6 +19,7 @@
 #define __INFECTOR_GAME_HXX__
 
 class GameBoard;
+class AI;
 
 // Class for main game logic, tying together players and the GUI
 class Game: public sigc::trackable
@@ -27,7 +28,8 @@ class Game: public sigc::trackable
 		// Constructor - pass in game board so we can pick up
 		// on emitted signals when it is clicked, and pass in
 		// game properties (board size & number of players)
-		Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, const bool hexagonal);
+		Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, const bool hexagonal,
+			const std::bitset<4> aiplayers);
 	
 		// Signals we can emit
 		sigc::signal<void, const int, const int, const int, const int, const bool>
@@ -48,11 +50,11 @@ class Game: public sigc::trackable
 		// Board clicked
 		void onSquareClicked(const int x, const int y);
 		
-		// Can the given player actually move?
-		bool canMove(const piece player) const;
-		
 		// Scores
 		int m_Score1, m_Score2, m_Score3, m_Score4;
+		
+		// AI player
+		std::auto_ptr<AI> m_pAI;
 };
 
 #endif

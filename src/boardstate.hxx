@@ -31,6 +31,18 @@ enum piece
 	no_such_square
 };
 
+// Struct for storing a single game move
+struct move
+{
+	int source_x;
+	int source_y;
+	int dest_x;
+	int dest_y;
+	move(const int sx, const int sy, const int dx, const int dy)
+		:source_x(sx), source_y(sy), dest_x(dx), dest_y(dy)
+	{};
+};
+
 class BoardState
 {
 	public:
@@ -55,6 +67,13 @@ class BoardState
 		// Calculate whether one square is adjacent to another within 1 or 2 squares
 		// Return 0 (not adjacent), 1 ("clone" distance) or 2 ("jump" distance)
 		unsigned int getAdjacency(const int ax, const int ay, const int bx, const int by) const;
+
+		// Enumerate available moves for the given player
+		// Set "stop" to true to stop as soon as one move is found
+		std::vector<move> getPossibleMoves(const piece player, const bool stop = false) const;
+
+		// Can the given player actually move?
+		bool canMove(const piece player) const;
 		
 	private:
 		// Game info
