@@ -18,21 +18,27 @@
 #ifndef __INFECTOR_AI_HXX__
 #define __INFECTOR_AI_HXX__
 
-class AI
+class Game;
+class BoardState;
+
+class AI : public sigc::trackable
 {
 	public:
-		AI(const Game *game, const BoardState *bs);
+		AI(Game *game, const BoardState *bs);
 	
 		// Signals we can emit
 		sigc::signal<void, const int, const int> square_clicked;
 	
 	private:
-		// Pointer to running game and board state
-		const Game *m_pGame;
+		// Pointer to current board state
 		const BoardState *m_pBoardState;
 		
 		// Event handlers
 		void onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y, const bool gameover);
+		
+		// Make move after timer has fired (so human players can observe selected piece first)
+		bool makeMove() const;
+		int next_x, next_y;
 };
 
 #endif

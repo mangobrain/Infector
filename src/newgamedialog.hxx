@@ -28,6 +28,9 @@ class NewGameDialog: public Gtk::Dialog
 		piece getLastPlayer() const;
 		void getBoardSize(int &w, int &h) const;
 		bool isBoardHexagonal() const;
+		
+		// Get a bit set indicating whether each of the possible four players is an AI
+		const std::bitset<4> getAIPlayers() const;
 
 	private:
 		Gtk::ComboBox *m_pNumPlayers;
@@ -36,6 +39,8 @@ class NewGameDialog: public Gtk::Dialog
 		Gtk::Label *m_pPlayer3Label;
 		Gtk::Label *m_pPlayer4Label;
 		Gtk::Label *m_pPlayerNumLabel;
+		Gtk::ComboBox *m_pPlayer1Box;
+		Gtk::ComboBox *m_pPlayer2Box;
 		Gtk::ComboBox *m_pPlayer3Box;
 		Gtk::ComboBox *m_pPlayer4Box;
 

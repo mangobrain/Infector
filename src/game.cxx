@@ -27,6 +27,7 @@
 
 // Language headers
 #include <cstdlib>
+#include <bitset>
 
 // Library headers
 #include <gtkmm.h>
@@ -38,14 +39,15 @@
 #include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"
+#include "ai.hxx"
 
 //
 // Implementation
 //
 
 // Constructor
-Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, const bool hexagonal, const std::bitset<4> aiplayers)
-	: m_BoardState(lastplayer, bw, bh, hexagonal), m_Score1(-1), m_Score2(-1), m_Score3(-1), m_Score4(-1), m_pAI(NULL)
+Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, const bool hexagonal, const std::bitset<4> &aiplayers)
+	: m_BoardState(lastplayer, bw, bh, hexagonal, aiplayers), m_Score1(-1), m_Score2(-1), m_Score3(-1), m_Score4(-1), m_pAI(NULL)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother
@@ -77,7 +79,7 @@ Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, con
 	// Create an AI object if necessary
 	if (aiplayers.any())
 	{
-		m_pAI.reset(new AI(this, &m_BoardState, aiplayers));
+		m_pAI.reset(new AI(this, &m_BoardState));
 		m_pAI->square_clicked.connect(sigc::mem_fun(*this, &Game::onSquareClicked));
 	}
 }

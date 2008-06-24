@@ -29,6 +29,7 @@
 #include <utility>
 #include <vector>
 #include <cstdlib>
+#include <bitset>
 
 // System headers
 
@@ -51,9 +52,9 @@ static const char *map =
 // Implementation
 //
 
-BoardState::BoardState(const piece lastplayer, const int width, const int height, const bool hexagonal)
+BoardState::BoardState(const piece lastplayer, const int width, const int height, const bool hexagonal, const std::bitset<4> &aiplayers)
 	: current_player(player_1), m_lastplayer(lastplayer), xsel(-1), ysel(-1), bw(width), bh(height),
-	m_hexagonal(hexagonal)
+	m_hexagonal(hexagonal), m_aiplayers(aiplayers)
 {
 	if (m_hexagonal)
 	{
@@ -189,6 +190,21 @@ int BoardState::getHeight() const
 piece BoardState::getPlayer() const
 {
 	return current_player;
+}
+
+bool BoardState::isAIPlayer(const piece player) const
+{
+	switch (player)
+	{
+		case player_1:
+			return m_aiplayers.test(0);
+		case player_2:
+			return m_aiplayers.test(1);
+		case player_3:
+			return m_aiplayers.test(2);
+		default:
+			return m_aiplayers.test(3);
+	}
 }
 
 bool BoardState::isHexagonal() const

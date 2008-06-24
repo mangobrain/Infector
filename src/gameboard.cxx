@@ -27,6 +27,7 @@
 
 // Language headers
 #include <cstdlib>
+#include <bitset>
 
 // Library headers
 #include <gtkmm.h>
@@ -38,6 +39,7 @@
 #include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"
+#include "ai.hxx"
 
 //
 // Implementation
@@ -45,7 +47,7 @@
 
 // Constructor
 GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::DrawingArea(cobject), m_DefaultBoardState(player_2, 8, 8, false), m_pBoardState(NULL),
+	: Gtk::DrawingArea(cobject), m_DefaultBoardState(player_2, 8, 8, false, 0), m_pBoardState(NULL),
 	bw(8), bh(8)
 {
 	// Connect mouse click events to the onClick handler
@@ -480,7 +482,11 @@ void GameBoard::onMoveMade(const int start_x, const int start_y, const int end_x
 	// TODO - Some form of animation
 	queue_draw();
 	
-	// Disable clicking when game is over - until next game starts
+	// Disable clicking when game is over or it's an AI's turn - until next game starts
 	if (gameover)
 		set_sensitive(false);
+	else if (m_pBoardState->isAIPlayer(m_pBoardState->getPlayer()))
+		set_sensitive(false);
+	else
+		set_sensitive(true);
 }

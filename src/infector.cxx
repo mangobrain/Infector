@@ -30,6 +30,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <algorithm>
+#include <bitset>
 
 // Library headers
 #include <gtkmm.h>
@@ -43,6 +44,7 @@
 #include "gameboard.hxx"
 #include "newgamedialog.hxx"
 #include "gamewindow.hxx"
+#include "ai.hxx"
 
 //
 // Implementation
@@ -167,7 +169,7 @@ void GameWindow::onNewGame()
 		// Stop the current running game and start a new one
 		int w, h;
 		m_pNewGameDialog->getBoardSize(w, h);
-		m_pGame.reset(new Game(m_pBoard, m_pNewGameDialog->getLastPlayer(), w, h, m_pNewGameDialog->isBoardHexagonal()));
+		m_pGame.reset(new Game(m_pBoard, m_pNewGameDialog->getLastPlayer(), w, h, m_pNewGameDialog->isBoardHexagonal(), m_pNewGameDialog->getAIPlayers()));
 		onMoveMade(0, 0, 0, 0, false);
 		m_pGame->move_made.connect(sigc::mem_fun(this, &GameWindow::onMoveMade));
 	}

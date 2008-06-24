@@ -26,6 +26,7 @@
 #endif
 
 // Language headers
+#include <bitset>
 
 // Library headers
 #include <gtkmm.h>
@@ -55,6 +56,8 @@ NewGameDialog::NewGameDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::
 	refXml->get_widget("bluelabel", m_pPlayer3Label);
 	refXml->get_widget("yellowlabel", m_pPlayer4Label);
 	refXml->get_widget("playernumlabel", m_pPlayerNumLabel);
+	refXml->get_widget("redcombo", m_pPlayer1Box);
+	refXml->get_widget("greencombo", m_pPlayer2Box);
 	refXml->get_widget("bluecombo", m_pPlayer3Box);
 	refXml->get_widget("yellowcombo", m_pPlayer4Box);
 	refXml->get_widget("boardsizecombo", m_pBoardSize);
@@ -146,4 +149,21 @@ void NewGameDialog::getBoardSize(int &w, int &h) const
 bool NewGameDialog::isBoardHexagonal() const
 {
 	return m_pBoardShape->get_active_row_number() == 1;
+}
+
+// Get a bit set indicating whether each of the possible four players is an AI
+const std::bitset<4> NewGameDialog::getAIPlayers() const
+{
+	std::bitset<4> results;
+	results.reset();
+	if (m_pPlayer1Box->get_active_row_number() == 1)
+		results.set(0);
+	if (m_pPlayer2Box->get_active_row_number() == 1)
+		results.set(1);
+	if (m_pPlayer3Box->get_active_row_number() == 1)
+		results.set(2);
+	if (m_pPlayer4Box->get_active_row_number() == 1)
+		results.set(3);
+	
+	return results;
 }

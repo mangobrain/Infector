@@ -46,7 +46,7 @@ struct move
 class BoardState
 {
 	public:
-		BoardState(const piece lastplayer, const int width, const int height, const bool hexagonal);
+		BoardState(const piece lastplayer, const int width, const int height, const bool hexagonal, const std::bitset<4> &aiplayers);
 		
 		// Property accessors
 		piece getPieceAt(const int x, const int y) const;
@@ -63,6 +63,8 @@ class BoardState
 		
 		// Advance to the next player's turn and return the new current player
 		piece nextPlayer();
+		
+		bool isAIPlayer(const piece) const;
 		
 		// Calculate whether one square is adjacent to another within 1 or 2 squares
 		// Return 0 (not adjacent), 1 ("clone" distance) or 2 ("jump" distance)
@@ -85,6 +87,7 @@ class BoardState
 		int xsel, ysel;
 		int bw, bh;
 		bool m_hexagonal;
+		const std::bitset<4> m_aiplayers;
 };
 
 #endif

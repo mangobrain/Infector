@@ -29,7 +29,7 @@ class Game: public sigc::trackable
 		// on emitted signals when it is clicked, and pass in
 		// game properties (board size & number of players)
 		Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, const bool hexagonal,
-			const std::bitset<4> aiplayers);
+			const std::bitset<4> &aiplayers);
 	
 		// Signals we can emit
 		sigc::signal<void, const int, const int, const int, const int, const bool>
