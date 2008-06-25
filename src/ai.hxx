@@ -20,6 +20,22 @@
 
 class Game;
 class BoardState;
+struct move;
+
+// One entry in the tree of enumerated moves
+struct treenode
+{
+	// Move made to get here from parent
+	move m;
+	// Player who made the move
+	piece player;
+	// State board is left in
+	BoardState *b;
+	// Heuristic score of this move
+	unsigned int score;
+	// Moves the next player can make from this starting point
+	std::list<treenode*> children;
+};
 
 class AI : public sigc::trackable
 {
@@ -39,6 +55,11 @@ class AI : public sigc::trackable
 		// Make move after timer has fired (so human players can observe selected piece first)
 		bool makeMove() const;
 		int next_x, next_y;
+		
+		// Root node of enumerated move tree
+		treenode *root;
+		// Current set of leaf nodes
+		std::list<treenode*> leaves;
 };
 
 #endif
