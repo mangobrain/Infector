@@ -41,6 +41,7 @@ struct move
 	move(const int sx, const int sy, const int dx, const int dy)
 		:source_x(sx), source_y(sy), dest_x(dx), dest_y(dy)
 	{};
+	move() {};
 };
 
 class BoardState
@@ -87,7 +88,7 @@ class BoardState
 		int xsel, ysel;
 		int bw, bh;
 		bool m_hexagonal;
-		const std::bitset<4> m_aiplayers;
+		std::bitset<4> m_aiplayers;
 };
 
 #endif
