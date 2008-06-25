@@ -155,6 +155,8 @@ void Game::onSquareClicked(const int x, const int y)
 					piece capturesquare = m_BoardState.getPieceAt(xx, yy);
 					if ((capturesquare == player_none) || (capturesquare == no_such_square))
 						continue;
+					if (capturesquare == m_BoardState.getPlayer())
+						continue;
 					// Ask BoardState whether or not the piece is adjacent
 					// - it abstracts away the board shape for us
 					if (m_BoardState.getAdjacency(x, y, xx, yy) == 1)
