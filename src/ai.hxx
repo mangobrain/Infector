@@ -21,27 +21,6 @@
 class Game;
 class BoardState;
 
-// One entry in the tree of enumerated moves
-struct treenode
-{
-	// Move made to get here from parent
-	move m;
-	// State board is left in
-	std::auto_ptr<BoardState> b;
-	// Heuristic score of this move
-	unsigned int score;
-	// Parent of this node
-	treenode *parent;
-	// Moves the next player can make from this starting point
-	std::list<treenode*> children;
-	// Delete all children when destroyed
-	~treenode()
-	{
-		for (std::list<treenode*>::iterator i = children.begin(); i != children.end(); ++i)
-			delete (*i);
-	};
-};
-
 class AI : public sigc::trackable
 {
 	public:
@@ -60,16 +39,6 @@ class AI : public sigc::trackable
 		// Make move after timer has fired (so human players can observe selected piece first)
 		bool makeMove() const;
 		int next_x, next_y;
-		
-		// Root node of enumerated move tree
-		treenode *root;
-		// Current set of leaf nodes
-		std::list<treenode*> leaves;
-		
-		// Expand the tree by generating new leaf nodes from the given set
-		// of leaf nodes.  Pass list in by value in case it's our own leaf set,
-		// because we overwrite the latter.
-		void growTreeFromLeaves(std::list<treenode*> l);
 };
 
 #endif
