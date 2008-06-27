@@ -37,10 +37,10 @@ class Game: public sigc::trackable
 		sigc::signal<void> invalid_move;
 		sigc::signal<void> select_piece;
 		
+		const BoardState& getBoardState() const;
+
 		// Get current scores
 		void getScores(int& p1, int& p2, int& p3, int& p4) const;
-		
-		const BoardState& getBoardState() const;
 
 	private:
 		// Board state
@@ -49,9 +49,6 @@ class Game: public sigc::trackable
 		// Event handlers
 		// Board clicked
 		void onSquareClicked(const int x, const int y);
-		
-		// Scores
-		int m_Score1, m_Score2, m_Score3, m_Score4;
 		
 		// AI player
 		std::auto_ptr<AI> m_pAI;

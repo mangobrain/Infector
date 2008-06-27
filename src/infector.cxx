@@ -232,9 +232,9 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 			if (s2 == max)
 				tiemsg << "green, ";
 			if (s3 == max)
-				tiemsg << "yellow, ";
-			if (s4 == max)
 				tiemsg << "blue, ";
+			if (s4 == max)
+				tiemsg << "yellow, ";
 			message.append(tiemsg.str().substr(0, tiemsg.str().length() - 2));
 		}
 			

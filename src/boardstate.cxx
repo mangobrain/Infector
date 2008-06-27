@@ -54,7 +54,7 @@ static const char *map =
 
 BoardState::BoardState(const piece lastplayer, const int width, const int height, const bool hexagonal, const std::bitset<4> &aiplayers)
 	: current_player(player_1), m_lastplayer(lastplayer), xsel(-1), ysel(-1), bw(width), bh(height),
-	m_hexagonal(hexagonal), m_aiplayers(aiplayers)
+	m_hexagonal(hexagonal), m_aiplayers(aiplayers), m_Score1(-1), m_Score2(-1), m_Score3(-1), m_Score4(-1)
 {
 	if (m_hexagonal)
 	{
@@ -150,6 +150,24 @@ BoardState::BoardState(const piece lastplayer, const int width, const int height
 				m_lastplayer = player_4;
 		}
 	}
+	
+	// Set initial scores
+	if (!hexagonal)
+	{
+		if (lastplayer == player_2)
+		{
+			m_Score1 = 2;
+			m_Score2 = 2;
+		} else {
+			m_Score1 = 1;
+			m_Score2 = 1;
+			m_Score3 = 1;
+			m_Score4 = 1;
+		}
+	} else {
+		m_Score1 = 3;
+		m_Score2 = 3;
+	}
 }
 
 // Property accessors
@@ -173,6 +191,94 @@ void BoardState::setPieceAt(const int x, const int y, const piece p)
 	int offset_y = y - pieces.at(x).first;
 	if ((offset_y < 0) || (offset_y >= pieces.at(x).second.size()))
 		return;
+	
+	if (p == player_none)
+	{
+		// If we're clearing out a square, subtract one from player's score
+		switch (pieces.at(x).second.at(offset_y))
+		{
+			case player_1:
+				--m_Score1;
+				break;
+			case player_2:
+				--m_Score2;
+				break;
+			case player_3:
+				--m_Score3;
+				break;
+			default:
+				--m_Score4;
+				break;
+		}
+	}
+	else
+	{
+		// Increase score for the player who's just gained a piece
+		switch (p)
+		{
+			case player_1:
+				m_Score1++;
+				break;
+			case player_2:
+				m_Score2++;
+				break;
+			case player_3:
+				m_Score3++;
+				break;
+			default:
+				m_Score4++;
+		}
+		
+		// Capture enemy pieces
+		for (int xx = x - 1; xx <= x + 1; ++xx)
+		{
+			int offset = -1;
+			for (int yy = y - 1; yy <= y + 1; ++yy)
+			{
+				piece capturesquare = getPieceAt(xx, yy);
+				if ((capturesquare == player_none) || (capturesquare == no_such_square) || (capturesquare == p))
+				{
+					++offset;
+					continue;
+				}
+				if (getAdjacency(x, y, xx, yy) == 1)
+				{
+					// Enemy piece is adjacent - capture it and update scores
+					int offset_yy = yy - pieces.at(xx).first;
+					pieces[xx].second[offset_yy] = p;
+					switch (capturesquare)
+					{
+						case player_1:
+							m_Score1--;
+							break;
+						case player_2:
+							m_Score2--;
+							break;
+						case player_3:
+							m_Score3--;
+							break;
+						default:
+							m_Score4--;
+					}
+					switch (p)
+					{
+						case player_1:
+							m_Score1++;
+							break;
+						case player_2:
+							m_Score2++;
+							break;
+						case player_3:
+							m_Score3++;
+							break;
+						default:
+							m_Score4++;
+					}
+				}
+				++offset;
+			}
+		}
+	}
 
 	pieces[x].second[offset_y] = p;
 }
@@ -341,4 +447,12 @@ std::vector<move> BoardState::getPossibleMoves(const piece player, const bool st
 bool BoardState::canMove(const piece player) const
 {
 	return (getPossibleMoves(player, true).size() > 0);
+}
+
+void BoardState::getScores(int& p1, int& p2, int& p3, int& p4) const
+{
+	p1 = m_Score1;
+	p2 = m_Score2;
+	p3 = m_Score3;
+	p4 = m_Score4;
 }

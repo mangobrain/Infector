@@ -77,6 +77,15 @@ class BoardState
 
 		// Can the given player actually move?
 		bool canMove(const piece player) const;
+
+		// Get current scores
+		void getScores(int& p1, int& p2, int& p3, int& p4) const;
+		
+		// Get number of players
+		int getNumPlayers() const
+		{
+			return (m_lastplayer == player_2) ? 2 : 4;
+		};
 		
 	private:
 		// Game info
@@ -89,6 +98,9 @@ class BoardState
 		int bw, bh;
 		bool m_hexagonal;
 		std::bitset<4> m_aiplayers;
+
+		// Scores
+		int m_Score1, m_Score2, m_Score3, m_Score4;
 };
 
 #endif

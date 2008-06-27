@@ -28,7 +28,6 @@
 // Language headers
 #include <cstdlib>
 #include <bitset>
-#include <iostream>
 
 // Library headers
 #include <gtkmm.h>
@@ -480,8 +479,6 @@ bool GameBoard::onResize(GdkEventConfigure *event)
 
 void GameBoard::onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y, const bool gameover)
 {
-	std::cout << "GameBoard" << std::endl;
-
 	// TODO - Some form of animation
 	// Also, find out how to make immediate redraws work - don't want to wait until AI::onMoveMade has finished.
 	queue_draw();
