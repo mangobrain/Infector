@@ -95,11 +95,19 @@ std::pair<int, move> minimax(BoardState* b, const int depth, const piece maximis
 			default:
 				us = s4; them = s2 + s3 + s1;
 		}
-		
-		if (us >= them)
-			return std::pair<int, move>(us - them, bestmove);
-		else
-			return std::pair<int, move>(-(them - us), bestmove);
+		if (us == 0)
+		{
+			std::cout << "LOSE! Depth: " << depth << ", score: " << us - them << std::endl;
+			for (int y = 0; y < b->getHeight(); ++y)
+			{
+				for (int x = 0; x < b->getWidth(); ++x)
+					std::cout << b->getPieceAt(x, y);
+				std::cout << std::endl;
+			}
+			us = -100;
+		}
+
+		return std::pair<int, move>(us - them, bestmove);
 	}
 
 	std::vector<move> moves(b->getPossibleMoves(p));
@@ -138,6 +146,7 @@ std::pair<int, move> minimax(BoardState* b, const int depth, const piece maximis
 			}
 		}
 	}
+	std::cout << "At depth " << depth << ", picked " << ((p == maximisingplayer) ? "max" : "min") << " move score of " << score << " for player " << p << " (I think I'm currently being player " << maximisingplayer << ")" << std::endl;
 	return std::pair<int, move>(score, bestmove);
 }
 
