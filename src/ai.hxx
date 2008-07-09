@@ -37,8 +37,9 @@ class AI : public sigc::trackable
 		void onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y, const bool gameover);
 		
 		// Make move after timer has fired (so human players can observe selected piece first)
-		bool makeMove() const;
-		int next_x, next_y;
+		bool makeMove();
+		bool selectpiece;
+		move m;
 };
 
 #endif

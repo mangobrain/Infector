@@ -32,6 +32,8 @@
 #include <algorithm>
 #include <bitset>
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 
 // Library headers
 #include <glibmm.h>
@@ -48,106 +50,21 @@
 //
 
 AI::AI(Game *game, const BoardState *bs)
-	: m_pBoardState(bs), next_x(0), next_y(0)
+	: m_pBoardState(bs)
 {
 	game->move_made.connect(sigc::mem_fun(*this, &AI::onMoveMade));
+	
+	// Seed the random number generator (moves are picked at random if there
+	// are multiple possibilities with the same score, such as in the opening)
+	srand(time(NULL));
+	
+	// Make a move if it's our turn first
+	onMoveMade(0, 0, 0, 0, false);
 }
 
-std::pair<int, move> minimax(BoardState* b, const int depth, const piece maximisingplayer, const piece lastplayer)
+bool movecmp(const std::pair<move, int> &a, const std::pair<move, int> &b)
 {
-	// If the game is over (the next player who can move is the one who moved last),
-	// or we've reached the cut-off depth,
-	// evaluate the current position and return a score.
-	bool stop = (depth == 0);
-	piece p = b->getPlayer();
-	bool gameover = false;
-	while (!(b->canMove(p)))
-	{
-		p = b->nextPlayer();
-		if (p == lastplayer)
-		{
-			gameover = true;
-			break;
-		}
-	}
-	if (stop || gameover)
-	{
-		int s1, s2, s3, s4;
-		b->getScores(s1, s2, s3, s4);
-		move bestmove;
-		bestmove.source_x = 0; bestmove.source_y = 0; bestmove.dest_x = 0; bestmove.dest_y = 0;
-		
-		// If we've played in the maximising player's favour, return positive
-		// If we've played in the opponent's favour, return negative
-
-		int us, them;
-		switch (maximisingplayer)
-		{
-			case player_1:
-				us = s1; them = s2 + s3 + s4;
-				break;
-			case player_2:
-				us = s2; them = s1 + s3 + s4;
-				break;
-			case player_3:
-				us = s3; them = s2 + s1 + s4;
-				break;
-			default:
-				us = s4; them = s2 + s3 + s1;
-		}
-		if (us == 0)
-		{
-			std::cout << "LOSE! Depth: " << depth << ", score: " << us - them << std::endl;
-			for (int y = 0; y < b->getHeight(); ++y)
-			{
-				for (int x = 0; x < b->getWidth(); ++x)
-					std::cout << b->getPieceAt(x, y);
-				std::cout << std::endl;
-			}
-			us = -100;
-		}
-
-		return std::pair<int, move>(us - them, bestmove);
-	}
-
-	std::vector<move> moves(b->getPossibleMoves(p));
-	int score = 0;
-	bool noscore = true;
-	move bestmove;
-	bestmove.source_x = 0; bestmove.source_y = 0; bestmove.dest_x = 0; bestmove.dest_y = 0;
-	for (std::vector<move>::iterator i = moves.begin(); i != moves.end(); ++i)
-	{
-		// Simulate current move
-		BoardState* new_b = new BoardState(*b);
-		int adj = new_b->getAdjacency(i->source_x, i->source_y, i->dest_x, i->dest_y);
-		if (adj == 2)
-			new_b->setPieceAt(i->source_x, i->source_y, player_none);
-		new_b->setPieceAt(i->dest_x, i->dest_y, p);
-			
-		// Keep searching down the tree
-		new_b->nextPlayer();
-		std::pair<int, move> newscore = minimax(new_b, depth - 1, maximisingplayer, p);
-		delete new_b;
-		
-		if (p == maximisingplayer)
-		{
-			if ((newscore.first > score) || noscore)
-			{
-				score = newscore.first;
-				bestmove = *i;
-				noscore = false;
-			}
-		} else {
-			if ((newscore.first < score) || noscore)
-			{
-				score = newscore.first;
-				bestmove = *i;
-				noscore = false;
-			}
-		}
-	}
-	std::cout << "At depth " << depth << ", picked " << ((p == maximisingplayer) ? "max" : "min") << " move score of " << score << " for player " << p << " (I think I'm currently being player " << maximisingplayer << ")" << std::endl;
-	return std::pair<int, move>(score, bestmove);
+	return a.second > b.second;
 }
 
 void AI::onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y, const bool gameover)
@@ -155,24 +72,149 @@ void AI::onMoveMade(const int start_x, const int start_y, const int end_x, const
 	if (gameover)
 		return;
 
-	if (m_pBoardState->isAIPlayer(m_pBoardState->getPlayer()))
+	piece me = m_pBoardState->getPlayer();
+	if (m_pBoardState->isAIPlayer(me))
 	{
-		BoardState* new_b = new BoardState(*m_pBoardState);
-		std::pair<int, move> m = minimax(new_b, m_pBoardState->getNumPlayers(), m_pBoardState->getPlayer(), m_pBoardState->getPlayer());
-		delete new_b;
+		// Get all possible moves, and allocate a second vector for storing them plus their scores
+		std::vector<move> moves(m_pBoardState->getPossibleMoves(me));
+		std::vector<std::pair<move, int> > scoredmoves;
+		scoredmoves.reserve(moves.size());
 		
-		// Highlight the square we're going to move
-		square_clicked(m.second.source_x, m.second.source_y);
-		next_x = m.second.dest_x;
-		next_y = m.second.dest_y;
-		// Make the actual move in 0.5 seconds time (to let people see)
+		// Score all possible moves and pick one of the best
+		
+		int s1, s2, s3, s4;
+		m_pBoardState->getScores(s1, s2, s3, s4);
+		
+		for (std::vector<move>::iterator i = moves.begin(); i != moves.end(); ++i)
+		{
+			int score = 0;
+		
+			// Simulate the current move
+			BoardState new_b(*m_pBoardState);
+			int adj = new_b.getAdjacency(i->source_x, i->source_y, i->dest_x, i->dest_y);
+			if (adj == 2)
+				new_b.setPieceAt(i->source_x, i->source_y, player_none);
+			new_b.setPieceAt(i->dest_x, i->dest_y, me);
+			
+			// Calculate how many squares we capture and score 4 points for each
+			int new_s1, new_s2, new_s3, new_s4;
+			new_b.getScores(new_s1, new_s2, new_s3, new_s4);
+			switch (me)
+			{
+				case player_1:
+					score += (new_s1 - s1) * 5;
+					break;
+				case player_2:
+					score += (new_s2 - s2) * 5;
+					break;
+				case player_3:
+					score += (new_s3 - s3) * 5;
+					break;
+				default:
+					score += (new_s4 - s4) * 5;
+			}
+			
+			// Now look at all squares and determine whether
+			// the board overall is in good or bad shape from our point of view
+			for (int y = 0; y < new_b.getHeight(); ++y)
+			{
+				for (int x = 0; x < new_b.getWidth(); ++x)
+				{
+					piece thisone = new_b.getPieceAt(x, y);
+					if (thisone == no_such_square)
+						continue;
+
+					int distance_one_our_pieces = 0;
+					int distance_two_our_pieces = 0;
+					int distance_one_holes = 0;
+					int distance_one_enemy_pieces = 0;
+					int distance_two_enemy_pieces = 0;
+
+					for (int yy = y - 1; yy <= y + 1; ++yy)
+					{
+						for (int xx = x - 1; xx <= x + 1; ++xx)
+						{
+							piece thatone = new_b.getPieceAt(xx, yy);
+							int adj = new_b.getAdjacency(x, y, xx, yy);
+							if (thatone == no_such_square && adj == 1)
+								++distance_one_holes;
+							else if (thatone != no_such_square && thatone != player_none)
+							{
+								if (adj == 1)
+								{
+									if (thatone == me)
+										++distance_one_our_pieces;
+									else
+										++distance_one_enemy_pieces;
+								}
+								else if (adj == 2)
+								{
+									if (thatone == me)
+										++distance_two_our_pieces;
+									else
+										++distance_two_enemy_pieces;
+								}
+							}
+						}
+					}
+					
+					if (thisone == me)
+						// Score points for defending our own pieces
+						score += (distance_one_our_pieces + distance_one_holes) * 2;
+					else if (thisone != player_none)
+						// Score points for being able to capture enemies
+						score += (distance_two_our_pieces == 0) ? 0 : 1;
+					else if (distance_two_enemy_pieces > 0 || distance_one_enemy_pieces > 0)
+					{
+						// Lose points if we can be captured - based on both number of pieces and how limiting it is to our game						
+						if (distance_one_our_pieces > 0)
+						{
+							score -= distance_one_our_pieces * 4;
+
+							BoardState new_bb(new_b);
+							new_bb.setPieceAt(x, y, (me == player_1) ? player_2 : player_1);
+							
+							int currmoves = new_b.getPossibleMoves(me).size();
+							int nextmoves = new_bb.getPossibleMoves(me).size();
+							
+							score -= (currmoves - nextmoves) / 10;
+						}
+					}
+					
+					// Score for giving ourselves a lot of future options
+					//score += new_b.getPossibleMoves(me).size() / 80;
+				}
+			}
+			
+			scoredmoves.push_back(std::pair<move, int>(*i, score));
+		}
+		
+		// Pick our best move.  Shuffle the list first so we don't know
+		// what will come out on top if we have multiple moves with the same high score.
+		std::random_shuffle(scoredmoves.begin(), scoredmoves.end());
+		std::stable_sort(scoredmoves.begin(), scoredmoves.end(), movecmp);
+		
+		m = scoredmoves.at(0).first;
+		
+		// Highlight the square we're going to move then
+		// make the actual move in 0.5 time increments (to let people see)
+		selectpiece = true;
 		Glib::signal_timeout().connect(sigc::mem_fun(*this, &AI::makeMove), 500);
 	}
 }
 
-bool AI::makeMove() const
+bool AI::makeMove()
 {
-	square_clicked(next_x, next_y);
-	// Don't keep firing the timer after this call
-	return false;
+	if (selectpiece)
+	{
+		// Select the piece we want to move
+		square_clicked(m.source_x, m.source_y);
+		selectpiece = false;
+		return true;
+	} else {
+		// Move it
+		square_clicked(m.dest_x, m.dest_y);
+		// Don't keep firing the timer after this call
+		return false;
+	}
 }

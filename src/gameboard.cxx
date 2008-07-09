@@ -356,8 +356,8 @@ void GameBoard::newGame(Game *g, const BoardState *b)
 	setBackground();
 	queue_draw();
 	
-	// Enable user interaction
-	set_sensitive(true);
+	// Enable user interaction if the first player's a human
+	set_sensitive(!(m_pBoardState->isAIPlayer(player_1)));
 }
 
 // Set the widget's background pixmap to the empty board
