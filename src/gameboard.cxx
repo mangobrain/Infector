@@ -380,7 +380,7 @@ void GameBoard::setBackground()
 	{
 		// Horrid hexagonal board
 		Glib::RefPtr<const Gtk::Style> style = get_style();
-		Gdk::Color bg = style->get_background(Gtk::STATE_NORMAL);
+		Gdk::Color bg = style->get_bg(Gtk::STATE_NORMAL);
 		cr->set_source_rgb(bg.get_red_p(), bg.get_green_p(), bg.get_blue_p());
 		cr->rectangle(0, 0, w, h);
 		cr->fill();

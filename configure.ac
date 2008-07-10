@@ -18,14 +18,14 @@ dnl    along with infector.  If not, see <http://www.gnu.org/licenses/>.
 dnl # Specify autoconf version requirements
 dnl # Not strictly necessary - but it's the version on my system,
 dnl # so for now, we'll pretend it's the required version.
-AC_PREREQ([2.59])
+AC_PREREQ([2.56])
 
 dnl # Initialise autoconf and automake
 dnl # Also specify automake version requirements (again, the version used
 dnl # development will suffice for now).
 AC_INIT([infector], [0.1], [sane@not.co.uk])
 AC_CONFIG_SRCDIR([src/infector.cxx])
-AM_INIT_AUTOMAKE([1.8.5])
+AM_INIT_AUTOMAKE([1.7.1])
 
 dnl # infector is written in C++, of course.  :)
 AC_PROG_CXX
