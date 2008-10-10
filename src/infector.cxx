@@ -64,8 +64,10 @@ void onAboutURL(Gtk::AboutDialog &d, const Glib::ustring &url)
 void onAboutEmail(Gtk::AboutDialog &d, const Glib::ustring &addr)
 {
 	// XXX This is also really, really hackish.
-	// Try to open an email client with xdg-email.
+	// Try to open an email client with xdg-email then gnome-open.
 	Glib::ustring command("xdg-email \"");
+	command += addr;
+	command += "\" || gnome-open \"mailto:";
 	command += addr;
 	command += "\"";
 	system(command.c_str());
