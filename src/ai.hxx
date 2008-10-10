@@ -24,6 +24,7 @@ class BoardState;
 class AI : public sigc::trackable
 {
 	public:
+		// Constructed by Game - pass in BoardState so we don't try to call getBoardState() during Game's constructor
 		AI(Game *game, const BoardState *bs);
 	
 		// Signals we can emit
