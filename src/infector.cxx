@@ -179,7 +179,7 @@ void GameWindow::onNewGame()
 void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int by, const bool gameover)
 {
 	int s1, s2, s3, s4;
-	m_pGame->getScores(s1, s2, s3, s4);
+	m_pGame->getBoardState().getScores(s1, s2, s3, s4);
 	m_pRedStatusbar->pop();
 	m_pGreenStatusbar->pop();
 	m_pBlueStatusbar->pop();

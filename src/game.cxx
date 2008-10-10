@@ -132,11 +132,6 @@ void Game::onSquareClicked(const int x, const int y)
 	}
 }
 
-void Game::getScores(int& p1, int& p2, int& p3, int& p4) const
-{
-	m_BoardState.getScores(p1, p2, p3, p4);
-}
-
 const BoardState& Game::getBoardState() const
 {
 	return m_BoardState;

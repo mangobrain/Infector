@@ -39,9 +39,6 @@ class Game: public sigc::trackable
 		
 		const BoardState& getBoardState() const;
 
-		// Get current scores
-		void getScores(int& p1, int& p2, int& p3, int& p4) const;
-
 	private:
 		// Board state
 		BoardState m_BoardState;
