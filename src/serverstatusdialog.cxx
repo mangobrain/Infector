@@ -90,12 +90,18 @@ void ServerStatusDialog::on_response(int response_id)
 	// OK button is disabled
 	m_pStartButton->set_sensitive(false);
 	
-	// Close all listening sockets
+	// Close all listening sockets by removing all references to their IOChannels
 	for (std::list<Glib::RefPtr<Glib::IOChannel> >::iterator i = serversocks.begin(); i != serversocks.end(); ++i)
 	{
 		i->reset();
 	}
+	for (std::list<sigc::connection>::iterator i = eventconns.begin(); i != eventconns.end(); ++i)
+	{
+		i->disconnect();
+	}
 	serversocks.clear();
+	
+	// TODO If response is cancel, close any open accepted sockets too.
 }
 
 // Port apply button clicked
@@ -105,9 +111,6 @@ void ServerStatusDialog::onApply()
 	// Disable port spinner and apply button
 	m_pPortSpin->set_sensitive(false);
 	m_pApplyButton->set_sensitive(false);
-	
-	// Set the cancel button to be the default widget
-	m_pCancelButton->grab_default();
 	
 	// Convert port number to string
 	std::ostringstream ostr;
@@ -145,22 +148,24 @@ void ServerStatusDialog::onApply()
 			if (s == INVALID_SOCKET)
 			{
 				errPop(strerror(errno));
-				freeaddrinfo(results);
 				response(Gtk::RESPONSE_CANCEL);
+				break;
 			} else {
 				// Bind it to the current address
 				if (bind(s, current->ai_addr, current->ai_addrlen) == SOCKET_ERROR)
 				{
 					errPop(strerror(errno));
-					freeaddrinfo(results);
 					response(Gtk::RESPONSE_CANCEL);
+					close(s);
+					break;
 				} else {
 					// Start it listening
 					if (listen(s, 10) == SOCKET_ERROR)
 					{
 						errPop(strerror(errno));
-						freeaddrinfo(results);
 						response(Gtk::RESPONSE_CANCEL);
+						close(s);
+						break;
 					} else {
 						// Connect it to signal handlers to be monitored
 #ifndef MINGW
@@ -168,6 +173,10 @@ void ServerStatusDialog::onApply()
 #else
 						Glib::RefPtr<Glib::IOChannel> ioc = Glib::IOChannel::create_from_win32_socket(s);
 #endif
+						// Bind the socket as one of the event handler's arguments, or we can't call accept()
+						eventconns.push_back(Glib::signal_io().connect(sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::handleServerSocks), s),
+							ioc, Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL));
+
 						// Close underlying socket automatically when IOChannel is destroyed,
 						// and store IOChannel reference in our list of server sockets
 						ioc->set_close_on_unref(true);
@@ -181,4 +190,31 @@ void ServerStatusDialog::onApply()
 		// Discard socket addresses
 		freeaddrinfo(results);
 	}
+}
+
+// Handle incoming connections on server sockets
+bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, SOCKET s)
+{
+	const char* message;
+	if (cond == Glib::IO_IN)
+	{
+		sockaddr newaddr;
+		SOCKET newsock = accept(s, &newaddr, sizeof(newaddr));
+		if (newsock == INVALID_SOCKET)
+		{
+			errPop(strerror(errno));
+			response(Gtk::RESPONSE_CANCEL);
+			return true;
+		}
+		// TODO Check sa_family of newaddr to see if it's a sockaddr_in
+		// or a sockaddr_in6.  Store the socket and its address somewhere
+		// such that it can be returned to calling code.
+		// Create an IOChannel (which won't close on dereference) so we can
+		// monitor to see if the client disconnects or errors.
+		// Add client to GUI, including options to pick players.
+	} else {
+		errPop("Error on listening socket");
+		response(Gtk::RESPONSE_CANCEL);
+	}
+	return true;
 }

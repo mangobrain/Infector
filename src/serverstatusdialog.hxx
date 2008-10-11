@@ -50,6 +50,12 @@ class ServerStatusDialog: public Gtk::Dialog
 		
 		// IOChannel references for our listening sockets
 		std::list<Glib::RefPtr<Glib::IOChannel> > serversocks;
+		
+		// Connection objects corresponding to socket event handlers
+		std::list<sigc::connection> eventconns;
+		
+		// Socket event handlers
+		bool handleServerSocks(Glib::IOCondition cond, SOCKET s);
 };
 
 #endif
