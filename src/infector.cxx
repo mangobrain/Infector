@@ -31,6 +31,7 @@
 #include <sstream>
 #include <algorithm>
 #include <bitset>
+#include <list>
 
 // Library headers
 #include <gtkmm.h>
@@ -43,6 +44,7 @@
 #include "game.hxx"
 #include "gameboard.hxx"
 #include "newgamedialog.hxx"
+#include "serverstatusdialog.hxx"
 #include "gamewindow.hxx"
 #include "ai.hxx"
 
@@ -168,6 +170,25 @@ void GameWindow::onNewGame()
 	// Process the response from the dialogue
 	if (response == Gtk::RESPONSE_OK)
 	{
+		// If there are remote players, show the server status dialogue,
+		// which will block until a suitable number of remote players are found
+		if (m_pNewGameDialog->getRemotePlayers().any())
+		{
+			// Instantiate dialogue if not already done
+			if (m_pServerStatusDialog.get() == NULL)
+			{
+				ServerStatusDialog *pServerStatusDialog;
+				m_refXml->get_widget_derived("serverstatusdialog", pServerStatusDialog);
+				m_pServerStatusDialog.reset(pServerStatusDialog);
+			}
+			
+			response = m_pServerStatusDialog->run();
+			m_pServerStatusDialog->hide();
+
+			if (response != Gtk::RESPONSE_OK)
+				return;
+		}
+
 		// Stop the current running game and start a new one
 		int w, h;
 		m_pNewGameDialog->getBoardSize(w, h);
