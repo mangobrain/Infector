@@ -151,19 +151,31 @@ bool NewGameDialog::isBoardHexagonal() const
 	return m_pBoardShape->get_active_row_number() == 1;
 }
 
-// Get a bit set indicating whether each of the possible four players is an AI
-const std::bitset<4> NewGameDialog::getAIPlayers() const
+// Get bit set indicating whether there are any players of this type
+const std::bitset<4> NewGameDialog::getPlayersOfType(const int t) const
 {
 	std::bitset<4> results;
 	results.reset();
-	if (m_pPlayer1Box->get_active_row_number() == 1)
+	if (m_pPlayer1Box->get_active_row_number() == t)
 		results.set(0);
-	if (m_pPlayer2Box->get_active_row_number() == 1)
+	if (m_pPlayer2Box->get_active_row_number() == t)
 		results.set(1);
-	if (m_pPlayer3Box->get_active_row_number() == 1)
+	if (m_pPlayer3Box->get_active_row_number() == t)
 		results.set(2);
-	if (m_pPlayer4Box->get_active_row_number() == 1)
+	if (m_pPlayer4Box->get_active_row_number() == t)
 		results.set(3);
 	
 	return results;
+}
+
+// Get a bit set indicating whether each of the possible four players is an AI
+const std::bitset<4> NewGameDialog::getAIPlayers() const
+{
+	return getPlayersOfType(1);
+}
+
+// Get bit set indicating whether there are any players of this type
+const std::bitset<4> NewGameDialog::getRemotePlayers() const
+{
+	return getPlayersOfType(2);
 }

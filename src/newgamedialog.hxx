@@ -32,6 +32,9 @@ class NewGameDialog: public Gtk::Dialog
 		// Get a bit set indicating whether each of the possible four players is an AI
 		const std::bitset<4> getAIPlayers() const;
 
+		// Same for whether we are expecting remote players to connect
+		const std::bitset<4> getRemotePlayers() const;
+
 	private:
 		Gtk::ComboBox *m_pNumPlayers;
 		Gtk::ComboBox *m_pBoardSize;
@@ -47,6 +50,9 @@ class NewGameDialog: public Gtk::Dialog
 		// Event handlers
 		void onChangePlayers();
 		void onChangeShape();
+		
+		// Get bit set indicating whether there are any players of this type
+		const std::bitset<4> getPlayersOfType(const int t) const;
 };
 
 #endif
