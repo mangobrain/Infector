@@ -43,6 +43,23 @@ PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4 >= 2.12])
 PKG_CHECK_MODULES([GLADEMM], [libglademm-2.4 >= 2.6])
 
+dnl # Are we building on MinGW?
+AC_MSG_CHECKING(host os)
+AC_CANONICAL_HOST
+AC_MSG_RESULT($host_os)
+win=false
+case "$host_os" in
+	mingw*)
+		win=true
+		LIBS="-lwsock32 ${LIBS}"
+		CXXFLAGS="-mthreads ${CXXFLAGS}"
+		AC_DEFINE([MINGW],[1],[Define if building for Windows (MinGW)])
+		;;
+	*)
+		;;
+esac
+AM_CONDITIONAL(MINGW, test "x$win" = "xtrue")
+
 dnl # All done.  Spit out the result.
 AC_CONFIG_FILES([
 	Makefile
