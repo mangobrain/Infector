@@ -102,6 +102,8 @@ void ServerStatusDialog::on_response(int response_id)
 	serversocks.clear();
 	
 	// TODO If response is cancel, close any open accepted sockets too.
+	// If response is OK, disconnect event handlers from accepted sockets,
+	// delete our references to them, but do not close them.
 }
 
 // Port apply button clicked
@@ -195,11 +197,11 @@ void ServerStatusDialog::onApply()
 // Handle incoming connections on server sockets
 bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, SOCKET s)
 {
-	const char* message;
 	if (cond == Glib::IO_IN)
 	{
-		sockaddr newaddr;
-		SOCKET newsock = accept(s, &newaddr, sizeof(newaddr));
+		sockaddr_storage newaddr;
+		socklen_t newaddrlen = sizeof(newaddr);
+		SOCKET newsock = accept(s, (sockaddr*) &newaddr, &newaddrlen);
 		if (newsock == INVALID_SOCKET)
 		{
 			errPop(strerror(errno));
@@ -212,6 +214,7 @@ bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, SOCKET s)
 		// Create an IOChannel (which won't close on dereference) so we can
 		// monitor to see if the client disconnects or errors.
 		// Add client to GUI, including options to pick players.
+		errPop("Accept success ;-)");
 	} else {
 		errPop("Error on listening socket");
 		response(Gtk::RESPONSE_CANCEL);
