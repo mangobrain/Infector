@@ -29,7 +29,7 @@ class GameBoard: public Gtk::DrawingArea
 
 		// Call this when a new game is started - will grab initial details
 		// and connect game event handlers to the instance's signals.
-		void newGame(Game *g, const BoardState *b);
+		void newGame(Game *g, const BoardState *b, const GameType *gt);
 
 	private:
 		// Callbacks for GTK/GDK events
@@ -45,10 +45,10 @@ class GameBoard: public Gtk::DrawingArea
 		void setBackground();
 
 		// Default & current state of game board
+		GameType m_DefaultGameType;
 		BoardState m_DefaultBoardState;
 		const BoardState *m_pBoardState;
-		
-		// Size of current game board
+		const GameType *m_pGameType;
 		int bw, bh;
 };
 

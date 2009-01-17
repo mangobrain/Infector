@@ -33,7 +33,7 @@
 #include <libglademm.h>
 
 // Project headers
-#include "boardstate.hxx"
+#include "gametype.hxx"
 #include "newgamedialog.hxx"
 
 //
@@ -117,65 +117,78 @@ void NewGameDialog::onChangeShape()
 	}
 }
 
-piece NewGameDialog::getLastPlayer() const
+void NewGameDialog::getGameType(GameType &gt) const
 {
-	if ((m_pNumPlayers->get_active_row_number() == 0) || (m_pBoardShape->get_active_row_number() == 1))
-		return player_2;
-	else
-		return player_4;
-}
-
-void NewGameDialog::getBoardSize(int &w, int &h) const
-{
+	// Set width & height
 	switch (m_pBoardSize->get_active_row_number())
 	{
 		case 0:
-			w = 5; h = 5;
+			gt.w = 5; gt.h = 5;
 			break;
 		case 1:
-			w = 8; h = 8;
+			gt.w = 8; gt.h = 8;
 			break;
 		case 2:
-			w = 10; h = 10;
+			gt.w = 10; gt.h = 10;
 			break;
 		case 3:
-			w = 14; h = 14;
+			gt.w = 14; gt.h = 14;
 			break;
 		default:
-			w = 20; h = 20;
+			gt.w = 20; gt.h = 20;
 	}
-}
-
-bool NewGameDialog::isBoardHexagonal() const
-{
-	return m_pBoardShape->get_active_row_number() == 1;
-}
-
-// Get bit set indicating whether there are any players of this type
-const std::bitset<4> NewGameDialog::getPlayersOfType(const int t) const
-{
-	std::bitset<4> results;
-	results.reset();
-	if (m_pPlayer1Box->get_active_row_number() == t)
-		results.set(0);
-	if (m_pPlayer2Box->get_active_row_number() == t)
-		results.set(1);
-	if (m_pPlayer3Box->get_active_row_number() == t)
-		results.set(2);
-	if (m_pPlayer4Box->get_active_row_number() == t)
-		results.set(3);
 	
-	return results;
-}
+	// Set square board flag
+	gt.square = (m_pBoardShape->get_active_row_number() == 0);
 
-// Get a bit set indicating whether each of the possible four players is an AI
-const std::bitset<4> NewGameDialog::getAIPlayers() const
-{
-	return getPlayersOfType(1);
-}
-
-// Get bit set indicating whether there are any players of this type
-const std::bitset<4> NewGameDialog::getRemotePlayers() const
-{
-	return getPlayersOfType(2);
+	// Set type of players 1 and 2
+	switch (m_pPlayer1Box->get_active_row_number())
+	{
+		case 0:
+			gt.player_1 = pt_local;
+			break;
+		case 1:
+			gt.player_1 = pt_ai;
+			break;
+		default:
+			gt.player_1 = pt_remote;
+	}
+	switch (m_pPlayer2Box->get_active_row_number())
+	{
+		case 0:
+			gt.player_2 = pt_local;
+			break;
+		case 1:
+			gt.player_2 = pt_ai;
+			break;
+		default:
+			gt.player_2 = pt_remote;
+	}
+	
+	// Set types of players 3 and 4 if it's a 4-player game
+	if (gt.square && (m_pNumPlayers->get_active_row_number() == 1))
+	{
+		switch (m_pPlayer3Box->get_active_row_number())
+		{
+			case 0:
+				gt.player_3 = pt_local;
+				break;
+			case 1:
+				gt.player_3 = pt_ai;
+				break;
+			default:
+				gt.player_3 = pt_remote;
+		}
+		switch (m_pPlayer4Box->get_active_row_number())
+		{
+			case 0:
+				gt.player_4 = pt_local;
+				break;
+			case 1:
+				gt.player_4 = pt_ai;
+				break;
+			default:
+				gt.player_4 = pt_remote;
+		}
+	}
 }

@@ -24,15 +24,15 @@ class BoardState;
 class AI : public sigc::trackable
 {
 	public:
-		// Constructed by Game - pass in BoardState so we don't try to call getBoardState() during Game's constructor
-		AI(Game *game, const BoardState *bs);
+		AI(Game *game, const BoardState *bs, const GameType *gt);
 	
 		// Signals we can emit
 		sigc::signal<void, const int, const int> square_clicked;
 	
 	private:
-		// Pointer to current board state
+		// Pointer to current board state & game type
 		const BoardState *m_pBoardState;
+		const GameType *m_pGameType;
 		
 		// Event handlers
 		void onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y, const bool gameover);

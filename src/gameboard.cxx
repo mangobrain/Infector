@@ -27,7 +27,6 @@
 
 // Language headers
 #include <cstdlib>
-#include <bitset>
 
 // Library headers
 #include <gtkmm.h>
@@ -36,6 +35,7 @@
 // System headers
 
 // Project headers
+#include "gametype.hxx"
 #include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"
@@ -47,8 +47,8 @@
 
 // Constructor
 GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::DrawingArea(cobject), m_DefaultBoardState(player_2, 8, 8, false, 0), m_pBoardState(NULL),
-	bw(8), bh(8)
+	: Gtk::DrawingArea(cobject), m_DefaultGameType(), m_DefaultBoardState(&m_DefaultGameType),
+		m_pBoardState(NULL), m_pGameType(NULL), bw(m_DefaultGameType.w), bh(m_DefaultGameType.h)
 {
 	// Connect mouse click events to the onClick handler
 	signal_button_press_event().connect(sigc::mem_fun(*this, &GameBoard::onClick));
@@ -67,10 +67,10 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::X
 	signal_configure_event().connect(sigc::mem_fun(*this, &GameBoard::onResize), true);
 	
 	// Don't put pieces on the default board - it looks like a game is in play
-	m_DefaultBoardState.setPieceAt(0, 0, player_none);
-	m_DefaultBoardState.setPieceAt(0, 7, player_none);
-	m_DefaultBoardState.setPieceAt(7, 0, player_none);
-	m_DefaultBoardState.setPieceAt(7, 7, player_none);
+	m_DefaultBoardState.setPieceAt(0, 0, pc_player_none);
+	m_DefaultBoardState.setPieceAt(0, 7, pc_player_none);
+	m_DefaultBoardState.setPieceAt(7, 0, pc_player_none);
+	m_DefaultBoardState.setPieceAt(7, 7, pc_player_none);
 	m_DefaultBoardState.clearSelection();
 }
 
@@ -95,7 +95,7 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 		int h(alloc.get_height());
 
 		const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
-		if (current->isHexagonal())
+		if (!((m_pGameType == NULL) ? m_DefaultGameType.square : m_pGameType->square))
 		{
 			// Horrid hexagonal board
 			double x = 0;
@@ -111,21 +111,21 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 				x = ((hxinc * 2) * (i - current->getInitialOffset())) + (hxinc / 2);
 				for (int j = 0; j < bw; ++j)
 				{
-					if (current->getPieceAt(j, i) != no_such_square)
+					if (current->getPieceAt(j, i) != pc_no_such_square)
 					{
 						bool draw = true;
 						switch (current->getPieceAt(j, i))
 						{
-							case player_1:
+							case pc_player_1:
 								cr->set_source_rgb(1, 0, 0);
 								break;
-							case player_2:
+							case pc_player_2:
 								cr->set_source_rgb(0, 1, 0);
 								break;
-							case player_3:
+							case pc_player_3:
 								cr->set_source_rgb(0, 0, 1);
 								break;
-							case player_4:
+							case pc_player_4:
 								cr->set_source_rgb(1, 1, 0);
 								break;
 							default:
@@ -168,7 +168,7 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 								draw = true;
 							}
 						}
-						if (self || (draw && (current->getPieceAt(j, i) == player_none)))
+						if (self || (draw && (current->getPieceAt(j, i) == pc_player_none)))
 						{
 							std::vector<double> dashes;
 							dashes.push_back(2);
@@ -195,16 +195,16 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 					bool draw = true;
 					switch (current->getPieceAt(j, i))
 					{
-						case player_1:
+						case pc_player_1:
 							cr->set_source_rgb(1, 0, 0);
 							break;
-						case player_2:
+						case pc_player_2:
 							cr->set_source_rgb(0, 1, 0);
 							break;
-						case player_3:
+						case pc_player_3:
 							cr->set_source_rgb(0, 0, 1);
 							break;
-						case player_4:
+						case pc_player_4:
 							cr->set_source_rgb(1, 1, 0);
 							break;
 						default:
@@ -241,7 +241,7 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 							draw = true;
 						}
 					}
-					if (self || (draw && (current->getPieceAt(j, i) == player_none)))
+					if (self || (draw && (current->getPieceAt(j, i) == pc_player_none)))
 					{
 						std::vector<double> dashes;
 						dashes.push_back(2);
@@ -269,7 +269,7 @@ bool GameBoard::onClick(GdkEventButton *event)
 	const int h(alloc.get_height());
 	
 	const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
-	if (current->isHexagonal())
+	if (!((m_pGameType == NULL) ? m_DefaultGameType.square : m_pGameType->square))
 	{
 		// Horrid hexagonal board
 		double x = 0;
@@ -285,7 +285,7 @@ bool GameBoard::onClick(GdkEventButton *event)
 			x = ((hxinc * 2) * (i - current->getInitialOffset())) + (hxinc / 2);
 			for (int j = 0; j < bw; ++j)
 			{
-				if (current->getPieceAt(j, i) != no_such_square)
+				if (current->getPieceAt(j, i) != pc_no_such_square)
 				{
 					// Point-in-hexagon test is split into three parts:
 					// - if relative x coord is between (hxinc) and (2 * hxinc), point in rectangle
@@ -340,7 +340,7 @@ bool GameBoard::onClick(GdkEventButton *event)
 
 // Call this when a new game is started - will grab initial details
 // and connect game event handlers to the instance's signals.
-void GameBoard::newGame(Game *g, const BoardState *b)
+void GameBoard::newGame(Game *g, const BoardState *b, const GameType *gt)
 {
 	// TODO - Implement signal handlers and uncomment this
 	g->move_made.connect(sigc::mem_fun(*this, &GameBoard::onMoveMade));
@@ -349,15 +349,18 @@ void GameBoard::newGame(Game *g, const BoardState *b)
 
 	// Store pointer to shared board state
 	m_pBoardState = b;
-	bw = b->getWidth();
-	bh = b->getHeight();
+	m_pGameType = gt;
+
+	// Store board width & height locally to keep code clean
+	bw = m_pGameType->w;
+	bh = m_pGameType->h;
 
 	// Refresh the board
 	setBackground();
 	queue_draw();
 	
-	// Enable user interaction if the first player's a human
-	set_sensitive(!(m_pBoardState->isAIPlayer(player_1)));
+	// Enable user interaction if the first player's a local human
+	set_sensitive(m_pGameType->player_1 == pt_local);
 }
 
 // Set the widget's background pixmap to the empty board
@@ -376,7 +379,7 @@ void GameBoard::setBackground()
 
 	// Draw board on pixmap
 	const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
-	if (current->isHexagonal())
+	if (!((m_pGameType == NULL) ? m_DefaultGameType.square : m_pGameType->square))
 	{
 		// Horrid hexagonal board
 		Glib::RefPtr<const Gtk::Style> style = get_style();
@@ -398,7 +401,7 @@ void GameBoard::setBackground()
 			x = ((hxinc * 2) * (i - current->getInitialOffset())) + (hxinc / 2);
 			for (int j = 0; j < bw; ++j)
 			{
-				if (current->getPieceAt(j, i) != no_such_square)
+				if (current->getPieceAt(j, i) != pc_no_such_square)
 				{
 					if (i % 2)
 					{
@@ -483,11 +486,9 @@ void GameBoard::onMoveMade(const int start_x, const int start_y, const int end_x
 	// Also, find out how to make immediate redraws work - don't want to wait until AI::onMoveMade has finished.
 	queue_draw();
 	
-	// Disable clicking when game is over or it's an AI's turn - until next game starts
+	// Disable clicking when game is over or it's not a local player's turn - until next game starts
 	if (gameover)
 		set_sensitive(false);
-	else if (m_pBoardState->isAIPlayer(m_pBoardState->getPlayer()))
-		set_sensitive(false);
 	else
-		set_sensitive(true);
+		set_sensitive(m_pGameType->isPlayerType(m_pBoardState->getPlayer(), pt_local));
 }

@@ -29,11 +29,11 @@
 #include <utility>
 #include <vector>
 #include <cstdlib>
-#include <bitset>
 
 // System headers
 
 // Project headers
+#include "gametype.hxx"
 #include "boardstate.hxx"
 
 //
@@ -52,11 +52,11 @@ static const char *map =
 // Implementation
 //
 
-BoardState::BoardState(const piece lastplayer, const int width, const int height, const bool hexagonal, const std::bitset<4> &aiplayers)
-	: current_player(player_1), m_lastplayer(lastplayer), xsel(-1), ysel(-1), bw(width), bh(height),
-	m_hexagonal(hexagonal), m_aiplayers(aiplayers), m_Score1(-1), m_Score2(-1), m_Score3(-1), m_Score4(-1)
+BoardState::BoardState(GameType *gt)
+	: current_player(pc_player_1), m_pGameType(gt), xsel(-1), ysel(-1),
+		m_Score1(-1), m_Score2(-1), m_Score3(-1), m_Score4(-1)
 {
-	if (m_hexagonal)
+	if (!(m_pGameType->square))
 	{
 
 		// Hexagonal board
@@ -76,13 +76,13 @@ BoardState::BoardState(const piece lastplayer, const int width, const int height
 		//        *****   *  ((width + height) - 1, (width + height) - 1)
 		
 		// Number or columns
-		pieces.resize((bw + bh) - 1);
+		pieces.resize((m_pGameType->w + m_pGameType->h) - 1);
 		// First column is w squares heigh - "height" refers to length of diagonal edge
-		int current_height = bw;
+		int current_height = m_pGameType->w;
 		// Columns get longer, until the midpoint, then start shrinking again
 		bool growing = true;
 		// Until we get past the midpoint, we also have a vertical offset
-		int current_offset = bh - 1;
+		int current_offset = m_pGameType->h - 1;
 		
 		for (std::vector<std::pair<int, std::vector<piece> > >::iterator i = pieces.begin(); i != pieces.end(); ++i)
 		{
@@ -92,7 +92,7 @@ BoardState::BoardState(const piece lastplayer, const int width, const int height
 			{
 				++current_height;
 				--current_offset;
-				if (current_height == (bw + bh) -1)
+				if (current_height == (m_pGameType->w + m_pGameType->h) -1)
 					growing = false;
 			} else {
 				--current_height;
@@ -101,60 +101,54 @@ BoardState::BoardState(const piece lastplayer, const int width, const int height
 		
 		// Now store the *actual* dimensions of the board, as if it were a square
 		// with the corners cut off.
-		bh = (width + height) - 1;
-		bw = bh;
+		int orig_h = m_pGameType->h;
+		int orig_w = m_pGameType->w;
+		m_pGameType->h = (m_pGameType->w + m_pGameType->h) - 1;
+		m_pGameType->w = m_pGameType->h;
 		
 		// Place starting pieces at the corners.
 		// Can only have two players (fairly) on a hexagonal board, so
 		// don't bother switching based on lastplayer.
 		// We aren't taking into account vertical offsets
 		// here, so zero in the column isn't always zero in the "square".
-		pieces[0].second[0] = player_2;
-		pieces[0].second[width - 1] = player_1;
-		pieces[height - 1].second[0] = player_1;
-		pieces[height - 1].second[bh - 1] = player_2;
-		pieces[bw - 1].second[0] = player_2;
-		pieces[bw - 1].second[width - 1] = player_1;
-		m_lastplayer = player_2;
+		pieces[0].second[0] = pc_player_2;
+		pieces[0].second[orig_w - 1] = pc_player_1;
+		pieces[orig_h - 1].second[0] = pc_player_1;
+		pieces[orig_h - 1].second[m_pGameType->h - 1] = pc_player_2;
+		pieces[m_pGameType->w - 1].second[0] = pc_player_2;
+		pieces[m_pGameType->w - 1].second[orig_w - 1] = pc_player_1;
 
 	} else {
-
 		// Traditional square board with a player at each corner
-		pieces.resize(bw);
+		pieces.resize(m_pGameType->w);
 		for (std::vector<std::pair<int, std::vector<piece> > >::iterator i = pieces.begin(); i != pieces.end(); ++i)
 		{
-			i->second.resize(bh);
+			i->second.resize(m_pGameType->h);
 			i->first = 0;
 		}
 		
 		// Place starting pieces
 		// Can only have 2 or 4 players on a square board
-		switch (lastplayer)
+		if (m_pGameType->player_3 == pt_none)
 		{
-			case no_such_square:
-			case player_none:
-			case player_1:
-			case player_2:
-				pieces[0].second[0] = player_2;
-				pieces[bw - 1].second[bh - 1] = player_2;
-				pieces[0].second[bh - 1] = player_1;
-				pieces[bw - 1].second[0] = player_1;
-				m_lastplayer = player_2;
-				break;
-			case player_3:
-			case player_4:
-				pieces[0].second[0] = player_3;
-				pieces[bw - 1].second[bh - 1] = player_2;
-				pieces[0].second[bh - 1] = player_1;
-				pieces[bw - 1].second[0] = player_4;
-				m_lastplayer = player_4;
+			// 2 players
+			pieces[0].second[0] = pc_player_2;
+			pieces[m_pGameType->w - 1].second[m_pGameType->h - 1] = pc_player_2;
+			pieces[0].second[m_pGameType->h - 1] = pc_player_1;
+			pieces[m_pGameType->w - 1].second[0] = pc_player_1;
+		} else {
+			// 4 players
+			pieces[0].second[0] = pc_player_3;
+			pieces[m_pGameType->w - 1].second[m_pGameType->h - 1] = pc_player_2;
+			pieces[0].second[m_pGameType->h - 1] = pc_player_1;
+			pieces[m_pGameType->w - 1].second[0] = pc_player_4;
 		}
 	}
 	
 	// Set initial scores
-	if (!hexagonal)
+	if (m_pGameType->square)
 	{
-		if (lastplayer == player_2)
+		if (m_pGameType->player_3 == pt_none)
 		{
 			m_Score1 = 2;
 			m_Score2 = 2;
@@ -174,11 +168,11 @@ BoardState::BoardState(const piece lastplayer, const int width, const int height
 piece BoardState::getPieceAt(const int x, const int y) const
 {
 	// Take into account unallocated squares in hexagonal board
-	if ((x < 0) || (x >= bw))
-		return no_such_square;
+	if ((x < 0) || (x >= m_pGameType->w))
+		return pc_no_such_square;
 	int offset_y = y - pieces.at(x).first;
 	if ((offset_y < 0) || (offset_y >= pieces.at(x).second.size()))
-		return no_such_square;
+		return pc_no_such_square;
 
 	return pieces.at(x).second.at(offset_y);
 }
@@ -186,24 +180,24 @@ piece BoardState::getPieceAt(const int x, const int y) const
 void BoardState::setPieceAt(const int x, const int y, const piece p)
 {
 	// Take into account unallocated squares in hexagonal board
-	if ((x < 0) || (x >= bw))
+	if ((x < 0) || (x >= m_pGameType->w))
 		return;
 	int offset_y = y - pieces.at(x).first;
 	if ((offset_y < 0) || (offset_y >= pieces.at(x).second.size()))
 		return;
 	
-	if (p == player_none)
+	if (p == pc_player_none)
 	{
 		// If we're clearing out a square, subtract one from player's score
 		switch (pieces.at(x).second.at(offset_y))
 		{
-			case player_1:
+			case pc_player_1:
 				--m_Score1;
 				break;
-			case player_2:
+			case pc_player_2:
 				--m_Score2;
 				break;
-			case player_3:
+			case pc_player_3:
 				--m_Score3;
 				break;
 			default:
@@ -216,13 +210,13 @@ void BoardState::setPieceAt(const int x, const int y, const piece p)
 		// Increase score for the player who's just gained a piece
 		switch (p)
 		{
-			case player_1:
+			case pc_player_1:
 				m_Score1++;
 				break;
-			case player_2:
+			case pc_player_2:
 				m_Score2++;
 				break;
-			case player_3:
+			case pc_player_3:
 				m_Score3++;
 				break;
 			default:
@@ -236,7 +230,7 @@ void BoardState::setPieceAt(const int x, const int y, const piece p)
 			for (int yy = y - 1; yy <= y + 1; ++yy)
 			{
 				piece capturesquare = getPieceAt(xx, yy);
-				if ((capturesquare == player_none) || (capturesquare == no_such_square) || (capturesquare == p))
+				if ((capturesquare == pc_player_none) || (capturesquare == pc_no_such_square) || (capturesquare == p))
 				{
 					++offset;
 					continue;
@@ -248,13 +242,13 @@ void BoardState::setPieceAt(const int x, const int y, const piece p)
 					pieces[xx].second[offset_yy] = p;
 					switch (capturesquare)
 					{
-						case player_1:
+						case pc_player_1:
 							m_Score1--;
 							break;
-						case player_2:
+						case pc_player_2:
 							m_Score2--;
 							break;
-						case player_3:
+						case pc_player_3:
 							m_Score3--;
 							break;
 						default:
@@ -262,13 +256,13 @@ void BoardState::setPieceAt(const int x, const int y, const piece p)
 					}
 					switch (p)
 					{
-						case player_1:
+						case pc_player_1:
 							m_Score1++;
 							break;
-						case player_2:
+						case pc_player_2:
 							m_Score2++;
 							break;
-						case player_3:
+						case pc_player_3:
 							m_Score3++;
 							break;
 						default:
@@ -283,39 +277,9 @@ void BoardState::setPieceAt(const int x, const int y, const piece p)
 	pieces[x].second[offset_y] = p;
 }
 
-int BoardState::getWidth() const
-{
-	return bw;
-}
-
-int BoardState::getHeight() const
-{
-	return bh;
-}
-
 piece BoardState::getPlayer() const
 {
 	return current_player;
-}
-
-bool BoardState::isAIPlayer(const piece player) const
-{
-	switch (player)
-	{
-		case player_1:
-			return m_aiplayers.test(0);
-		case player_2:
-			return m_aiplayers.test(1);
-		case player_3:
-			return m_aiplayers.test(2);
-		default:
-			return m_aiplayers.test(3);
-	}
-}
-
-bool BoardState::isHexagonal() const
-{
-	return m_hexagonal;
 }
 
 void BoardState::getSelectedSquare(int &x, int &y) const
@@ -332,7 +296,7 @@ int BoardState::getInitialOffset() const
 void BoardState::setSelectedSquare(const int x, const int y)
 {
 	// Take into account unallocated squares in hexagonal board
-	if ((x < 0) || (x >= bw))
+	if ((x < 0) || (x >= m_pGameType->w))
 		return;
 	int offset_y = y - pieces.at(x).first;
 	if ((offset_y < 0) || (offset_y >= pieces.at(x).second.size()))
@@ -351,10 +315,13 @@ void BoardState::clearSelection()
 // Advance to the next player's turn and return the new current player
 piece BoardState::nextPlayer()
 {
-	if (current_player == m_lastplayer)
-		current_player = player_1;
-	else
+	if (((m_pGameType->player_3 == pt_none) && (current_player == pc_player_2))
+		|| (current_player == pc_player_4))
+	{
+		current_player = pc_player_1;
+	} else {
 		current_player = (piece)(current_player + 1);
+	}
 	return current_player;
 }
 
@@ -368,20 +335,20 @@ unsigned int BoardState::getAdjacency(const int ax, const int ay, const int bx, 
 
 	// Range checking, including chopped-off corners on hexagonal board
 
-	if ((ax < 0) || (ax >= bw))
+	if ((ax < 0) || (ax >= m_pGameType->w))
 		return 0;
 	int offset_y = ay - pieces.at(ax).first;
 	if ((offset_y < 0) || (offset_y >= pieces.at(ax).second.size()))
 		return 0;
 	
-	if ((bx < 0) || (bx >= bw))
+	if ((bx < 0) || (bx >= m_pGameType->w))
 		return 0;
 	offset_y = by - pieces.at(bx).first;
 	if ((offset_y < 0) || (offset_y >= pieces.at(bx).second.size()))
 		return 0;
 
 	// Now the actual shape-dependent adjacency test
-	if (m_hexagonal)
+	if (!(m_pGameType->square))
 	{
 		// Look it up in the adjacency map.
 		// First convert to coordinates in the range (0, 0) to (4, 4)
@@ -416,9 +383,9 @@ unsigned int BoardState::getAdjacency(const int ax, const int ay, const int bx, 
 std::vector<move> BoardState::getPossibleMoves(const piece player, const bool stop) const
 {
 	std::vector<move> results;
-	for (int x = 0; x < bw; ++x)
+	for (int x = 0; x < m_pGameType->w; ++x)
 	{
-		for (int y = 0; y < bh; ++y)
+		for (int y = 0; y < m_pGameType->h; ++y)
 		{
 			if (getPieceAt(x, y) != player)
 				continue;
@@ -426,9 +393,8 @@ std::vector<move> BoardState::getPossibleMoves(const piece player, const bool st
 			{
 				for (int yy = y - 2; yy <= y + 2; ++yy)
 				{
-					
 					if ((getAdjacency(x, y, xx, yy) > 0)
-						&& (getPieceAt(xx, yy) == player_none))
+						&& (getPieceAt(xx, yy) == pc_player_none))
 					{
 						results.push_back(move(x, y, xx, yy));
 						if (stop)

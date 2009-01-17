@@ -27,7 +27,6 @@
 
 // Language headers
 #include <cstdlib>
-#include <bitset>
 
 // Library headers
 #include <gtkmm.h>
@@ -36,6 +35,7 @@
 // System headers
 
 // Project headers
+#include "gametype.hxx"
 #include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"
@@ -46,8 +46,8 @@
 //
 
 // Constructor
-Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, const bool hexagonal, const std::bitset<4> &aiplayers)
-	: m_BoardState(lastplayer, bw, bh, hexagonal, aiplayers), m_pAI(NULL)
+Game::Game(GameBoard* b, GameType &gt)
+	: m_GameType(gt), m_BoardState(&m_GameType), m_pAI(NULL)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother
@@ -56,12 +56,12 @@ Game::Game(GameBoard* b, const piece lastplayer, const int bw, const int bh, con
 	// Connect square clicked handler to game board instance
 	b->square_clicked.connect(sigc::mem_fun(*this, &Game::onSquareClicked));
 	
-	b->newGame(this, &m_BoardState);
+	b->newGame(this, &m_BoardState, &m_GameType);
 	
 	// Create an AI object if necessary
-	if (aiplayers.any())
+	if (gt.anyPlayersOfType(pt_ai))
 	{
-		m_pAI.reset(new AI(this, &m_BoardState));
+		m_pAI.reset(new AI(this, &m_BoardState, &m_GameType));
 		m_pAI->square_clicked.connect(sigc::mem_fun(*this, &Game::onSquareClicked));
 	}
 }
@@ -85,7 +85,7 @@ void Game::onSquareClicked(const int x, const int y)
 		invalid_move();
 	else {
 		// Yes! Is it a valid move?
-		if (((xsel == x) && (ysel == y)) || (m_BoardState.getPieceAt(x, y) != player_none))
+		if (((xsel == x) && (ysel == y)) || (m_BoardState.getPieceAt(x, y) != pc_player_none))
 			// Nope - they tried to move the piece onto itself, or the
 			// destination square isn't empty/doesn't exist.
 			invalid_move();
@@ -108,7 +108,7 @@ void Game::onSquareClicked(const int x, const int y)
 			// and advance the state of the game.
 			m_BoardState.setPieceAt(x, y, m_BoardState.getPlayer());
 			if (!clone)
-				m_BoardState.setPieceAt(xsel, ysel, player_none);
+				m_BoardState.setPieceAt(xsel, ysel, pc_player_none);
 			m_BoardState.clearSelection();
 			
 			// Can the next player actually move?
@@ -127,6 +127,8 @@ void Game::onSquareClicked(const int x, const int y)
 				}
 			}
 			
+			// TODO - Change this to pass in a move structure.
+			// Will mean changing all onMoveMade signal handlers.
 			move_made(xsel, ysel, x, y, gameover);
 		}
 	}

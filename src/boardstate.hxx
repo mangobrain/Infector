@@ -20,17 +20,6 @@
 
 class Game;
 
-// Enumerated type for board square states
-enum piece
-{
-	player_none,
-	player_1,
-	player_2,
-	player_3,
-	player_4,
-	no_such_square
-};
-
 // Struct for storing a single game move
 struct move
 {
@@ -47,15 +36,12 @@ struct move
 class BoardState
 {
 	public:
-		BoardState(const piece lastplayer, const int width, const int height, const bool hexagonal, const std::bitset<4> &aiplayers);
+		BoardState(GameType *gt);
 		
 		// Property accessors
 		piece getPieceAt(const int x, const int y) const;
 		void setPieceAt(const int x, const int y, const piece p);
-		int getWidth() const;
-		int getHeight() const;
 		piece getPlayer() const;
-		bool isHexagonal() const;
 		void getSelectedSquare(int &x, int &y) const;
 		void setSelectedSquare(const int x, const int y);
 		void clearSelection();
@@ -64,8 +50,6 @@ class BoardState
 		
 		// Advance to the next player's turn and return the new current player
 		piece nextPlayer();
-		
-		bool isAIPlayer(const piece) const;
 		
 		// Calculate whether one square is adjacent to another within 1 or 2 squares
 		// Return 0 (not adjacent), 1 ("clone" distance) or 2 ("jump" distance)
@@ -81,23 +65,15 @@ class BoardState
 		// Get current scores
 		void getScores(int& p1, int& p2, int& p3, int& p4) const;
 		
-		// Get number of players
-		int getNumPlayers() const
-		{
-			return (m_lastplayer == player_2) ? 2 : 4;
-		};
-		
 	private:
 		// Game info
 		piece current_player;
-		piece m_lastplayer;
+		GameType *m_pGameType;
+
 		// Board state - store each column with an explicit vertical offset (for
 		// supporting hexagonal boards)
 		std::vector<std::pair<int, std::vector<piece> > > pieces;
 		int xsel, ysel;
-		int bw, bh;
-		bool m_hexagonal;
-		std::bitset<4> m_aiplayers;
 
 		// Scores
 		int m_Score1, m_Score2, m_Score3, m_Score4;

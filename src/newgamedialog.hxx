@@ -24,16 +24,8 @@ class NewGameDialog: public Gtk::Dialog
 		// Constructor - called by glademm by get_widget_derived
 		NewGameDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
 		
-		// Game property accessors
-		piece getLastPlayer() const;
-		void getBoardSize(int &w, int &h) const;
-		bool isBoardHexagonal() const;
-		
-		// Get a bit set indicating whether each of the possible four players is an AI
-		const std::bitset<4> getAIPlayers() const;
-
-		// Same for whether we are expecting remote players to connect
-		const std::bitset<4> getRemotePlayers() const;
+		// Return game details
+		void getGameType(GameType &gt) const;
 
 	private:
 		Gtk::ComboBox *m_pNumPlayers;
@@ -50,9 +42,6 @@ class NewGameDialog: public Gtk::Dialog
 		// Event handlers
 		void onChangePlayers();
 		void onChangeShape();
-		
-		// Get bit set indicating whether there are any players of this type
-		const std::bitset<4> getPlayersOfType(const int t) const;
 };
 
 #endif

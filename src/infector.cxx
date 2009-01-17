@@ -40,6 +40,7 @@
 // System headers
 
 // Project headers
+#include "gametype.hxx"
 #include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"
@@ -170,9 +171,12 @@ void GameWindow::onNewGame()
 	// Process the response from the dialogue
 	if (response == Gtk::RESPONSE_OK)
 	{
+		GameType gt;
+		m_pNewGameDialog->getGameType(gt);
+	
 		// If there are remote players, show the server status dialogue,
 		// which will block until a suitable number of remote players are found
-		if (m_pNewGameDialog->getRemotePlayers().any())
+		if (gt.anyPlayersOfType(pt_remote))
 		{
 			// Instantiate dialogue if not already done
 			if (m_pServerStatusDialog.get() == NULL)
@@ -182,6 +186,7 @@ void GameWindow::onNewGame()
 				m_pServerStatusDialog.reset(pServerStatusDialog);
 			}
 			
+			//m_pServerStatusDialog->setGameDetails(gt);
 			response = m_pServerStatusDialog->run();
 			m_pServerStatusDialog->hide();
 
@@ -190,9 +195,7 @@ void GameWindow::onNewGame()
 		}
 
 		// Stop the current running game and start a new one
-		int w, h;
-		m_pNewGameDialog->getBoardSize(w, h);
-		m_pGame.reset(new Game(m_pBoard, m_pNewGameDialog->getLastPlayer(), w, h, m_pNewGameDialog->isBoardHexagonal(), m_pNewGameDialog->getAIPlayers()));
+		m_pGame.reset(new Game(m_pBoard, gt));
 		onMoveMade(0, 0, 0, 0, false);
 		m_pGame->move_made.connect(sigc::mem_fun(this, &GameWindow::onMoveMade));
 	}
@@ -269,13 +272,13 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 	} else {
 		switch (m_pGame->getBoardState().getPlayer())
 		{
-			case player_1:
+			case pc_player_1:
 				m_pStatusbar->push("Red to play");
 				break;
-			case player_2:
+			case pc_player_2:
 				m_pStatusbar->push("Green to play");
 				break;
-			case player_3:
+			case pc_player_3:
 				m_pStatusbar->push("Blue to play");
 				break;
 			default:

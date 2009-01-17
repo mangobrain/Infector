@@ -30,7 +30,6 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
-#include <bitset>
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -40,6 +39,7 @@
 #include <sigc++/sigc++.h>
 
 // Project headers
+#include "gametype.hxx"
 #include "boardstate.hxx"
 #include "ai.hxx"
 #include "game.hxx"
@@ -49,8 +49,8 @@
 // Implementation
 //
 
-AI::AI(Game *game, const BoardState *bs)
-	: m_pBoardState(bs)
+AI::AI(Game *game, const BoardState *bs, const GameType *gt)
+	: m_pBoardState(bs), m_pGameType(gt)
 {
 	game->move_made.connect(sigc::mem_fun(*this, &AI::onMoveMade));
 	
@@ -73,7 +73,7 @@ void AI::onMoveMade(const int start_x, const int start_y, const int end_x, const
 		return;
 
 	piece me = m_pBoardState->getPlayer();
-	if (m_pBoardState->isAIPlayer(me))
+	if (m_pGameType->isPlayerType(me, pt_ai))
 	{
 		// Get all possible moves, and allocate a second vector for storing them plus their scores
 		std::vector<move> moves(m_pBoardState->getPossibleMoves(me));
@@ -93,7 +93,7 @@ void AI::onMoveMade(const int start_x, const int start_y, const int end_x, const
 			BoardState new_b(*m_pBoardState);
 			int adj = new_b.getAdjacency(i->source_x, i->source_y, i->dest_x, i->dest_y);
 			if (adj == 2)
-				new_b.setPieceAt(i->source_x, i->source_y, player_none);
+				new_b.setPieceAt(i->source_x, i->source_y, pc_player_none);
 			new_b.setPieceAt(i->dest_x, i->dest_y, me);
 			
 			// Calculate how many squares we capture and score 4 points for each
@@ -101,13 +101,13 @@ void AI::onMoveMade(const int start_x, const int start_y, const int end_x, const
 			new_b.getScores(new_s1, new_s2, new_s3, new_s4);
 			switch (me)
 			{
-				case player_1:
+				case pc_player_1:
 					score += (new_s1 - s1) * 5;
 					break;
-				case player_2:
+				case pc_player_2:
 					score += (new_s2 - s2) * 5;
 					break;
-				case player_3:
+				case pc_player_3:
 					score += (new_s3 - s3) * 5;
 					break;
 				default:
@@ -116,12 +116,12 @@ void AI::onMoveMade(const int start_x, const int start_y, const int end_x, const
 			
 			// Now look at all squares and determine whether
 			// the board overall is in good or bad shape from our point of view
-			for (int y = 0; y < new_b.getHeight(); ++y)
+			for (int y = 0; y < m_pGameType->h; ++y)
 			{
-				for (int x = 0; x < new_b.getWidth(); ++x)
+				for (int x = 0; x < m_pGameType->w; ++x)
 				{
 					piece thisone = new_b.getPieceAt(x, y);
-					if (thisone == no_such_square)
+					if (thisone == pc_no_such_square)
 						continue;
 
 					int distance_one_our_pieces = 0;
@@ -136,9 +136,9 @@ void AI::onMoveMade(const int start_x, const int start_y, const int end_x, const
 						{
 							piece thatone = new_b.getPieceAt(xx, yy);
 							int adj = new_b.getAdjacency(x, y, xx, yy);
-							if (thatone == no_such_square && adj == 1)
+							if (thatone == pc_no_such_square && adj == 1)
 								++distance_one_holes;
-							else if (thatone != no_such_square && thatone != player_none)
+							else if (thatone != pc_no_such_square && thatone != pc_player_none)
 							{
 								if (adj == 1)
 								{
@@ -161,7 +161,7 @@ void AI::onMoveMade(const int start_x, const int start_y, const int end_x, const
 					if (thisone == me)
 						// Score points for defending our own pieces
 						score += (distance_one_our_pieces + distance_one_holes) * 2;
-					else if (thisone != player_none)
+					else if (thisone != pc_player_none)
 						// Score points for being able to capture enemies
 						score += (distance_two_our_pieces == 0) ? 0 : 1;
 					else if (distance_two_enemy_pieces > 0 || distance_one_enemy_pieces > 0)
@@ -172,7 +172,11 @@ void AI::onMoveMade(const int start_x, const int start_y, const int end_x, const
 							score -= distance_one_our_pieces * 4;
 
 							BoardState new_bb(new_b);
-							new_bb.setPieceAt(x, y, (me == player_1) ? player_2 : player_1);
+							// Make a move to the current square by any player bar me
+							piece pp = (piece)(me + 1);
+							if (pp == pc_no_such_square)
+								pp = pc_player_1;
+							new_bb.setPieceAt(x, y, pp);
 							
 							int currmoves = new_b.getPossibleMoves(me).size();
 							int nextmoves = new_bb.getPossibleMoves(me).size();
