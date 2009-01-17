@@ -30,7 +30,6 @@
 #include <cstdlib>
 #include <sstream>
 #include <algorithm>
-#include <bitset>
 #include <list>
 
 // Library headers

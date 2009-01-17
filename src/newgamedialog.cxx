@@ -25,9 +25,6 @@
 #	include "config.h"
 #endif
 
-// Language headers
-#include <bitset>
-
 // Library headers
 #include <gtkmm.h>
 #include <libglademm.h>
