@@ -30,12 +30,17 @@
 #include <sstream>
 #include <cerrno>
 #include <list>
+#include <deque>
+#include <algorithm>
+#include <functional>
 
 // Library headers
 #include <gtkmm.h>
 #include <libglademm.h>
 
 // Project headers
+#include "gametype.hxx"
+#include "clientinfo.hxx"
 #include "serverstatusdialog.hxx"
 
 // System headers
@@ -43,6 +48,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 //
 // Implementation
@@ -61,12 +67,35 @@ void ServerStatusDialog::errPop(const char* err) const
 
 // Constructor
 ServerStatusDialog::ServerStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::Dialog(cobject)
+	: Gtk::Dialog(cobject), m_pGameType(NULL), redrow(0), greenrow(0), bluerow(0), yellowrow(0), requiredclients(0)
 {
 	refXml->get_widget("serverportspin", m_pPortSpin);
 	refXml->get_widget("serverportapplybutton", m_pApplyButton);
 	refXml->get_widget("serverstartbutton", m_pStartButton);
 	refXml->get_widget("servercancelbutton", m_pCancelButton);
+	refXml->get_widget("ssgamedescription", m_pGameDescription);
+	
+	refXml->get_widget("serverclientstable", m_pClientTable);
+	
+	refXml->get_widget("ssclientlabel1", m_paClientLabels[0]);
+	refXml->get_widget("ssclientlabel2", m_paClientLabels[1]);
+	refXml->get_widget("ssclientlabel3", m_paClientLabels[2]);
+	refXml->get_widget("ssclientlabel4", m_paClientLabels[3]);
+	
+	refXml->get_widget("ssclientkick1", m_paClientKickButtons[0]);
+	refXml->get_widget("ssclientkick2", m_paClientKickButtons[1]);
+	refXml->get_widget("ssclientkick3", m_paClientKickButtons[2]);
+	refXml->get_widget("ssclientkick4", m_paClientKickButtons[3]);
+	
+	refXml->get_widget("ssredlabel", m_pRedLabel);
+	refXml->get_widget("ssgreenlabel", m_pGreenLabel);
+	refXml->get_widget("ssbluelabel", m_pBlueLabel);
+	refXml->get_widget("ssyellowlabel", m_pYellowLabel);
+	
+	refXml->get_widget("ssredclient", m_pRedClient);
+	refXml->get_widget("ssgreenclient", m_pGreenClient);
+	refXml->get_widget("ssblueclient", m_pBlueClient);
+	refXml->get_widget("ssyellowclient", m_pYellowClient);
 	
 	// Link the Apply button with the onApply method for opening a listen port
 	m_pApplyButton->signal_clicked().connect(sigc::mem_fun(*this, &ServerStatusDialog::onApply));
@@ -74,9 +103,179 @@ ServerStatusDialog::ServerStatusDialog(BaseObjectType *cobject, const Glib::RefP
 	// XXX Set default value of server port spin button
 	// - doesn't seem to work from within Glade
 	m_pPortSpin->set_value(49152);
+	
+	// Attach combo boxes for assigning clients to player colours
+	// to the client info display table.
+	for (size_t i = 0; i < 4; ++i)
+		m_pClientTable->attach(m_aClientComboBoxes[i], 1, 2, i, i + 1);
 }
 
-// Set controls back to default state
+// Set player description labels in the game details area.
+// Return true if the player slot is filled (AI, local, or a connected remote player)
+bool setPlayerDescription(const playertype pt, Gtk::Label *label, int target_row = 0,
+	Gtk::ComboBoxText *clientcombos = NULL, Gtk::Label **clientaddrs = NULL)
+{
+	switch (pt)
+	{
+		case pt_ai:
+			label->set_label("Computer");
+			return true;
+		case pt_local:
+			label->set_label("Local");
+			return true;
+		case pt_none:
+			return false;
+		default:
+			{
+				// If the player is a remote client, set it to Empty,
+				// unless one of the client combo boxes is set to the
+				// row for this player - in which case set it to the
+				// description of that client.
+				label->set_label("<i>Empty</i>");
+				if (clientcombos != NULL)
+				{
+					for (size_t i = 0; i < 4; ++i)
+					{
+						if (clientcombos[i].get_active_row_number() == target_row)
+						{
+							label->set_label(clientaddrs[i]->get_label());
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+	}
+}
+
+// Called whenever one of the client type combo boxes is changed
+void ServerStatusDialog::onClientComboChange(const size_t id)
+{
+	// Ensure we do not have two players trying to play the same
+	// colour by unsetting any other combo boxes with the same active row
+	// Keep ClientInfo structures up to date as well
+	int row = m_aClientComboBoxes[id].get_active_row_number();
+	if (row == redrow)
+			clients[id].player = pc_player_1;
+	else if (row == greenrow)
+			clients[id].player = pc_player_2;
+	else if (row == bluerow)
+			clients[id].player = pc_player_3;
+	else if (row == yellowrow)
+			clients[id].player = pc_player_4;
+	else
+			clients[id].player = pc_player_none;
+	for (size_t i = 0; i < 4; ++i)
+	{
+		if (i == id)
+			continue;
+		if (m_aClientComboBoxes[i].get_active_row_number() == row)
+		{
+			m_aClientComboBoxes[i].set_active(0);
+			clients[i].player = pc_player_none;
+		}
+	}
+	
+	setGUIFromClientState();
+}
+
+// Set game description label text, and set Clients and Game Details
+// tables to their initial states
+void ServerStatusDialog::setGameDetails(const GameType &gt)
+{
+	m_pGameType = &gt;
+
+	// Build game description string
+	Glib::ustring description;
+	if (gt.square)
+		description = "Square board, ";
+	else
+		description = "Hexagonal board, ";
+	description += Glib::ustring::compose("%1x%2, ", gt.w, gt.h);
+	if ((!gt.square) || (gt.player_3 == pt_none))
+		description += "2 players";
+	else
+		description += "4 players";
+	
+	// Put it on UI
+	m_pGameDescription->set_label(description);
+	
+	// Hide blue & yellow player labels if it's a 2 player game
+	if ((!gt.square) || (gt.player_3 == pt_none))
+	{
+		m_pBlueLabel->hide(); m_pBlueClient->hide();
+		m_pYellowLabel->hide(); m_pYellowClient->hide();
+	} else {
+		m_pBlueLabel->show(); m_pBlueClient->show();
+		m_pYellowLabel->show(); m_pYellowClient->show();
+	}
+	
+	// Work out how many client connections to accept
+	requiredclients = 0;
+	if (gt.player_1 == pt_remote)
+	{
+		++requiredclients;
+	}
+	if (gt.player_2 == pt_remote)
+	{
+		++requiredclients;
+	}
+	if (gt.square)
+	{
+		if (gt.player_3 == pt_remote)
+		{
+			++requiredclients;;
+		}
+		if (gt.player_4 == pt_remote)
+		{
+			++requiredclients;
+		}
+	}
+	
+	// Disconnect all client combo box event handlers before manually
+	// modifying their state, so we don't get into a recursion loop
+	for (std::list<sigc::connection>::iterator i = clientcomboconns.begin(); i != clientcomboconns.end(); ++i)
+		i->disconnect();
+	clientcomboconns.clear();
+	
+	// Put player selection text on client combo boxes.
+	// Store which row of the client combo boxes corresponds to each player.
+	redrow = -1; greenrow = -1; yellowrow = -1; bluerow = -1;
+	for (size_t i = 0; i < 4; ++i)
+	{
+		m_aClientComboBoxes[i].clear_items();
+		m_aClientComboBoxes[i].append_text("None");
+		int currentrow = 1;
+		if (gt.player_1 == pt_remote)
+		{
+			m_aClientComboBoxes[i].append_text("Red");
+			redrow = currentrow++;
+		}
+		if (gt.player_2 == pt_remote)
+		{
+			m_aClientComboBoxes[i].append_text("Green");
+			greenrow = currentrow++;
+		}
+		if (gt.square)
+		{
+			if (gt.player_3 == pt_remote)
+			{
+				m_aClientComboBoxes[i].append_text("Blue");
+				bluerow = currentrow++;
+			}
+			if (gt.player_4 == pt_remote)
+			{
+				m_aClientComboBoxes[i].append_text("Yellow");
+				yellowrow = currentrow++;
+			}
+		}
+	}
+	
+	clients.clear();
+	setGUIFromClientState();
+}
+
+// Run when dialog response is given
 void ServerStatusDialog::on_response(int response_id)
 {
 	// Apply button is enabled and default
@@ -89,21 +288,37 @@ void ServerStatusDialog::on_response(int response_id)
 	
 	// OK button is disabled
 	m_pStartButton->set_sensitive(false);
+
+	// Detach all event handlers - even if response wasn't cancel, calling
+	// code will want to install its own for client sockets
+	for (std::list<sigc::connection>::iterator i = servereventconns.begin(); i != servereventconns.end(); ++i)
+		i->disconnect();
+	for (std::list<std::pair<const int, sigc::connection> >::iterator i = clienteventconns.begin(); i != clienteventconns.end(); ++i)
+		i->second.disconnect();
+	servereventconns.clear();
+	clienteventconns.clear();
 	
 	// Close all listening sockets by removing all references to their IOChannels
-	for (std::list<Glib::RefPtr<Glib::IOChannel> >::iterator i = serversocks.begin(); i != serversocks.end(); ++i)
+	for (std::list<Glib::RefPtr<Glib::IOChannel> >::iterator i = serverchannels.begin(); i != serverchannels.end(); ++i)
 	{
 		i->reset();
 	}
-	for (std::list<sigc::connection>::iterator i = eventconns.begin(); i != eventconns.end(); ++i)
-	{
-		i->disconnect();
-	}
-	serversocks.clear();
+	serverchannels.clear();
 	
-	// TODO If response is cancel, close any open accepted sockets too.
-	// If response is OK, disconnect event handlers from accepted sockets,
-	// delete our references to them, but do not close them.
+	// If response is anything other than OK, close any open accepted sockets too.
+	for (std::list<std::pair<const int, Glib::RefPtr<Glib::IOChannel> > >::iterator i = clientchannels.begin(); i != clientchannels.end(); ++i)
+	{
+		if (response_id != Gtk::RESPONSE_OK)
+			i->second->close(false);	
+		i->second.reset();
+	}
+	clientchannels.clear();
+	if (response_id != Gtk::RESPONSE_OK)
+		clients.clear();
+	
+	// TODO If response is OK, disconnect event handlers from accepted sockets,
+	// delete our references to them, but do not close them - calling code
+	// will want them open.
 }
 
 // Port apply button clicked
@@ -146,15 +361,17 @@ void ServerStatusDialog::onApply()
 		while (current != NULL)
 		{
 			// Create a socket
-			SOCKET s = socket(current->ai_family, current->ai_socktype, current->ai_protocol);
-			if (s == INVALID_SOCKET)
+			int s = socket(current->ai_family, current->ai_socktype, current->ai_protocol);
+			if (s < 0)
 			{
 				errPop(strerror(errno));
 				response(Gtk::RESPONSE_CANCEL);
 				break;
 			} else {
 				// Bind it to the current address
-				if (bind(s, current->ai_addr, current->ai_addrlen) == SOCKET_ERROR)
+				int val = 1;
+				setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(int));
+				if (bind(s, current->ai_addr, current->ai_addrlen) < 0)
 				{
 					errPop(strerror(errno));
 					response(Gtk::RESPONSE_CANCEL);
@@ -162,7 +379,7 @@ void ServerStatusDialog::onApply()
 					break;
 				} else {
 					// Start it listening
-					if (listen(s, 10) == SOCKET_ERROR)
+					if (listen(s, 10) < 0)
 					{
 						errPop(strerror(errno));
 						response(Gtk::RESPONSE_CANCEL);
@@ -176,13 +393,13 @@ void ServerStatusDialog::onApply()
 						Glib::RefPtr<Glib::IOChannel> ioc = Glib::IOChannel::create_from_win32_socket(s);
 #endif
 						// Bind the socket as one of the event handler's arguments, or we can't call accept()
-						eventconns.push_back(Glib::signal_io().connect(sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::handleServerSocks), s),
+						servereventconns.push_back(Glib::signal_io().connect(sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::handleServerSocks), s),
 							ioc, Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL));
 
 						// Close underlying socket automatically when IOChannel is destroyed,
 						// and store IOChannel reference in our list of server sockets
 						ioc->set_close_on_unref(true);
-						serversocks.push_back(ioc);
+						serverchannels.push_back(ioc);
 					}
 				}
 			}
@@ -194,30 +411,235 @@ void ServerStatusDialog::onApply()
 	}
 }
 
+// Handle disconnection of client sockets
+bool ServerStatusDialog::handleClientSocks(Glib::IOCondition cond, const int s)
+{
+	removeClient(s);
+	
+	// Return false to disconnect from event handler
+	return false;
+}
+
+// Function template for comparing first member of a pair to
+// a given integer.  Used with std::bind2nd to form a functor
+// for std::find_if, to locate clients by socket in clientchannels &
+// clienteventconns lists.  Could be replaced with compose1 and
+// select1st if those were standard rather than SGI extensions.
+template <class A> bool equalTo(const std::pair<const int, A> a, int b)
+{
+	return a.first == b;
+}
+
+// Remote all references to a connected client given their socket
+void ServerStatusDialog::removeClient(const int s)
+{
+	// Remove connection object for event handler from list
+	std::list<std::pair<const int, sigc::connection> >::iterator eventconn =
+		std::find_if(clienteventconns.begin(), clienteventconns.end(),
+			std::bind2nd(std::ptr_fun(&equalTo<sigc::connection>), s)
+	);
+	// Disconnect event handler *before* returning - otherwise, when
+	// invoked from onKickClient, closing the socket invokes handleClientSocks,
+	// which invokes this again, and so on...
+	eventconn->second.disconnect();
+	clienteventconns.erase(eventconn);
+	
+	// Close socket & delete IO channel
+	std::list<std::pair<const int, Glib::RefPtr<Glib::IOChannel> > >::iterator ioc =
+		std::find_if(clientchannels.begin(), clientchannels.end(),
+			std::bind2nd(std::ptr_fun(&equalTo<Glib::RefPtr<Glib::IOChannel> >), s)
+	);
+	ioc->second->close(false);
+	ioc->second.reset();
+	clientchannels.erase(ioc);
+	
+	// Remove client from client list
+	for (std::deque<ClientInfo>::iterator i = clients.begin(); i != clients.end(); ++i)
+	{
+		if (i->socket == s)
+		{
+			clients.erase(i);
+			break;
+		}
+	}
+	
+	setGUIFromClientState();
+}
+
 // Handle incoming connections on server sockets
-bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, SOCKET s)
+bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, const int s)
 {
 	if (cond == Glib::IO_IN)
 	{
 		sockaddr_storage newaddr;
 		socklen_t newaddrlen = sizeof(newaddr);
-		SOCKET newsock = accept(s, (sockaddr*) &newaddr, &newaddrlen);
-		if (newsock == INVALID_SOCKET)
+		memset(&newaddr, 0, sizeof(newaddr));
+		int newsock = accept(s, (sockaddr*) &newaddr, &newaddrlen);
+		if (newsock < 0)
 		{
 			errPop(strerror(errno));
 			response(Gtk::RESPONSE_CANCEL);
 			return true;
 		}
-		// TODO Check sa_family of newaddr to see if it's a sockaddr_in
-		// or a sockaddr_in6.  Store the socket and its address somewhere
-		// such that it can be returned to calling code.
+		
+		// Should we accept this socket, or is the server full?
+		if (clients.size() == requiredclients)
+		{
+			// TODO - Send client a "server full" message
+			close(newsock);
+			return true;
+		}
+		
+		// Check ss_family of newaddr to see if it's a sockaddr_in
+		// or a sockaddr_in6.  Convert the client address to a string
+		// accordingly.
+		char buf[INET6_ADDRSTRLEN];
+		const char *result;
+		switch (newaddr.ss_family)
+		{
+			case AF_INET:
+				result = inet_ntop(newaddr.ss_family,
+					&(((sockaddr_in *) &newaddr)->sin_addr), buf, INET_ADDRSTRLEN);
+				break;
+			default:
+				result = inet_ntop(newaddr.ss_family,
+					&(((sockaddr_in6 *) &newaddr)->sin6_addr), buf, INET6_ADDRSTRLEN);
+		}
+		if (result == NULL)
+		{
+			errPop(strerror(errno));
+			response(Gtk::RESPONSE_CANCEL);
+			return true;
+		}
+		Glib::ustring clientaddr(buf);
+		
+		// Automatically assign first unassigned colour to client
+		ClientInfo newclient;
+		newclient.socket = newsock;
+		newclient.player = remoteplayers.front(); remoteplayers.pop_front();
+		newclient.address = clientaddr;
+		clients.push_back(newclient);
+		
+		// TODO - Send game description to client over network
+		
 		// Create an IOChannel (which won't close on dereference) so we can
 		// monitor to see if the client disconnects or errors.
-		// Add client to GUI, including options to pick players.
-		errPop("Accept success ;-)");
+#ifndef MINGW
+		Glib::RefPtr<Glib::IOChannel> ioc = Glib::IOChannel::create_from_fd(newsock);
+#else
+		Glib::RefPtr<Glib::IOChannel> ioc = Glib::IOChannel::create_from_win32_socket(newsock);
+#endif
+		ioc->set_close_on_unref(false);
+		std::pair<const int, Glib::RefPtr<Glib::IOChannel> > sioc(newsock, ioc);
+		clientchannels.push_back(sioc);
+
+		// Connect the socket to an event handler, listening to see if the client disconnects
+		std::pair<const int, sigc::connection> eventconn(newsock,
+			Glib::signal_io().connect(
+				sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::handleClientSocks), newsock),
+					ioc, Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL)
+		);
+		clienteventconns.push_back(eventconn);
+		
+		setGUIFromClientState();
 	} else {
 		errPop("Error on listening socket");
 		response(Gtk::RESPONSE_CANCEL);
 	}
 	return true;
+}
+
+// Ensure GUI - connected clients list, game description, etc. - is up to
+// date with the latest client state.
+void ServerStatusDialog::setGUIFromClientState()
+{
+	// Rebuild the needs-assigning list
+	remoteplayers.clear();
+	if (m_pGameType->player_1 == pt_remote)
+		remoteplayers.push_back(pc_player_1);
+	if (m_pGameType->player_2 == pt_remote)
+		remoteplayers.push_back(pc_player_2);
+	if (m_pGameType->square)
+	{
+		if (m_pGameType->player_3 == pt_remote)
+			remoteplayers.push_back(pc_player_3);
+		if (m_pGameType->player_4 == pt_remote)
+			remoteplayers.push_back(pc_player_4);
+	}
+	for (std::deque<ClientInfo>::const_iterator i = clients.begin(); i != clients.end(); ++i)
+	{
+		remoteplayers.remove(i->player);
+	}
+
+	// Disconnect all client combo box event handlers before manually
+	// modifying their state, so we don't get into a recursion loop
+	for (std::list<sigc::connection>::iterator i = clientcomboconns.begin(); i != clientcomboconns.end(); ++i)
+		i->disconnect();
+	clientcomboconns.clear();
+
+	// Add clients to GUI, including options to pick players.
+	for (size_t i = 0; i < 4; ++i)
+	{
+		m_aClientComboBoxes[i].set_active(0);
+		if (i >= clients.size())
+		{
+			m_paClientLabels[i]->hide();
+			m_paClientKickButtons[i]->hide();
+			m_aClientComboBoxes[i].hide();
+		} else {
+			m_paClientLabels[i]->set_label(clients[i].address);
+			m_paClientLabels[i]->show();
+			m_paClientKickButtons[i]->show();
+			switch (clients[i].player)
+			{
+				case pc_player_none:
+					m_aClientComboBoxes[i].set_active(0);
+					break;
+				case pc_player_1:
+					m_aClientComboBoxes[i].set_active(redrow);
+					break;
+				case pc_player_2:
+					m_aClientComboBoxes[i].set_active(greenrow);
+					break;
+				case pc_player_3:
+					m_aClientComboBoxes[i].set_active(bluerow);
+					break;
+				default:
+					m_aClientComboBoxes[i].set_active(yellowrow);
+			}
+			m_aClientComboBoxes[i].show();
+		}
+	}
+
+	// Update the game details text indicating colours & clients
+	bool allSlotsFilled = true;
+	allSlotsFilled &= setPlayerDescription(m_pGameType->player_1, m_pRedClient, redrow, m_aClientComboBoxes, m_paClientLabels);
+	allSlotsFilled &= setPlayerDescription(m_pGameType->player_2, m_pGreenClient, greenrow, m_aClientComboBoxes, m_paClientLabels);
+	if (m_pGameType->square && m_pGameType->player_3 != pt_none)
+	{
+		allSlotsFilled &= setPlayerDescription(m_pGameType->player_3, m_pBlueClient, bluerow, m_aClientComboBoxes, m_paClientLabels);
+		allSlotsFilled &= setPlayerDescription(m_pGameType->player_4, m_pYellowClient, yellowrow, m_aClientComboBoxes, m_paClientLabels);
+	}
+	
+	// Allow starting the game if all slots are filled
+	m_pStartButton->set_sensitive(allSlotsFilled);
+
+	// Reconnect client combo box event handlers
+	for (size_t i = 0; i < 4; ++i)
+		clientcomboconns.push_back(m_aClientComboBoxes[i].signal_changed().connect(sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::onClientComboChange), i)));
+	
+	// Disconnect & reconnect all client kick button event handlers
+	for (std::list<sigc::connection>::iterator i = clientkickconns.begin(); i != clientkickconns.end(); ++i)
+		i->disconnect();
+	clientkickconns.clear();
+	size_t buttonindex = 0;
+	// Pass client socket into event handler function, as this is what removeClient expects as its argument
+	for (std::deque<ClientInfo>::const_iterator i = clients.begin(); i != clients.end(); ++i)
+		clientkickconns.push_back(m_paClientKickButtons[buttonindex++]->signal_clicked().connect(sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::onKickClient), i->socket)));
+}
+
+// Client disconnect button event handler
+void ServerStatusDialog::onKickClient(const int s)
+{
+	removeClient(s);
 }

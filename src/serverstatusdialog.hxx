@@ -18,26 +18,42 @@
 #ifndef __INFECTOR_SERVERSTATUSDIALOG_HXX__
 #define __INFECTOR_SERVERSTATUSDIALOG_HXX__
 
-#ifndef MINGW
-#define SOCKET int
-#define INVALID_SOCKET -1
-#define SOCKET_ERROR -1
-#endif
-
 class ServerStatusDialog: public Gtk::Dialog
 {
 	public:
 		// Constructor - called by glademm by get_widget_derived
 		ServerStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
 		
-		// Set controls back to default state
-		void setToDefaults();
+		// Set game description label text, and set Clients and Game Details
+		// tables to their initial states
+		void setGameDetails(const GameType &gt);
 	
 	private:
+		Gtk::Label *m_paClientLabels[4];
+		Gtk::ComboBoxText m_aClientComboBoxes[4];
+		Gtk::Button *m_paClientKickButtons[4];
+		Gtk::Table *m_pClientTable;
+		Gtk::Label *m_pRedLabel;
+		Gtk::Label *m_pGreenLabel;
+		Gtk::Label *m_pBlueLabel;
+		Gtk::Label *m_pYellowLabel;
+		Gtk::Label *m_pRedClient;
+		Gtk::Label *m_pGreenClient;
+		Gtk::Label *m_pBlueClient;
+		Gtk::Label *m_pYellowClient;
+		Gtk::Label *m_pGameDescription;
 		Gtk::SpinButton *m_pPortSpin;
 		Gtk::Button *m_pStartButton;
 		Gtk::Button *m_pCancelButton;
 		Gtk::Button *m_pApplyButton;
+		
+		const GameType *m_pGameType;
+		
+		int redrow, greenrow, bluerow, yellowrow;
+		
+		// Number of remote players in game (and hence number
+		// if client connections we should accept)
+		size_t requiredclients;
 		
 		// Event handlers
 		void onApply();
@@ -49,13 +65,45 @@ class ServerStatusDialog: public Gtk::Dialog
 		void errPop(const char* err) const;
 		
 		// IOChannel references for our listening sockets
-		std::list<Glib::RefPtr<Glib::IOChannel> > serversocks;
+		std::list<Glib::RefPtr<Glib::IOChannel> > serverchannels;
+		
+		// List of connected clients
+		std::deque<ClientInfo> clients;
+		
+		// Unassigned players
+		std::list<piece> remoteplayers;
 		
 		// Connection objects corresponding to socket event handlers
-		std::list<sigc::connection> eventconns;
+		std::list<sigc::connection> servereventconns;
+		
+		// Store the client socket along with client socket event handler
+		// connections & IOChannels, so we can delete them individually when
+		// clients disconnect
+		std::list<std::pair<const int, sigc::connection> > clienteventconns;
+		std::list<std::pair<const int, Glib::RefPtr<Glib::IOChannel> > > clientchannels;
+		
+		// Connection objects corresponding to client combo box event handlers
+		std::list<sigc::connection> clientcomboconns;
+		
+		// Connection objects corresponding to client kick button event handlers
+		std::list<sigc::connection> clientkickconns;
 		
 		// Socket event handlers
-		bool handleServerSocks(Glib::IOCondition cond, SOCKET s);
+		bool handleServerSocks(Glib::IOCondition cond, const int s);
+		bool handleClientSocks(Glib::IOCondition cond, const int s);
+		
+		// Client player selection box event handler
+		void onClientComboChange(const size_t id);
+		
+		// Client kick button event handler
+		void onKickClient(const int s);
+		
+		// Ensure GUI - connected clients list, game description,
+		// etc. - is up to date with the latest client state.
+		void setGUIFromClientState();
+		
+		// Remote all references to a connected client given their socket
+		void removeClient(const int s);
 };
 
 #endif

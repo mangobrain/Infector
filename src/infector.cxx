@@ -31,6 +31,7 @@
 #include <sstream>
 #include <algorithm>
 #include <list>
+#include <deque>
 
 // Library headers
 #include <gtkmm.h>
@@ -40,6 +41,7 @@
 
 // Project headers
 #include "gametype.hxx"
+#include "clientinfo.hxx"
 #include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"
@@ -185,7 +187,7 @@ void GameWindow::onNewGame()
 				m_pServerStatusDialog.reset(pServerStatusDialog);
 			}
 			
-			//m_pServerStatusDialog->setGameDetails(gt);
+			m_pServerStatusDialog->setGameDetails(gt);
 			response = m_pServerStatusDialog->run();
 			m_pServerStatusDialog->hide();
 
