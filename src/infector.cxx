@@ -41,7 +41,7 @@
 
 // Project headers
 #include "gametype.hxx"
-#include "clientinfo.hxx"
+#include "clientsocket.hxx"
 #include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"

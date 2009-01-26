@@ -64,11 +64,9 @@ class ServerStatusDialog: public Gtk::Dialog
 		// Convenience function for showing an error popup
 		void errPop(const char* err) const;
 		
-		// IOChannel references for our listening sockets
+		// IOChannel references for our sockets
 		std::list<Glib::RefPtr<Glib::IOChannel> > serverchannels;
-		
-		// List of connected clients
-		std::deque<ClientInfo> clients;
+		std::deque<Glib::RefPtr<ClientSocket> > clientsockets;
 		
 		// Unassigned players
 		std::list<piece> remoteplayers;
@@ -77,10 +75,9 @@ class ServerStatusDialog: public Gtk::Dialog
 		std::list<sigc::connection> servereventconns;
 		
 		// Store the client socket along with client socket event handler
-		// connections & IOChannels, so we can delete them individually when
+		// connections, so we can delete them individually when
 		// clients disconnect
 		std::list<std::pair<const int, sigc::connection> > clienteventconns;
-		std::list<std::pair<const int, Glib::RefPtr<Glib::IOChannel> > > clientchannels;
 		
 		// Connection objects corresponding to client combo box event handlers
 		std::list<sigc::connection> clientcomboconns;
@@ -104,6 +101,9 @@ class ServerStatusDialog: public Gtk::Dialog
 		
 		// Remote all references to a connected client given their socket
 		void removeClient(const int s);
+		
+		// Send game description to clients over network
+		void sendGameDetails();
 };
 
 #endif

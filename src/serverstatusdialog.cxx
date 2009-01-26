@@ -40,7 +40,7 @@
 
 // Project headers
 #include "gametype.hxx"
-#include "clientinfo.hxx"
+#include "clientsocket.hxx"
 #include "serverstatusdialog.hxx"
 
 // System headers
@@ -153,18 +153,18 @@ void ServerStatusDialog::onClientComboChange(const size_t id)
 {
 	// Ensure we do not have two players trying to play the same
 	// colour by unsetting any other combo boxes with the same active row
-	// Keep ClientInfo structures up to date as well
+	// Keep ClientSocket structures up to date as well
 	int row = m_aClientComboBoxes[id].get_active_row_number();
 	if (row == redrow)
-			clients[id].player = pc_player_1;
+			clientsockets[id]->setPlayer(pc_player_1);
 	else if (row == greenrow)
-			clients[id].player = pc_player_2;
+			clientsockets[id]->setPlayer(pc_player_2);
 	else if (row == bluerow)
-			clients[id].player = pc_player_3;
+			clientsockets[id]->setPlayer(pc_player_3);
 	else if (row == yellowrow)
-			clients[id].player = pc_player_4;
+			clientsockets[id]->setPlayer(pc_player_4);
 	else
-			clients[id].player = pc_player_none;
+			clientsockets[id]->setPlayer(pc_player_none);
 	for (size_t i = 0; i < 4; ++i)
 	{
 		if (i == id)
@@ -172,7 +172,8 @@ void ServerStatusDialog::onClientComboChange(const size_t id)
 		if (m_aClientComboBoxes[i].get_active_row_number() == row)
 		{
 			m_aClientComboBoxes[i].set_active(0);
-			clients[i].player = pc_player_none;
+			if (i < clientsockets.size())
+				clientsockets[i]->setPlayer(pc_player_none);
 		}
 	}
 	
@@ -183,6 +184,11 @@ void ServerStatusDialog::onClientComboChange(const size_t id)
 // tables to their initial states
 void ServerStatusDialog::setGameDetails(const GameType &gt)
 {
+	// TODO - Remove this and have a hand-over function which lets calling code
+	// retrieve our ClientSocket RefPtrs then clears the local list, which
+	// must be called if the dialogue response is OK
+	clientsockets.clear();
+
 	m_pGameType = &gt;
 
 	// Build game description string
@@ -271,7 +277,6 @@ void ServerStatusDialog::setGameDetails(const GameType &gt)
 		}
 	}
 	
-	clients.clear();
 	setGUIFromClientState();
 }
 
@@ -306,19 +311,8 @@ void ServerStatusDialog::on_response(int response_id)
 	serverchannels.clear();
 	
 	// If response is anything other than OK, close any open accepted sockets too.
-	for (std::list<std::pair<const int, Glib::RefPtr<Glib::IOChannel> > >::iterator i = clientchannels.begin(); i != clientchannels.end(); ++i)
-	{
-		if (response_id != Gtk::RESPONSE_OK)
-			i->second->close(false);	
-		i->second.reset();
-	}
-	clientchannels.clear();
 	if (response_id != Gtk::RESPONSE_OK)
-		clients.clear();
-	
-	// TODO If response is OK, disconnect event handlers from accepted sockets,
-	// delete our references to them, but do not close them - calling code
-	// will want them open.
+		clientsockets.clear();
 }
 
 // Port apply button clicked
@@ -430,6 +424,12 @@ template <class A> bool equalTo(const std::pair<const int, A> a, int b)
 	return a.first == b;
 }
 
+// Similar for finding the ClientSocket for the given socket
+bool sockEqualTo(const Glib::RefPtr<ClientSocket> a, int b)
+{
+	return a->getSocket() == b;
+}
+
 // Remote all references to a connected client given their socket
 void ServerStatusDialog::removeClient(const int s)
 {
@@ -445,23 +445,11 @@ void ServerStatusDialog::removeClient(const int s)
 	clienteventconns.erase(eventconn);
 	
 	// Close socket & delete IO channel
-	std::list<std::pair<const int, Glib::RefPtr<Glib::IOChannel> > >::iterator ioc =
-		std::find_if(clientchannels.begin(), clientchannels.end(),
-			std::bind2nd(std::ptr_fun(&equalTo<Glib::RefPtr<Glib::IOChannel> >), s)
+	std::deque<Glib::RefPtr<ClientSocket> >::iterator ioc =
+		std::find_if(clientsockets.begin(), clientsockets.end(),
+			std::bind2nd(std::ptr_fun(&sockEqualTo), s)
 	);
-	ioc->second->close(false);
-	ioc->second.reset();
-	clientchannels.erase(ioc);
-	
-	// Remove client from client list
-	for (std::deque<ClientInfo>::iterator i = clients.begin(); i != clients.end(); ++i)
-	{
-		if (i->socket == s)
-		{
-			clients.erase(i);
-			break;
-		}
-	}
+	clientsockets.erase(ioc);
 	
 	setGUIFromClientState();
 }
@@ -483,7 +471,7 @@ bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, const int s)
 		}
 		
 		// Should we accept this socket, or is the server full?
-		if (clients.size() == requiredclients)
+		if (clientsockets.size() == requiredclients)
 		{
 			// TODO - Send client a "server full" message
 			close(newsock);
@@ -514,30 +502,18 @@ bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, const int s)
 		Glib::ustring clientaddr(buf);
 		
 		// Automatically assign first unassigned colour to client
-		ClientInfo newclient;
-		newclient.socket = newsock;
-		newclient.player = remoteplayers.front(); remoteplayers.pop_front();
-		newclient.address = clientaddr;
-		clients.push_back(newclient);
+		ClientSocket *newclient = new ClientSocket(newsock, clientaddr, remoteplayers.front());
+		remoteplayers.pop_front();
+		clientsockets.push_back(Glib::RefPtr<ClientSocket>(newclient));
 		
-		// TODO - Send game description to client over network
-		
-		// Create an IOChannel (which won't close on dereference) so we can
-		// monitor to see if the client disconnects or errors.
-#ifndef MINGW
-		Glib::RefPtr<Glib::IOChannel> ioc = Glib::IOChannel::create_from_fd(newsock);
-#else
-		Glib::RefPtr<Glib::IOChannel> ioc = Glib::IOChannel::create_from_win32_socket(newsock);
-#endif
-		ioc->set_close_on_unref(false);
-		std::pair<const int, Glib::RefPtr<Glib::IOChannel> > sioc(newsock, ioc);
-		clientchannels.push_back(sioc);
+		// Send game description to clients over network
+		sendGameDetails();
 
 		// Connect the socket to an event handler, listening to see if the client disconnects
 		std::pair<const int, sigc::connection> eventconn(newsock,
 			Glib::signal_io().connect(
 				sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::handleClientSocks), newsock),
-					ioc, Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL)
+					newclient->getChannel(), Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL)
 		);
 		clienteventconns.push_back(eventconn);
 		
@@ -566,9 +542,9 @@ void ServerStatusDialog::setGUIFromClientState()
 		if (m_pGameType->player_4 == pt_remote)
 			remoteplayers.push_back(pc_player_4);
 	}
-	for (std::deque<ClientInfo>::const_iterator i = clients.begin(); i != clients.end(); ++i)
+	for (std::deque<Glib::RefPtr<ClientSocket> >::const_iterator i = clientsockets.begin(); i != clientsockets.end(); ++i)
 	{
-		remoteplayers.remove(i->player);
+		remoteplayers.remove((*i)->getPlayer());
 	}
 
 	// Disconnect all client combo box event handlers before manually
@@ -581,16 +557,16 @@ void ServerStatusDialog::setGUIFromClientState()
 	for (size_t i = 0; i < 4; ++i)
 	{
 		m_aClientComboBoxes[i].set_active(0);
-		if (i >= clients.size())
+		if (i >= clientsockets.size())
 		{
 			m_paClientLabels[i]->hide();
 			m_paClientKickButtons[i]->hide();
 			m_aClientComboBoxes[i].hide();
 		} else {
-			m_paClientLabels[i]->set_label(clients[i].address);
+			m_paClientLabels[i]->set_label(clientsockets[i]->getAddress());
 			m_paClientLabels[i]->show();
 			m_paClientKickButtons[i]->show();
-			switch (clients[i].player)
+			switch (clientsockets[i]->getPlayer())
 			{
 				case pc_player_none:
 					m_aClientComboBoxes[i].set_active(0);
@@ -621,7 +597,15 @@ void ServerStatusDialog::setGUIFromClientState()
 		allSlotsFilled &= setPlayerDescription(m_pGameType->player_4, m_pYellowClient, yellowrow, m_aClientComboBoxes, m_paClientLabels);
 	}
 	
+	// Send game description to clients over network
+	sendGameDetails();
+	
 	// Allow starting the game if all slots are filled
+	// TODO - Only allow the OK button to be clicked if all client
+	// sockets are ready for output, as that means they have all
+	// received the latest game details.  Add a signal to client
+	// sockets which is emitted when writes finish, and connect
+	// a callback method to it here.
 	m_pStartButton->set_sensitive(allSlotsFilled);
 
 	// Reconnect client combo box event handlers
@@ -634,12 +618,119 @@ void ServerStatusDialog::setGUIFromClientState()
 	clientkickconns.clear();
 	size_t buttonindex = 0;
 	// Pass client socket into event handler function, as this is what removeClient expects as its argument
-	for (std::deque<ClientInfo>::const_iterator i = clients.begin(); i != clients.end(); ++i)
-		clientkickconns.push_back(m_paClientKickButtons[buttonindex++]->signal_clicked().connect(sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::onKickClient), i->socket)));
+	for (std::deque<Glib::RefPtr<ClientSocket> >::const_iterator i = clientsockets.begin(); i != clientsockets.end(); ++i)
+		clientkickconns.push_back(
+			m_paClientKickButtons[buttonindex++]->signal_clicked().connect(
+				sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::onKickClient), (*i)->getSocket())
+			)
+		);
 }
 
 // Client disconnect button event handler
 void ServerStatusDialog::onKickClient(const int s)
 {
 	removeClient(s);
+}
+
+// Send game description to clients over network
+void ServerStatusDialog::sendGameDetails()
+{
+	// s|h (board shape)
+	// 2|4 (num. players)
+	// 4 player descriptions, each two bytes:
+	//    0 - local human/none
+	//    1 - AI
+	//    2 - remote
+	//    Second byte is either 0 or client address length for type 2
+	// Client's player number (0 - 4, 0 for connected but unassigned)
+	// Header total: 11 bytes
+	//
+	// Client addresses (in order, one for each type 2)
+	
+	std::string message;
+	if (m_pGameType->square)
+	{
+		message.append(1, 's');
+		if (m_pGameType->player_3 == pt_none)
+			message.append(1, 2);
+		else
+			message.append(1, 4);
+	} else
+		message.append("h2");
+
+	int players = 2;
+	if (m_pGameType->square && m_pGameType->player_3 != pt_none)
+		players = 4;
+
+	for (int i = 0; i < players; ++i)
+	{
+		playertype p;
+
+		if (i == 0)
+			p = m_pGameType->player_1;
+		else if (i == 1)
+			p = m_pGameType->player_2;
+		else if (i == 2)
+			p = m_pGameType->player_3;
+		else
+			p = m_pGameType->player_4;
+
+		if (p == pt_ai)
+			message.append(1, 0).append(1, 0);
+		else if (p == pt_local)
+			message.append(1, 1).append(1, 0);
+		else
+			message.append(1, 2).append(1, 0);
+	}
+	
+	// Append two empty player descriptions if necessary -
+	// we want a static header size
+	if (players == 2)
+		message.append(4, 0);
+	
+	// Append - for now - a dummy 11th byte
+	message.append(1, 0);
+	
+	std::string redaddr, greenaddr, blueaddr, yellowaddr;
+	for (std::deque<Glib::RefPtr<ClientSocket> >::const_iterator i = clientsockets.begin(); i != clientsockets.end(); ++i)
+	{
+		if ((*i)->getPlayer() == pc_player_1)
+		{
+			redaddr.assign((*i)->getAddress().c_str(), (*i)->getAddress().bytes());
+			message[3] = (char) ((*i)->getAddress().bytes());
+		}
+		else if ((*i)->getPlayer() == pc_player_2)
+		{
+			greenaddr.assign((*i)->getAddress().c_str(), (*i)->getAddress().bytes());
+			message[5] = (char) ((*i)->getAddress().bytes());
+		}
+		else if ((*i)->getPlayer() == pc_player_3)
+		{
+			blueaddr.assign((*i)->getAddress().c_str(), (*i)->getAddress().bytes());
+			message[7] = (char) ((*i)->getAddress().bytes());
+		}
+		else if ((*i)->getPlayer() == pc_player_4)
+		{
+			blueaddr.assign((*i)->getAddress().c_str(), (*i)->getAddress().bytes());
+			message[9] = (char) ((*i)->getAddress().bytes());
+		}
+	}
+	message.append(redaddr).append(greenaddr).append(blueaddr).append(yellowaddr);
+	
+	// Send message out to each client, including the client's player number
+	for (std::deque<Glib::RefPtr<ClientSocket> >::iterator i = clientsockets.begin(); i != clientsockets.end(); ++i)
+	{
+		if ((*i)->getPlayer() == pc_player_1)
+			message[10] = 1;
+		else if ((*i)->getPlayer() == pc_player_2)
+			message[10] = 2;
+		else if ((*i)->getPlayer() == pc_player_3)
+			message[10] = 3;
+		else if ((*i)->getPlayer() == pc_player_4)
+			message[10] = 4;
+		else
+			message[10] = 0;
+		
+		(*i)->writeChars(message.c_str(), message.length());
+	}
 }
