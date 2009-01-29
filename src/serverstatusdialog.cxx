@@ -506,9 +506,6 @@ bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, const int s)
 		remoteplayers.pop_front();
 		clientsockets.push_back(Glib::RefPtr<ClientSocket>(newclient));
 		
-		// Send game description to clients over network
-		sendGameDetails();
-
 		// Connect the socket to an event handler, listening to see if the client disconnects
 		std::pair<const int, sigc::connection> eventconn(newsock,
 			Glib::signal_io().connect(
@@ -635,6 +632,9 @@ void ServerStatusDialog::onKickClient(const int s)
 // Send game description to clients over network
 void ServerStatusDialog::sendGameDetails()
 {
+	if (clientsockets.size() == 0)
+		return;
+
 	// s|h (board shape)
 	// 2|4 (num. players)
 	// 4 player descriptions, each two bytes:
@@ -716,7 +716,7 @@ void ServerStatusDialog::sendGameDetails()
 		}
 	}
 	message.append(redaddr).append(greenaddr).append(blueaddr).append(yellowaddr);
-	
+
 	// Send message out to each client, including the client's player number
 	for (std::deque<Glib::RefPtr<ClientSocket> >::iterator i = clientsockets.begin(); i != clientsockets.end(); ++i)
 	{
@@ -730,7 +730,7 @@ void ServerStatusDialog::sendGameDetails()
 			message[10] = 4;
 		else
 			message[10] = 0;
-		
+
 		(*i)->writeChars(message.c_str(), message.length());
 	}
 }
