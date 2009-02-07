@@ -482,9 +482,11 @@ bool GameBoard::onResize(GdkEventConfigure *event)
 
 void GameBoard::onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y, const bool gameover)
 {
-	// TODO - Some form of animation
-	// Also, find out how to make immediate redraws work - don't want to wait until AI::onMoveMade has finished.
+	// TODO - Some form of animation?
+	// Redraw the board immediately
 	queue_draw();
+	while (Gtk::Main::events_pending())
+		Gtk::Main::iteration();
 	
 	// Disable clicking when game is over or it's not a local player's turn - until next game starts
 	if (gameover)
