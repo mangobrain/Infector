@@ -70,6 +70,20 @@ struct GameType
 				return (player_4 == pt);
 		}
 	};
+	playertype typeOf(const piece pc) const
+	{
+		switch (pc)
+		{
+			case pc_player_1:
+				return player_1;
+			case pc_player_2:
+				return player_2;
+			case pc_player_3:
+				return player_3;
+			default:
+				return player_4;
+		}
+	};
 };
 
 #endif

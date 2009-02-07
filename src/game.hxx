@@ -20,6 +20,7 @@
 
 class GameBoard;
 class AI;
+class ClientSocket;
 
 // Class for main game logic, tying together players and the GUI
 class Game: public sigc::trackable
@@ -28,7 +29,8 @@ class Game: public sigc::trackable
 		// Constructor - pass in game board so we can pick up
 		// on emitted signals when it is clicked, and pass in
 		// game properties (board size, number of players, etc.)
-		Game(GameBoard* b, GameType &gt);
+		Game(GameBoard* b, GameType &gt,
+			const std::deque<Glib::RefPtr<ClientSocket> > *clientsocks = NULL);
 	
 		// Signals we can emit
 		sigc::signal<void, const int, const int, const int, const int, const bool>
@@ -44,10 +46,23 @@ class Game: public sigc::trackable
 
 		// Board state
 		BoardState m_BoardState;
+		
+		// Client sockets, if acting as network server
+		std::deque<Glib::RefPtr<ClientSocket> > m_ClientSockets;
 
 		// Event handlers
 		// Board clicked
 		void onSquareClicked(const int x, const int y);
+		// Client sockets
+		bool handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> sock);
+		
+		// See if a particular move is valid for the current player
+		bool validMove(const int ax, const int ay, const int bx, const int by) const;
+		
+		// Network input buffer
+		char netbuf[4];
+		// Number of bytes read for the current remote player's move
+		size_t netbufsize;
 		
 		// AI player
 		std::auto_ptr<AI> m_pAI;

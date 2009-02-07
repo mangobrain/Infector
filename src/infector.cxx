@@ -177,6 +177,7 @@ void GameWindow::onNewGame()
 	
 		// If there are remote players, show the server status dialogue,
 		// which will block until a suitable number of remote players are found
+		// Either way, stop the current running game and start a new one
 		if (gt.anyPlayersOfType(pt_remote))
 		{
 			// Instantiate dialogue if not already done
@@ -193,10 +194,15 @@ void GameWindow::onNewGame()
 
 			if (response != Gtk::RESPONSE_OK)
 				return;
+			else {
+				m_pGame.reset(new Game(m_pBoard, gt,
+					m_pServerStatusDialog->getClientSockets()));
+				m_pServerStatusDialog->clearClientSocketRefs();
+			}
 		}
-
-		// Stop the current running game and start a new one
-		m_pGame.reset(new Game(m_pBoard, gt));
+		else
+			m_pGame.reset(new Game(m_pBoard, gt));
+		
 		onMoveMade(0, 0, 0, 0, false);
 		m_pGame->move_made.connect(sigc::mem_fun(this, &GameWindow::onMoveMade));
 	}
