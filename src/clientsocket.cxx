@@ -61,6 +61,9 @@ ClientSocket::ClientSocket(const int socket, const Glib::ustring &address, const
 	
 	// No character encoding - binary data please
 	m_pIOChannel->set_encoding("");
+	
+	// No buffering please
+	m_pIOChannel->set_buffered(false);
 }
 
 // Put data in internal buffer & send it, using non-blocking I/O
@@ -83,6 +86,9 @@ bool ClientSocket::handleIOOut(Glib::IOCondition cond)
 		while (true)
 		{
 			size_t b = 0;
+			// TODO - Put an exception handler around here, and have it trigger
+			// a sigc error signal so that calling code can deal with errors
+			// asynchronously.
 			Glib::IOStatus s = m_pIOChannel->write(m_buffer.c_str(), m_buffer.length(), b);
 			
 			// How much data was sent?  Either truncate the buffer accordingly,
