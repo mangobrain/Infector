@@ -27,6 +27,21 @@ class ServerStatusDialog: public Gtk::Dialog
 		// Set game description label text, and set Clients and Game Details
 		// tables to their initial states
 		void setGameDetails(const GameType &gt);
+		
+		// Get client socket reference list - for retrieval by calling code
+		// once a network game has successfully been established
+		const std::deque<Glib::RefPtr<ClientSocket> > *getClientSockets() const
+		{
+			return &clientsockets;
+		};
+		
+		// Clear out references to client sockets (don't want them to stay
+		// open when the dialogue's closed, but cannot clear out references
+		// on our own before calling code has had a chance to retrieve them)
+		void clearClientSocketRefs()
+		{
+			clientsockets.clear();
+		};
 	
 	private:
 		Gtk::Label *m_paClientLabels[4];
