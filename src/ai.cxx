@@ -201,7 +201,8 @@ void AI::onMoveMade(const int start_x, const int start_y, const int end_x, const
 		m = scoredmoves.at(0).first;
 		
 		// Highlight the square we're going to move then
-		// make the actual move in 0.5 time increments (to let people see)
+		// make the actual move in 0.5 second time increments
+		// (to let people see)
 		selectpiece = true;
 		Glib::signal_timeout().connect(sigc::mem_fun(*this, &AI::makeMove), 500);
 	}
