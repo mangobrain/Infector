@@ -52,7 +52,7 @@
 AI::AI(Game *game, const BoardState *bs, const GameType *gt)
 	: m_pBoardState(bs), m_pGameType(gt)
 {
-	game->move_made.connect(sigc::mem_fun(*this, &AI::onMoveMade));
+	game->move_made.connect(sigc::mem_fun(this, &AI::onMoveMade));
 	
 	// Seed the random number generator (moves are picked at random if there
 	// are multiple possibilities with the same score, such as in the opening)
@@ -204,7 +204,7 @@ void AI::onMoveMade(const int start_x, const int start_y, const int end_x, const
 		// make the actual move in 0.5 second time increments
 		// (to let people see)
 		selectpiece = true;
-		Glib::signal_timeout().connect(sigc::mem_fun(*this, &AI::makeMove), 500);
+		Glib::signal_timeout().connect(sigc::mem_fun(this, &AI::makeMove), 500);
 	}
 }
 
