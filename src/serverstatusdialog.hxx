@@ -77,7 +77,7 @@ class ServerStatusDialog: public Gtk::Dialog
 		void on_response(int response_id);
 		
 		// Convenience function for showing an error popup
-		void errPop(const char* err) const;
+		void errPop(const char *err) const;
 		
 		// IOChannel references for our sockets
 		std::list<Glib::RefPtr<Glib::IOChannel> > serverchannels;
@@ -93,6 +93,7 @@ class ServerStatusDialog: public Gtk::Dialog
 		// connections, so we can delete them individually when
 		// clients disconnect
 		std::list<std::pair<const int, sigc::connection> > clienteventconns;
+		std::list<sigc::connection> clienterrconns;
 		
 		// Connection objects corresponding to client combo box event handlers
 		std::list<sigc::connection> clientcomboconns;
@@ -103,6 +104,7 @@ class ServerStatusDialog: public Gtk::Dialog
 		// Socket event handlers
 		bool handleServerSocks(Glib::IOCondition cond, const int s);
 		bool handleClientSocks(Glib::IOCondition cond, const int s);
+		void clientWriteError(const Glib::ustring &e, const int s);
 		
 		// Client player selection box event handler
 		void onClientComboChange(const size_t id);

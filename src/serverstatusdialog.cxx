@@ -55,7 +55,7 @@
 //
 
 // Convenience function for showing an error popup
-void ServerStatusDialog::errPop(const char* err) const
+void ServerStatusDialog::errPop(const char *err) const
 {
 	Glib::ustring message(err);
 	Gtk::MessageDialog *m = new Gtk::MessageDialog((Gtk::Window&)(*this), message, false,
@@ -98,7 +98,7 @@ ServerStatusDialog::ServerStatusDialog(BaseObjectType *cobject, const Glib::RefP
 	refXml->get_widget("ssyellowclient", m_pYellowClient);
 	
 	// Link the Apply button with the onApply method for opening a listen port
-	m_pApplyButton->signal_clicked().connect(sigc::mem_fun(*this, &ServerStatusDialog::onApply));
+	m_pApplyButton->signal_clicked().connect(sigc::mem_fun(this, &ServerStatusDialog::onApply));
 	
 	// XXX Set default value of server port spin button
 	// - doesn't seem to work from within Glade
@@ -300,8 +300,11 @@ void ServerStatusDialog::on_response(int response_id)
 		i->disconnect();
 	for (std::list<std::pair<const int, sigc::connection> >::iterator i = clienteventconns.begin(); i != clienteventconns.end(); ++i)
 		i->second.disconnect();
+	for (std::list<sigc::connection>::iterator i = clienterrconns.begin(); i != clienterrconns.end(); ++i)
+		i->disconnect();
 	servereventconns.clear();
 	clienteventconns.clear();
+	clienterrconns.clear();
 	
 	// Close all listening sockets by removing all references to their IOChannels
 	for (std::list<Glib::RefPtr<Glib::IOChannel> >::iterator i = serverchannels.begin(); i != serverchannels.end(); ++i)
@@ -408,10 +411,21 @@ void ServerStatusDialog::onApply()
 // Handle disconnection of client sockets
 bool ServerStatusDialog::handleClientSocks(Glib::IOCondition cond, const int s)
 {
+	// Clients shouldn't be writing down their sockets at this stage
 	removeClient(s);
 	
 	// Return false to disconnect from event handler
 	return false;
+}
+
+// Handle write errors to client sockets
+void ServerStatusDialog::clientWriteError(const Glib::ustring &e, const int s)
+{
+	// Disconnect the failed client and show an error message
+	removeClient(s);
+	Glib::ustring m("Client write error: ");
+	m.append(e);
+	errPop(m.c_str());
 }
 
 // Function template for comparing first member of a pair to
@@ -513,6 +527,12 @@ bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, const int s)
 					newclient->getChannel(), Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL)
 		);
 		clienteventconns.push_back(eventconn);
+		
+		// Also connect to the socket's write error signal, to catch
+		// errors during asynchronous writes
+		clienterrconns.push_back(newclient->write_error.connect(
+			sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::clientWriteError), newsock)
+		));
 		
 		setGUIFromClientState();
 	} else {
