@@ -86,10 +86,20 @@ bool ClientSocket::handleIOOut(Glib::IOCondition cond)
 		while (true)
 		{
 			size_t b = 0;
-			// TODO - Put an exception handler around here, and have it trigger
-			// a sigc error signal so that calling code can deal with errors
-			// asynchronously.
-			Glib::IOStatus s = m_pIOChannel->write(m_buffer.c_str(), m_buffer.length(), b);
+			
+			// Raise an error signal if we get an exception during writing.
+			// This class does non-blocking writes asynchronously from the
+			// code requesting the write, so the calling code is not able
+			// to catch the exception itself directly.
+			Glib::IOStatus s;
+			try {
+				s = m_pIOChannel->write(m_buffer.c_str(), m_buffer.length(), b);
+			}
+			catch (Glib::IOChannelError &e)
+			{
+				write_error(e.what());
+				return false;
+			}
 			
 			// How much data was sent?  Either truncate the buffer accordingly,
 			// or exit if the answer is "everything".

@@ -66,6 +66,9 @@ class ClientSocket : public Glib::Object
 			return m_pIOChannel;
 		};
 		
+		// Signal emitted on write error
+		sigc::signal<void, const Glib::ustring&> write_error;
+		
 	private:
 		int m_socket;
 		Glib::RefPtr<Glib::IOChannel> m_pIOChannel;
