@@ -51,7 +51,7 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::X
 		m_pBoardState(NULL), m_pGameType(NULL), bw(m_DefaultGameType.w), bh(m_DefaultGameType.h)
 {
 	// Connect mouse click events to the onClick handler
-	signal_button_press_event().connect(sigc::mem_fun(*this, &GameBoard::onClick));
+	signal_button_press_event().connect(sigc::mem_fun(this, &GameBoard::onClick));
 
 	// The widget is painted directly by us, but we'll leave the library
 	// to do its own double buffering, thanks.
@@ -61,10 +61,10 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::X
 	// we don't have to redraw it in every single expose event.
 	// The widget needs to be realised before we can get its Gdk::Window as a
 	// drawable, so have setBackground called after signal_realize has fired.
-	signal_realize().connect_notify(sigc::mem_fun(*this, &GameBoard::setBackground), true);
+	signal_realize().connect_notify(sigc::mem_fun(this, &GameBoard::setBackground), true);
 	
 	// The background will need to be redrawn whenever the widget is resized
-	signal_configure_event().connect(sigc::mem_fun(*this, &GameBoard::onResize), true);
+	signal_configure_event().connect(sigc::mem_fun(this, &GameBoard::onResize), true);
 	
 	// Don't put pieces on the default board - it looks like a game is in play
 	m_DefaultBoardState.setPieceAt(0, 0, pc_player_none);
@@ -263,6 +263,12 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 // Mouse click handler
 bool GameBoard::onClick(GdkEventButton *event)
 {
+	if (m_pBoardState == NULL || m_pGameType == NULL ||
+		!(m_pGameType->isPlayerType(m_pBoardState->getPlayer(), pt_local)))
+	{
+		return true;
+	}
+
 	// Work out which square was clicked on
 	Gtk::Allocation alloc = get_allocation();
 	const int w(alloc.get_width());
@@ -343,9 +349,9 @@ bool GameBoard::onClick(GdkEventButton *event)
 void GameBoard::newGame(Game *g, const BoardState *b, const GameType *gt)
 {
 	// TODO - Implement signal handlers and uncomment this
-	g->move_made.connect(sigc::mem_fun(*this, &GameBoard::onMoveMade));
-	//g->invalid_move.connect(sigc::mem_fun(*this, &GameBoard::onInvalidMove));
-	g->select_piece.connect(sigc::mem_fun(*this, &GameBoard::queue_draw));
+	g->move_made.connect(sigc::mem_fun(this, &GameBoard::onMoveMade));
+	//g->invalid_move.connect(sigc::mem_fun(this, &GameBoard::onInvalidMove));
+	g->select_piece.connect(sigc::mem_fun(this, &GameBoard::queue_draw));
 
 	// Store pointer to shared board state
 	m_pBoardState = b;
@@ -480,6 +486,11 @@ bool GameBoard::onResize(GdkEventConfigure *event)
 	return true;
 }
 
+void GameBoard::endGame()
+{
+	m_pGameType = NULL;
+}
+
 void GameBoard::onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y, const bool gameover)
 {
 	// TODO - Some form of animation?
@@ -490,7 +501,5 @@ void GameBoard::onMoveMade(const int start_x, const int start_y, const int end_x
 	
 	// Disable clicking when game is over or it's not a local player's turn - until next game starts
 	if (gameover)
-		set_sensitive(false);
-	else
-		set_sensitive(m_pGameType->isPlayerType(m_pBoardState->getPlayer(), pt_local));
+		endGame();
 }

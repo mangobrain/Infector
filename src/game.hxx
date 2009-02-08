@@ -37,6 +37,7 @@ class Game: public sigc::trackable
 			move_made;
 		sigc::signal<void> invalid_move;
 		sigc::signal<void> select_piece;
+		sigc::signal<void, const Glib::ustring&> network_error;
 		
 		const BoardState& getBoardState() const;
 
@@ -55,6 +56,7 @@ class Game: public sigc::trackable
 		void onSquareClicked(const int x, const int y);
 		// Client sockets
 		bool handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> sock);
+		void clientWriteError(const Glib::ustring &e);
 		
 		// See if a particular move is valid for the current player
 		bool validMove(const int ax, const int ay, const int bx, const int by) const;

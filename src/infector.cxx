@@ -110,15 +110,15 @@ GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade:
 	// Link the "About" menu item to the onAbout method
 	Gtk::MenuItem *pAbout;
 	m_refXml->get_widget("aboutmenuitem", pAbout);
-	pAbout->signal_activate().connect(sigc::mem_fun(*this, &GameWindow::onAbout));
+	pAbout->signal_activate().connect(sigc::mem_fun(this, &GameWindow::onAbout));
 
 	// Link the "New" menu item & button to the onNewGame method
 	Gtk::MenuItem *pNewGame;
 	m_refXml->get_widget("newgamemenuitem", pNewGame);
-	pNewGame->signal_activate().connect(sigc::mem_fun(*this, &GameWindow::onNewGame));
+	pNewGame->signal_activate().connect(sigc::mem_fun(this, &GameWindow::onNewGame));
 	Gtk::ToolButton *pNewGameButton;
 	m_refXml->get_widget("newtoolbutton", pNewGameButton);
-	pNewGameButton->signal_clicked().connect(sigc::mem_fun(*this, &GameWindow::onNewGame));
+	pNewGameButton->signal_clicked().connect(sigc::mem_fun(this, &GameWindow::onNewGame));
 	
 	// Link the "Quit" menu item to the hide method
 	Gtk::MenuItem *pQuit;
@@ -205,7 +205,19 @@ void GameWindow::onNewGame()
 		
 		onMoveMade(0, 0, 0, 0, false);
 		m_pGame->move_made.connect(sigc::mem_fun(this, &GameWindow::onMoveMade));
+		m_pGame->network_error.connect(sigc::mem_fun(this, &GameWindow::onNetworkError));
 	}
+}
+
+// Network error - show popup & desensitise the board
+void GameWindow::onNetworkError(const Glib::ustring &e)
+{
+	m_pBoard->endGame();
+	Gtk::MessageDialog *m = new Gtk::MessageDialog((Gtk::Window&)(*this), e, false,
+		Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+	m->run();
+	m->hide();
+	delete m;
 }
 
 // Move made - update status bar, and show popup if game has ended
@@ -270,6 +282,8 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 				tiemsg << "yellow, ";
 			message.append(tiemsg.str().substr(0, tiemsg.str().length() - 2));
 		}
+
+		m_pBoard->endGame();
 			
 		Gtk::MessageDialog *m = new Gtk::MessageDialog(*this, message, false,
 			Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);

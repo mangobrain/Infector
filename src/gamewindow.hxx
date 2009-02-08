@@ -51,6 +51,7 @@ class GameWindow: public Gtk::Window
 		void onAbout();
 		void onNewGame();
 		void onMoveMade(const int ax, const int ay, const int bx, const int by, const bool gameover);
+		void onNetworkError(const Glib::ustring &e);
 };
 
 #endif

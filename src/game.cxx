@@ -58,7 +58,7 @@ Game::Game(GameBoard* b, GameType &gt,
 	// storing returned connection objects.
 
 	// Connect square clicked handler to game board instance
-	b->square_clicked.connect(sigc::mem_fun(*this, &Game::onSquareClicked));
+	b->square_clicked.connect(sigc::mem_fun(this, &Game::onSquareClicked));
 	
 	// Clear the board and set its initial state for this game
 	b->newGame(this, &m_BoardState, &m_GameType);
@@ -67,7 +67,7 @@ Game::Game(GameBoard* b, GameType &gt,
 	if (gt.anyPlayersOfType(pt_ai))
 	{
 		m_pAI.reset(new AI(this, &m_BoardState, &m_GameType));
-		m_pAI->square_clicked.connect(sigc::mem_fun(*this, &Game::onSquareClicked));
+		m_pAI->square_clicked.connect(sigc::mem_fun(this, &Game::onSquareClicked));
 	}
 	
 	// Take a copy of client sockets, if we've been given any,
@@ -81,8 +81,16 @@ Game::Game(GameBoard* b, GameType &gt,
 			Glib::signal_io().connect(
 				sigc::bind(sigc::mem_fun(this, &Game::handleClientSocks), *i),
 					(*i)->getChannel(), Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL);
+			(*i)->write_error.connect(sigc::mem_fun(this, &Game::clientWriteError));
 		}
 	}
+}
+
+// Write error occurred on client socket
+void Game::clientWriteError(const Glib::ustring &e)
+{
+	m_ClientSockets.clear();
+	network_error("I/O error on client socket");
 }
 
 // Handle events on client sockets
@@ -90,9 +98,8 @@ bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> 
 {
 	if (cond != Glib::IO_IN)
 	{
-		// TODO - Have a new "network error" signal, and emit it here to
-		// end the game (set the board to insensitive, close all client
-		// sockets)
+		m_ClientSockets.clear();
+		network_error("I/O error on client socket");
 		return false;
 	}
 	else
@@ -109,15 +116,32 @@ bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> 
 	
 		// It's an input event.  Read in either all or part of a move,
 		// depending on whether or not we already have part of the move
-		// in our buffer.  Don't read anything if it isn't this client's turn.
+		// in our buffer.
+		
+		// If it isn't this client's turn, a network error has occurred.
 		if (m_BoardState.getPlayer() != sock->getPlayer())
-			return true;
+		{
+			m_ClientSockets.clear();
+			network_error("Client disconnected or unexpected data received");
+			return false;
+		}
 		
 		size_t read = 0;
-		// TODO - Put an exception handler around this, or whatever is
-		// necessary to detect when a client has disconnected, and raise
-		// the network error signal.
-		sock->getChannel()->read(netbuf + netbufsize, 4 - netbufsize, read);
+		try {
+			sock->getChannel()->read(netbuf + netbufsize, 4 - netbufsize, read);
+		}
+		catch (Glib::IOChannelError &e)
+		{
+			m_ClientSockets.clear();
+			network_error("Error reading from client socket");
+			return false;
+		}
+		if (read == 0)
+		{
+			m_ClientSockets.clear();
+			network_error("Client disconnected");
+			return false;
+		}
 		netbufsize += read;
 		
 		if (netbufsize == 4)
@@ -127,7 +151,21 @@ bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> 
 			// Make the player's move, if it's valid.
 			if (validMove(netbuf[0], netbuf[1], netbuf[2], netbuf[3]))
 			{
+				// Highlight the square we're going to move then
+				// make the actual move in 0.5 second time increments
+				// (to let people see what's going on).
+				onSquareClicked(netbuf[0], netbuf[1]);
+				// Let the board redraw to highlight the selected piece
+				while (Gtk::Main::events_pending())
+					Gtk::Main::iteration();
+				Glib::usleep(500000);
+				onSquareClicked(netbuf[2], netbuf[3]);
+
 				// Echo move to other connected clients.
+				// Yes, this does introduce a delay into clients viewing
+				// their opponent's moves, but it's the simplest way to
+				// ensure we don't start receiving another move before
+				// the game state has advanced to the next player's turn.
 				for (std::deque<Glib::RefPtr<ClientSocket> >::const_iterator i = m_ClientSockets.begin();
 					i != m_ClientSockets.end(); ++i)
 				{
@@ -135,16 +173,6 @@ bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> 
 					if (sock != (*i))
 						(*i)->writeChars(netbuf, 4);
 				}
-				
-				// Highlight the square we're going to move then
-				// make the actual move in 0.5 second time increments
-				// (to let people see)
-				onSquareClicked(netbuf[0], netbuf[1]);
-				// Let the board redraw to highlight the selected piece
-				while (Gtk::Main::events_pending())
-					Gtk::Main::iteration();
-				Glib::usleep(500000);
-				onSquareClicked(netbuf[2], netbuf[3]);
 			}
 		}
 
