@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.5 on Tue Feb 10 21:12:53 2009 -->
+<!--Generated with glade3 3.4.5 on Tue Feb 10 22:42:22 2009 -->
 <glade-interface>
   <widget class="GtkWindow" id="mainwindow">
     <property name="title">Infector</property>
@@ -255,7 +255,7 @@
                         <child>
                           <widget class="GtkLabel" id="playernumlabel">
                             <property name="visible">True</property>
-                            <property name="xalign">0</property>
+                            <property name="xalign">1</property>
                             <property name="label" translatable="yes">_Players:</property>
                             <property name="use_underline">True</property>
                             <property name="mnemonic_widget">numplayerscombo</property>
@@ -303,7 +303,7 @@
                         <child>
                           <widget class="GtkLabel" id="boardsizelabel">
                             <property name="visible">True</property>
-                            <property name="xalign">0</property>
+                            <property name="xalign">1</property>
                             <property name="label" translatable="yes">Board _size:</property>
                             <property name="use_underline">True</property>
                             <property name="mnemonic_widget">boardsizecombo</property>
@@ -320,7 +320,7 @@
                         <child>
                           <widget class="GtkLabel" id="boardshapelabel">
                             <property name="visible">True</property>
-                            <property name="xalign">0</property>
+                            <property name="xalign">1</property>
                             <property name="label" translatable="yes">_Board shape:</property>
                             <property name="use_underline">True</property>
                             <property name="mnemonic_widget">boardshapecombo</property>
@@ -453,7 +453,7 @@ Networked</property>
                         <child>
                           <widget class="GtkLabel" id="redlabel">
                             <property name="visible">True</property>
-                            <property name="xalign">0</property>
+                            <property name="xalign">1</property>
                             <property name="label" translatable="yes">_Red:</property>
                             <property name="use_underline">True</property>
                             <property name="mnemonic_widget">redcombo</property>
@@ -468,7 +468,7 @@ Networked</property>
                         <child>
                           <widget class="GtkLabel" id="greenlabel">
                             <property name="visible">True</property>
-                            <property name="xalign">0</property>
+                            <property name="xalign">1</property>
                             <property name="label" translatable="yes">_Green:</property>
                             <property name="use_underline">True</property>
                             <property name="mnemonic_widget">greencombo</property>
@@ -484,7 +484,7 @@ Networked</property>
                         </child>
                         <child>
                           <widget class="GtkLabel" id="bluelabel">
-                            <property name="xalign">0</property>
+                            <property name="xalign">1</property>
                             <property name="label" translatable="yes">B_lue:</property>
                             <property name="use_underline">True</property>
                             <property name="mnemonic_widget">bluecombo</property>
@@ -500,7 +500,7 @@ Networked</property>
                         </child>
                         <child>
                           <widget class="GtkLabel" id="yellowlabel">
-                            <property name="xalign">0</property>
+                            <property name="xalign">1</property>
                             <property name="label" translatable="yes">_Yellow:</property>
                             <property name="use_underline">True</property>
                             <property name="mnemonic_widget">yellowcombo</property>
@@ -658,6 +658,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                     <child>
                       <widget class="GtkLabel" id="serverportlabel">
                         <property name="visible">True</property>
+                        <property name="xalign">1</property>
                         <property name="label" translatable="yes">Port:</property>
                       </widget>
                     </child>
@@ -994,7 +995,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                             </child>
                             <child>
                               <widget class="GtkLabel" id="ssyellowlabel">
-                                <property name="xalign">0</property>
+                                <property name="xalign">1</property>
                                 <property name="label" translatable="yes">Yellow:</property>
                                 <property name="mnemonic_widget">yellowcombo</property>
                               </widget>
@@ -1007,7 +1008,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                             </child>
                             <child>
                               <widget class="GtkLabel" id="ssbluelabel">
-                                <property name="xalign">0</property>
+                                <property name="xalign">1</property>
                                 <property name="label" translatable="yes">Blue:</property>
                                 <property name="mnemonic_widget">bluecombo</property>
                               </widget>
@@ -1021,7 +1022,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                             <child>
                               <widget class="GtkLabel" id="ssgreenlabel">
                                 <property name="visible">True</property>
-                                <property name="xalign">0</property>
+                                <property name="xalign">1</property>
                                 <property name="label" translatable="yes">Green:</property>
                                 <property name="mnemonic_widget">greencombo</property>
                               </widget>
@@ -1035,7 +1036,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                             <child>
                               <widget class="GtkLabel" id="ssredlabel">
                                 <property name="visible">True</property>
-                                <property name="xalign">0</property>
+                                <property name="xalign">1</property>
                                 <property name="label" translatable="yes">Red:</property>
                                 <property name="mnemonic_widget">redcombo</property>
                               </widget>
@@ -1184,6 +1185,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                     <child>
                       <widget class="GtkLabel" id="clientaddrlabel">
                         <property name="visible">True</property>
+                        <property name="xalign">1</property>
                         <property name="label" translatable="yes">Address:</property>
                       </widget>
                     </child>
@@ -1209,6 +1211,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                     <child>
                       <widget class="GtkLabel" id="clientportlabel">
                         <property name="visible">True</property>
+                        <property name="xalign">1</property>
                         <property name="label" translatable="yes">Port:</property>
                       </widget>
                       <packing>
@@ -1318,7 +1321,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                             </child>
                             <child>
                               <widget class="GtkLabel" id="csyellowlabel">
-                                <property name="xalign">0</property>
+                                <property name="xalign">1</property>
                                 <property name="label" translatable="yes">Yellow:</property>
                                 <property name="mnemonic_widget">yellowcombo</property>
                               </widget>
@@ -1331,7 +1334,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                             </child>
                             <child>
                               <widget class="GtkLabel" id="csbluelabel">
-                                <property name="xalign">0</property>
+                                <property name="xalign">1</property>
                                 <property name="label" translatable="yes">Blue:</property>
                                 <property name="mnemonic_widget">bluecombo</property>
                               </widget>
@@ -1345,7 +1348,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                             <child>
                               <widget class="GtkLabel" id="csgreenlabel">
                                 <property name="visible">True</property>
-                                <property name="xalign">0</property>
+                                <property name="xalign">1</property>
                                 <property name="label" translatable="yes">Green:</property>
                                 <property name="mnemonic_widget">greencombo</property>
                               </widget>
@@ -1359,7 +1362,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                             <child>
                               <widget class="GtkLabel" id="csredlabel">
                                 <property name="visible">True</property>
-                                <property name="xalign">0</property>
+                                <property name="xalign">1</property>
                                 <property name="label" translatable="yes">Red:</property>
                                 <property name="mnemonic_widget">redcombo</property>
                               </widget>
