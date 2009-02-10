@@ -112,6 +112,7 @@ void ClientStatusDialog::setDefaults()
 	
 	// Have we received game details yet?
 	detailsreceived = false;
+	netbuf.clear();
 }
 
 // Connect button click event handler
@@ -234,7 +235,10 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 					bytesremaining += (size_t)(netbuf.at(5));
 					bytesremaining += (size_t)(netbuf.at(7));
 					bytesremaining += (size_t)(netbuf.at(9));
-				} else {
+				}
+				if (bytesremaining == 0)
+				{
+					detailsreceived = true;
 					// Parse full game details and update GUI
 					// Set client address labels
 					size_t rl = (size_t)(netbuf.at(3));
@@ -270,6 +274,7 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 					}
 					// Get ready to receive an updated set of game details
 					bytesremaining = 11;
+					netbuf.clear();
 				}
 			}
 			return true;
