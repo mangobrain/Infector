@@ -36,7 +36,7 @@ class Game: public sigc::trackable
 		void giveClientSockets(const std::deque<Glib::RefPtr<ClientSocket> > &clientsocks);
 		
 		// Extra initialisation for clients - include server socket
-		void giveServerSocket(const Glib::RefPtr<Socket> &serversock);
+		void giveServerSocket(const Glib::RefPtr<Socket> &serversock) {};
 	
 		// Signals we can emit
 		sigc::signal<void, const int, const int, const int, const int, const bool>

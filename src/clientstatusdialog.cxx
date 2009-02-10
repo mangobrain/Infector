@@ -29,7 +29,6 @@
 #include <cerrno>
 #include <cstring>
 #include <sstream>
-#include <memory>
 
 // Library headers
 #include <gtkmm.h>
@@ -43,6 +42,7 @@
 // Project headers
 #include "gametype.hxx"
 #include "socket.hxx"
+#include "clientstatusdialog.hxx"
 
 //
 // Implementation
@@ -115,7 +115,7 @@ void ClientStatusDialog::setDefaults()
 }
 
 // Connect button click event handler
-void onConnect()
+void ClientStatusDialog::onConnect()
 {
 	m_pPortSpin->set_sensitive(false);
 	m_pAddressEntry->set_sensitive(false);
@@ -167,11 +167,12 @@ void onConnect()
 			return;
 		}
 		// Create a Socket object from it
-		serversock.reset(new Socket(s));
+		serversock = Glib::RefPtr<Socket>(new Socket(s));
 		// Attach the underlying IOChannel to our event handler
-		sockeventconn = Glib::signal_io.connect(
+		sockeventconn = Glib::signal_io().connect(
 			sigc::mem_fun(this, &ClientStatusDialog::handleServerSock),
-				 Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL);
+				 serversock->getChannel(),
+				 	Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL);
 	}
 }
 
@@ -196,14 +197,13 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 		//
 		// Client addresses (in order, one for each type 2)
 		
-		size_t netbufsize = netbuf.length();
 		size_t read = 0;
 		if (bytesremaining > 0)
 		{
 			// Grab header; calculate remaining number of bytes (player
 			// addresses), retrieve those too; when we have a full set of
 			// data, update the GUI
-			std::auto_ptr<char> buf(new char[bytesremaining]);
+			char *buf = new char[bytesremaining];
 			try {
 				serversock->getChannel()->read(buf, bytesremaining, read);
 			}
@@ -211,16 +211,19 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 			{
 				errPop("Error reading from server");
 				response(Gtk::RESPONSE_CANCEL);
+				delete[] buf;
 				return false;
 			}
 			if (read == 0)
 			{
 				errPop("Server disconnected");
 				response(Gtk::RESPONSE_CANCEL);
+				delete[] buf;
 				return false;
 			}
 			bytesremaining -= read;
 			netbuf.append(buf, read);
+			delete[] buf;
 			if (bytesremaining == 0)
 			{
 				if (netbuf.length() == 11)
@@ -233,6 +236,19 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 					bytesremaining += (size_t)(netbuf.at(9));
 				} else {
 					// Parse full game details and update GUI
+					// Set client address labels
+					size_t rl = (size_t)(netbuf.at(3));
+					size_t gl = (size_t)(netbuf.at(5));
+					size_t bl = (size_t)(netbuf.at(7));
+					size_t yl = (size_t)(netbuf.at(9));
+					if (rl > 0)
+						m_pRedClient->set_label(netbuf.substr(11, rl).c_str());
+					else
+						m_pRedClient->set_label("<i>Empty</i>");
+					if (gl > 0)
+						m_pGreenClient->set_label(netbuf.substr(11 + rl, gl).c_str());
+					else
+						m_pGreenClient->set_label("<i>Empty</i>");
 					m_pGameDetailsFrame->show();
 					if (netbuf.at(1) == 2)
 					{
@@ -241,10 +257,19 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 					} else {
 						m_pBlueLabel->show(); m_pBlueClient->show();
 						m_pYellowLabel->show(); m_pYellowClient->show();
+						if (bl > 0)
+							m_pBlueClient->set_label(
+								netbuf.substr(11 + rl + gl, bl).c_str());
+						else
+							m_pBlueClient->set_label("<i>Empty</i>");
+						if (yl > 0)
+							m_pYellowClient->set_label(
+								netbuf.substr(11 + rl + gl + bl, yl).c_str());
+						else
+							m_pYellowClient->set_label("<i>Empty</i>");
 					}
-					// Set client address labels
-					if ((size_t)(netbuf.at(3)) > 0)
-					else
+					// Get ready to receive an updated set of game details
+					bytesremaining = 11;
 				}
 			}
 			return true;
