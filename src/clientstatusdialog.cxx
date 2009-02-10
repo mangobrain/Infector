@@ -108,7 +108,7 @@ void ClientStatusDialog::setDefaults()
 	m_pGameDetailsFrame->hide();
 	
 	// No. of bytes of network input we know we need == size of header
-	bytesremaining = 11;
+	bytesremaining = 13;
 	
 	// Have we received game details yet?
 	detailsreceived = false;
@@ -177,6 +177,19 @@ void ClientStatusDialog::onConnect()
 	}
 }
 
+const char *getLabel(char p)
+{
+	switch (p)
+	{
+		case 0:
+			return "Host";
+		case 1:
+			return "Computer";
+		default:
+			return "<i>Empty</i>";
+	}
+}
+
 // Handle events on the server socket
 bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 {
@@ -194,7 +207,8 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 		//    2 - remote
 		//    Second byte is either 0 or client address length for type 2
 		// Client's player number (0 - 4, 0 for connected but unassigned)
-		// Header total: 11 bytes
+		// width & height
+		// Header total: 13 bytes
 		//
 		// Client addresses (in order, one for each type 2)
 		
@@ -222,37 +236,113 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 				delete[] buf;
 				return false;
 			}
+
 			bytesremaining -= read;
 			netbuf.append(buf, read);
 			delete[] buf;
+			
+			// If we've already received at least one full update,
+			// and we receive a '1', take it as meaning that the
+			// host has clicked "OK" on the server status dialogue.
+			if (detailsreceived && netbuf.length() == 1 && netbuf.at(0) == 1)
+			{
+				response(Gtk::RESPONSE_OK);
+				return false;
+			}
+
+			// We've received either a full header, or a full complete update
 			if (bytesremaining == 0)
 			{
-				if (netbuf.length() == 11)
+				// Full header
+				if (netbuf.length() == 13)
 				{
+					// Validate header data
+					//
+					// If it isn't a square or a hexagonal board,
+					// isn't two or four players, is a hexagonal board
+					// with other than two players, has any unrecognised
+					// player types, has a client player number greater
+					// than the number of players, or gives addresses for
+					// players local to the server (local/AI), it isn't
+					// valid game data.
+					
+					if ((netbuf.at(0) != 's' && netbuf.at(0) != 'h')
+						|| (netbuf.at(1) != 2 && netbuf.at(1) != 4)
+						|| (netbuf.at(0) == 'h' && netbuf.at(1) != 2)
+						|| (netbuf.at(2) > 2) || (netbuf.at(4) > 2)
+						|| (netbuf.at(6) > 2) || (netbuf.at(8) > 2)
+						|| (netbuf.at(10) > netbuf.at(1))
+						|| (netbuf.at(2) != 2 && netbuf.at(3) != 0)
+						|| (netbuf.at(4) != 2 && netbuf.at(5) != 0)
+						|| (netbuf.at(6) != 2 && netbuf.at(7) != 0)
+						|| (netbuf.at(8) != 2 && netbuf.at(9) != 0))
+					{
+						errPop("Invalid data from server");
+						response(Gtk::RESPONSE_CANCEL);
+						return false;
+					}
+					
 					// Parse header to find out how much more data we need
 					// Bytes 3, 5, 7 and 9 (from 0) contain player address lengths
+					
 					bytesremaining += (size_t)(netbuf.at(3));
 					bytesremaining += (size_t)(netbuf.at(5));
 					bytesremaining += (size_t)(netbuf.at(7));
 					bytesremaining += (size_t)(netbuf.at(9));
+					
+					// Fill in GameType structure
+					m_GameType.square = (netbuf.at(0) == 's');
+					
+					// The "local" player is indicated by our client number,
+					// all other players are remote
+					if (netbuf.at(2) == 2 && netbuf.at(10) == 1)
+						m_GameType.player_1 = pt_local;
+					else
+						m_GameType.player_1 = pt_remote;
+					if (netbuf.at(4) == 2 && netbuf.at(10) == 2)
+						m_GameType.player_2 = pt_local;
+					else
+						m_GameType.player_2 = pt_remote;
+					if (netbuf.at(1) == 4)
+					{
+						if (netbuf.at(6) == 2 && netbuf.at(10) == 3)
+							m_GameType.player_3 = pt_local;
+						else
+							m_GameType.player_3 = pt_remote;
+						if (netbuf.at(8) == 2 && netbuf.at(10) == 4)
+							m_GameType.player_4 = pt_local;
+						else
+							m_GameType.player_4 = pt_remote;
+					} else {
+						m_GameType.player_3 = pt_none;
+						m_GameType.player_4 = pt_none;
+					}
+					
+					m_GameType.w = netbuf.at(11);
+					m_GameType.h = netbuf.at(12);
 				}
+				
+				// Full update (could be full header with no address info
+				// attached, hence the second "if" rather than an "else")
 				if (bytesremaining == 0)
 				{
 					detailsreceived = true;
+					
 					// Parse full game details and update GUI
 					// Set client address labels
+					
 					size_t rl = (size_t)(netbuf.at(3));
 					size_t gl = (size_t)(netbuf.at(5));
 					size_t bl = (size_t)(netbuf.at(7));
 					size_t yl = (size_t)(netbuf.at(9));
 					if (rl > 0)
-						m_pRedClient->set_label(netbuf.substr(11, rl).c_str());
+						m_pRedClient->set_label(netbuf.substr(13, rl).c_str());
 					else
-						m_pRedClient->set_label("<i>Empty</i>");
+						m_pRedClient->set_label(getLabel(netbuf.at(2)));
 					if (gl > 0)
-						m_pGreenClient->set_label(netbuf.substr(11 + rl, gl).c_str());
+						m_pGreenClient->set_label(netbuf.substr(13 + rl, gl).c_str());
 					else
-						m_pGreenClient->set_label("<i>Empty</i>");
+						m_pGreenClient->set_label(getLabel(netbuf.at(4)));
 					m_pGameDetailsFrame->show();
 					if (netbuf.at(1) == 2)
 					{
@@ -263,17 +353,32 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 						m_pYellowLabel->show(); m_pYellowClient->show();
 						if (bl > 0)
 							m_pBlueClient->set_label(
-								netbuf.substr(11 + rl + gl, bl).c_str());
+								netbuf.substr(13 + rl + gl, bl).c_str());
 						else
-							m_pBlueClient->set_label("<i>Empty</i>");
+							m_pBlueClient->set_label(getLabel(netbuf.at(6)));
 						if (yl > 0)
 							m_pYellowClient->set_label(
-								netbuf.substr(11 + rl + gl + bl, yl).c_str());
+								netbuf.substr(13 + rl + gl + bl, yl).c_str());
 						else
-							m_pYellowClient->set_label("<i>Empty</i>");
+							m_pYellowClient->set_label(getLabel(netbuf.at(8)));
 					}
+					
+					// Build game description string
+					Glib::ustring description;
+					if (m_GameType.square)
+						description = "Square board, ";
+					else
+						description = "Hexagonal board, ";
+					description += Glib::ustring::compose("%1x%2, ", m_GameType.w, m_GameType.h);
+					if ((!m_GameType.square) || (m_GameType.player_3 == pt_none))
+						description += "2 players";
+					else
+						description += "4 players";
+					m_pGameDescription->set_label(description);
+					
 					// Get ready to receive an updated set of game details
-					bytesremaining = 11;
+					
+					bytesremaining = 13;
 					netbuf.clear();
 				}
 			}

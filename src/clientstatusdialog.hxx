@@ -25,7 +25,9 @@ class ClientStatusDialog: public Gtk::Dialog
 		ClientStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
 
 		// Return game details
-		void getGameType(GameType &gt) const {};
+		void getGameType(GameType &gt) const {
+			gt = m_GameType;
+		};
 
 		// Return a reference pointer to the server connection
 		const Glib::RefPtr<Socket> &getServerSocket() const
