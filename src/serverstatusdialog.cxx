@@ -1,4 +1,4 @@
-// Copyright 2008 Philip Allison <sane@not.co.uk>
+// Copyright 2008-2009 Philip Allison <sane@not.co.uk>
 
 //    This file is part of Infector.
 //
@@ -40,7 +40,7 @@
 
 // Project headers
 #include "gametype.hxx"
-#include "clientsocket.hxx"
+#include "socket.hxx"
 #include "serverstatusdialog.hxx"
 
 // System headers
@@ -72,7 +72,6 @@ ServerStatusDialog::ServerStatusDialog(BaseObjectType *cobject, const Glib::RefP
 	refXml->get_widget("serverportspin", m_pPortSpin);
 	refXml->get_widget("serverportapplybutton", m_pApplyButton);
 	refXml->get_widget("serverstartbutton", m_pStartButton);
-	refXml->get_widget("servercancelbutton", m_pCancelButton);
 	refXml->get_widget("ssgamedescription", m_pGameDescription);
 	
 	refXml->get_widget("serverclientstable", m_pClientTable);
@@ -87,8 +86,6 @@ ServerStatusDialog::ServerStatusDialog(BaseObjectType *cobject, const Glib::RefP
 	refXml->get_widget("ssclientkick3", m_paClientKickButtons[2]);
 	refXml->get_widget("ssclientkick4", m_paClientKickButtons[3]);
 	
-	refXml->get_widget("ssredlabel", m_pRedLabel);
-	refXml->get_widget("ssgreenlabel", m_pGreenLabel);
 	refXml->get_widget("ssbluelabel", m_pBlueLabel);
 	refXml->get_widget("ssyellowlabel", m_pYellowLabel);
 	

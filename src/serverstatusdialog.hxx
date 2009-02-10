@@ -30,9 +30,9 @@ class ServerStatusDialog: public Gtk::Dialog
 		
 		// Get client socket reference list - for retrieval by calling code
 		// once a network game has successfully been established
-		const std::deque<Glib::RefPtr<ClientSocket> > *getClientSockets() const
+		const std::deque<Glib::RefPtr<ClientSocket> > &getClientSockets() const
 		{
-			return &clientsockets;
+			return clientsockets;
 		};
 		
 		// Clear out references to client sockets (don't want them to stay
@@ -48,8 +48,6 @@ class ServerStatusDialog: public Gtk::Dialog
 		Gtk::ComboBoxText m_aClientComboBoxes[4];
 		Gtk::Button *m_paClientKickButtons[4];
 		Gtk::Table *m_pClientTable;
-		Gtk::Label *m_pRedLabel;
-		Gtk::Label *m_pGreenLabel;
 		Gtk::Label *m_pBlueLabel;
 		Gtk::Label *m_pYellowLabel;
 		Gtk::Label *m_pRedClient;
@@ -59,7 +57,6 @@ class ServerStatusDialog: public Gtk::Dialog
 		Gtk::Label *m_pGameDescription;
 		Gtk::SpinButton *m_pPortSpin;
 		Gtk::Button *m_pStartButton;
-		Gtk::Button *m_pCancelButton;
 		Gtk::Button *m_pApplyButton;
 		
 		const GameType *m_pGameType;
@@ -77,6 +74,8 @@ class ServerStatusDialog: public Gtk::Dialog
 		void on_response(int response_id);
 		
 		// Convenience function for showing an error popup
+		// TODO - Unify with the one in ClientStatusDialog; could
+		// possibly also be used by GameWindow::onNetworkError.
 		void errPop(const char *err) const;
 		
 		// IOChannel references for our sockets

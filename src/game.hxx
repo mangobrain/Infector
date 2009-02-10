@@ -1,4 +1,4 @@
-// Copyright 2008 Philip Allison <sane@not.co.uk>
+// Copyright 2008-2009 Philip Allison <sane@not.co.uk>
 
 //    This file is part of Infector.
 //
@@ -21,6 +21,7 @@
 class GameBoard;
 class AI;
 class ClientSocket;
+class Socket;
 
 // Class for main game logic, tying together players and the GUI
 class Game: public sigc::trackable
@@ -29,8 +30,13 @@ class Game: public sigc::trackable
 		// Constructor - pass in game board so we can pick up
 		// on emitted signals when it is clicked, and pass in
 		// game properties (board size, number of players, etc.)
-		Game(GameBoard* b, GameType &gt,
-			const std::deque<Glib::RefPtr<ClientSocket> > *clientsocks = NULL);
+		Game(GameBoard* b, GameType &gt);
+		
+		// Extra initialisation for servers - give list of client sockets
+		void giveClientSockets(const std::deque<Glib::RefPtr<ClientSocket> > &clientsocks);
+		
+		// Extra initialisation for clients - include server socket
+		void giveServerSocket(const Glib::RefPtr<Socket> &serversock);
 	
 		// Signals we can emit
 		sigc::signal<void, const int, const int, const int, const int, const bool>

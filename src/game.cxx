@@ -1,4 +1,4 @@
-// Copyright 2008 Philip Allison <sane@not.co.uk>
+// Copyright 2008-2009 Philip Allison <sane@not.co.uk>
 
 //    This file is part of Infector.
 //
@@ -42,15 +42,14 @@
 #include "game.hxx"
 #include "gameboard.hxx"
 #include "ai.hxx"
-#include "clientsocket.hxx"
+#include "socket.hxx"
 
 //
 // Implementation
 //
 
 // Constructor
-Game::Game(GameBoard* b, GameType &gt,
-	const std::deque<Glib::RefPtr<ClientSocket> > *clientsocks)
+Game::Game(GameBoard* b, GameType &gt)
 	: m_GameType(gt), m_BoardState(&m_GameType), netbufsize(0), m_pAI(NULL)
 {
 	// All signals will be auto-disconnected on destruction, because
@@ -69,20 +68,20 @@ Game::Game(GameBoard* b, GameType &gt,
 		m_pAI.reset(new AI(this, &m_BoardState, &m_GameType));
 		m_pAI->square_clicked.connect(sigc::mem_fun(this, &Game::onSquareClicked));
 	}
-	
-	// Take a copy of client sockets, if we've been given any,
-	// and connect up network event handlers
-	if (clientsocks != NULL)
+}
+
+// Extra initialisation for servers - give list of client sockets
+void Game::giveClientSockets(const std::deque<Glib::RefPtr<ClientSocket> > &clientsocks)
+{
+	// Take a copy of client sockets, and connect up network event handlers
+	for (std::deque<Glib::RefPtr<ClientSocket> >::const_iterator i = clientsocks.begin();
+		i != clientsocks.end(); ++i)
 	{
-		for (std::deque<Glib::RefPtr<ClientSocket> >::const_iterator i = clientsocks->begin();
-			i != clientsocks->end(); ++i)
-		{
-			m_ClientSockets.push_back(*i);
-			Glib::signal_io().connect(
-				sigc::bind(sigc::mem_fun(this, &Game::handleClientSocks), *i),
-					(*i)->getChannel(), Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL);
-			(*i)->write_error.connect(sigc::mem_fun(this, &Game::clientWriteError));
-		}
+		m_ClientSockets.push_back(*i);
+		Glib::signal_io().connect(
+			sigc::bind(sigc::mem_fun(this, &Game::handleClientSocks), *i),
+				(*i)->getChannel(), Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL);
+		(*i)->write_error.connect(sigc::mem_fun(this, &Game::clientWriteError));
 	}
 }
 

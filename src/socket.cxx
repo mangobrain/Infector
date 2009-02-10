@@ -1,4 +1,4 @@
-// Copyright 2008 Philip Allison <sane@not.co.uk>
+// Copyright 2008-2009 Philip Allison <sane@not.co.uk>
 
 //    This file is part of Infector.
 //
@@ -30,7 +30,7 @@
 
 // Project headers
 #include "gametype.hxx"
-#include "clientsocket.hxx"
+#include "socket.hxx"
 
 // System headers
 #include <sys/types.h>
@@ -42,10 +42,9 @@
 // Implementation
 //
 
-// Constructor - take socket, string represenation of address
-// and player colour; set options & construct IOChannel
-ClientSocket::ClientSocket(const int socket, const Glib::ustring &address, const piece player)
-	: m_socket(socket), m_pIOChannel(Glib::IOChannel::create_from_fd(socket)), m_address(address), m_player(player)
+// Constructor - take socket, set options & construct IOChannel
+Socket::Socket(const int socket)
+	: m_socket(socket), m_pIOChannel(Glib::IOChannel::create_from_fd(socket))
 {
 	// Set TCP_NODELAY on the socket - we want data to be sent out
 	// as soon as possible, regardless of the potentially tiny amounts
@@ -67,7 +66,7 @@ ClientSocket::ClientSocket(const int socket, const Glib::ustring &address, const
 }
 
 // Put data in internal buffer & send it, using non-blocking I/O
-void ClientSocket::writeChars(const char *data, const size_t amount)
+void Socket::writeChars(const char *data, const size_t amount)
 {
 	m_buffer.append(data, amount);
 	handleIOOut(Glib::IO_OUT);
@@ -76,7 +75,7 @@ void ClientSocket::writeChars(const char *data, const size_t amount)
 // Handler for when the socket becomes writeable -
 // send data from the buffer if we have any; otherwise, we are
 // ready for more data
-bool ClientSocket::handleIOOut(Glib::IOCondition cond)
+bool Socket::handleIOOut(Glib::IOCondition cond)
 {
 	if (m_buffer.length() > 0)
 	{

@@ -1,4 +1,4 @@
-# Copyright 2008 Philip Allison <sane@not.co.uk>
+# Copyright 2008-2009 Philip Allison <sane@not.co.uk>
 
 #    This file is part of Infector.
 #
@@ -18,7 +18,7 @@
 bin_PROGRAMS = infector
 
 infector_SOURCES = infector.cxx gameboard.cxx game.cxx boardstate.cxx \
-	newgamedialog.cxx ai.cxx serverstatusdialog.cxx clientsocket.cxx
+	newgamedialog.cxx ai.cxx serverstatusdialog.cxx socket.cxx
 infector_CXXFLAGS = $(GTKMM_CFLAGS) $(GLADEMM_CFLAGS) $(AM_CXXFLAGS)
 infector_LDADD = $(GTKMM_LIBS) $(GLADEMM_LIBS) $(AM_LIBS)
 infector_CPPFLAGS = -DPKGDATADIR='"$(pkgdatadir)"' $(AM_CPPFLAGS)

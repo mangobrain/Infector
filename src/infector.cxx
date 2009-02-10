@@ -1,4 +1,4 @@
-// Copyright 2008 Philip Allison <sane@not.co.uk>
+// Copyright 2008-2009 Philip Allison <sane@not.co.uk>
 
 //    This file is part of Infector.
 //
@@ -41,12 +41,13 @@
 
 // Project headers
 #include "gametype.hxx"
-#include "clientsocket.hxx"
+#include "socket.hxx"
 #include "boardstate.hxx"
 #include "game.hxx"
 #include "gameboard.hxx"
 #include "newgamedialog.hxx"
 #include "serverstatusdialog.hxx"
+#include "clientstatusdialog.hxx"
 #include "gamewindow.hxx"
 #include "ai.hxx"
 
@@ -120,6 +121,14 @@ GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade:
 	m_refXml->get_widget("newtoolbutton", pNewGameButton);
 	pNewGameButton->signal_clicked().connect(sigc::mem_fun(this, &GameWindow::onNewGame));
 	
+	// Link the "Connect" menu item & button to the onConnect method
+	Gtk::MenuItem *pConnect;
+	m_refXml->get_widget("connectmenuitem", pConnect);
+	pConnect->signal_activate().connect(sigc::mem_fun(this, &GameWindow::onConnect));
+	Gtk::ToolButton *pConnectButton;
+	m_refXml->get_widget("connecttoolbutton", pConnectButton);
+	pConnectButton->signal_clicked().connect(sigc::mem_fun(this, &GameWindow::onConnect));
+	
 	// Link the "Quit" menu item to the hide method
 	Gtk::MenuItem *pQuit;
 	m_refXml->get_widget("quitmenuitem", pQuit);
@@ -157,7 +166,7 @@ void GameWindow::onAbout()
 // New game event handler
 void GameWindow::onNewGame()
 {
-	// Instantiate the about dialogue if not already done
+	// Instantiate the new game dialogue if not already done
 	if (m_pNewGameDialog.get() == NULL)
 	{
 		NewGameDialog *pNewGameDialog;
@@ -180,7 +189,7 @@ void GameWindow::onNewGame()
 		// Either way, stop the current running game and start a new one
 		if (gt.anyPlayersOfType(pt_remote))
 		{
-			// Instantiate dialogue if not already done
+			// Instantiate server status dialogue if not already done
 			if (m_pServerStatusDialog.get() == NULL)
 			{
 				ServerStatusDialog *pServerStatusDialog;
@@ -195,15 +204,53 @@ void GameWindow::onNewGame()
 			if (response != Gtk::RESPONSE_OK)
 				return;
 			else {
-				m_pGame.reset(new Game(m_pBoard, gt,
-					m_pServerStatusDialog->getClientSockets()));
+				m_pGame.reset(new Game(m_pBoard, gt));
+				m_pGame->giveClientSockets(m_pServerStatusDialog->getClientSockets());
 				m_pServerStatusDialog->clearClientSocketRefs();
 			}
 		}
 		else
 			m_pGame.reset(new Game(m_pBoard, gt));
 		
+		// Set status bar to initial state
 		onMoveMade(0, 0, 0, 0, false);
+		
+		// Connect game event handlers
+		m_pGame->move_made.connect(sigc::mem_fun(this, &GameWindow::onMoveMade));
+		m_pGame->network_error.connect(sigc::mem_fun(this, &GameWindow::onNetworkError));
+	}
+}
+
+// Connect to network game event handler
+void GameWindow::onConnect()
+{
+	// Instantiate the connect dialogue if not already done
+	if (m_pClientStatusDialog.get() == NULL)
+	{
+		ClientStatusDialog *pClientStatusDialog;
+		m_refXml->get_widget_derived("clientstatusdialog", pClientStatusDialog);
+		m_pClientStatusDialog.reset(pClientStatusDialog);
+	}
+
+	// Block whilst showing the dialogue, then hide it when it's dismissed
+	m_pClientStatusDialog->setDefaults();
+	int response = m_pClientStatusDialog->run();
+	m_pClientStatusDialog->hide();
+
+	if (response == Gtk::RESPONSE_OK)
+	{
+		GameType gt;
+		m_pClientStatusDialog->getGameType(gt);
+		
+		m_pGame.reset(new Game(m_pBoard, gt));
+		m_pGame->giveServerSocket(m_pClientStatusDialog->getServerSocket());
+		
+		onMoveMade(0, 0, 0, 0, false);
+
+		// Set status bar to initial state
+		onMoveMade(0, 0, 0, 0, false);
+		
+		// Connect game event handlers
 		m_pGame->move_made.connect(sigc::mem_fun(this, &GameWindow::onMoveMade));
 		m_pGame->network_error.connect(sigc::mem_fun(this, &GameWindow::onNetworkError));
 	}

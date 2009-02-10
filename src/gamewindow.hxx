@@ -31,6 +31,7 @@ class GameWindow: public Gtk::Window
 		std::auto_ptr<Gtk::AboutDialog> m_pAboutDialog;
 		std::auto_ptr<NewGameDialog> m_pNewGameDialog;
 		std::auto_ptr<ServerStatusDialog> m_pServerStatusDialog;
+		std::auto_ptr<ClientStatusDialog> m_pClientStatusDialog;
 
 		// Game board display (derived widget)
 		GameBoard *m_pBoard;
@@ -50,6 +51,7 @@ class GameWindow: public Gtk::Window
 		// Event handlers
 		void onAbout();
 		void onNewGame();
+		void onConnect();
 		void onMoveMade(const int ax, const int ay, const int bx, const int by, const bool gameover);
 		void onNetworkError(const Glib::ustring &e);
 };
