@@ -660,7 +660,8 @@ void ServerStatusDialog::sendGameDetails()
 	//    2 - remote
 	//    Second byte is either 0 or client address length for type 2
 	// Client's player number (0 - 4, 0 for connected but unassigned)
-	// Header total: 11 bytes
+	// width & height
+	// Header total: 13 bytes
 	//
 	// Client addresses (in order, one for each type 2)
 	
@@ -673,7 +674,7 @@ void ServerStatusDialog::sendGameDetails()
 		else
 			message.append(1, 4);
 	} else
-		message.append("h2");
+		message.append("h\2");
 
 	int players = 2;
 	if (m_pGameType->square && m_pGameType->player_3 != pt_none)
@@ -692,9 +693,9 @@ void ServerStatusDialog::sendGameDetails()
 		else
 			p = m_pGameType->player_4;
 
-		if (p == pt_ai)
+		if (p == pt_local)
 			message.append(1, 0).append(1, 0);
-		else if (p == pt_local)
+		else if (p == pt_ai)
 			message.append(1, 1).append(1, 0);
 		else
 			message.append(1, 2).append(1, 0);
@@ -707,6 +708,9 @@ void ServerStatusDialog::sendGameDetails()
 	
 	// Append - for now - a dummy 11th byte
 	message.append(1, 0);
+
+	message.append(1, m_pGameType->w);
+	message.append(1, m_pGameType->h);
 	
 	std::string redaddr, greenaddr, blueaddr, yellowaddr;
 	for (std::deque<Glib::RefPtr<ClientSocket> >::const_iterator i = clientsockets.begin(); i != clientsockets.end(); ++i)
