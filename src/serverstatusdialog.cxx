@@ -313,6 +313,12 @@ void ServerStatusDialog::on_response(int response_id)
 	// If response is anything other than OK, close any open accepted sockets too.
 	if (response_id != Gtk::RESPONSE_OK)
 		clientsockets.clear();
+	else {
+		// If response *is* OK, send game start signal to clients
+		const char *m = "\1";
+		for (std::deque<Glib::RefPtr<ClientSocket> >::iterator i = clientsockets.begin(); i != clientsockets.end(); ++i)
+			(*i)->writeChars(m, 1);
+	}
 }
 
 // Port apply button clicked
