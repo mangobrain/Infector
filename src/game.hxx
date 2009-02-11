@@ -36,7 +36,7 @@ class Game: public sigc::trackable
 		void giveClientSockets(const std::deque<Glib::RefPtr<ClientSocket> > &clientsocks);
 		
 		// Extra initialisation for clients - include server socket
-		void giveServerSocket(const Glib::RefPtr<Socket> &serversock) {};
+		void giveServerSocket(const Glib::RefPtr<Socket> &serversock);
 	
 		// Signals we can emit
 		sigc::signal<void, const int, const int, const int, const int, const bool>
@@ -57,12 +57,19 @@ class Game: public sigc::trackable
 		// Client sockets, if acting as network server
 		std::deque<Glib::RefPtr<ClientSocket> > m_ClientSockets;
 
+		// Server socket, if acting as network client
+		Glib::RefPtr<Socket> m_ServerSocket;
+		bool haveserversocket;
+
 		// Event handlers
 		// Board clicked
 		void onSquareClicked(const int x, const int y);
 		// Client sockets
 		bool handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> sock);
 		void clientWriteError(const Glib::ustring &e);
+		// Server sockets
+		bool handleServerSock(Glib::IOCondition cond);
+		void serverWriteError(const Glib::ustring &e);
 		
 		// See if a particular move is valid for the current player
 		bool validMove(const int ax, const int ay, const int bx, const int by) const;

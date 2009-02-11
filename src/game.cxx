@@ -50,7 +50,7 @@
 
 // Constructor
 Game::Game(GameBoard* b, GameType &gt)
-	: m_GameType(gt), m_BoardState(&m_GameType), netbufsize(0), m_pAI(NULL)
+	: m_GameType(gt), m_BoardState(&m_GameType), haveserversocket(false), netbufsize(0), m_pAI(NULL)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother
@@ -85,11 +85,36 @@ void Game::giveClientSockets(const std::deque<Glib::RefPtr<ClientSocket> > &clie
 	}
 }
 
+// Extra initialisation for clients - give server socket
+void Game::giveServerSocket(const Glib::RefPtr<Socket> &serversock)
+{
+	// Take a reference to the socket
+	m_ServerSocket = serversock;
+	haveserversocket = true;
+
+	// Set up network event handlers
+	Glib::signal_io().connect(
+		sigc::mem_fun(this, &Game::handleServerSock), m_ServerSocket->getChannel(),
+			Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL);
+	m_ServerSocket->write_error.connect(sigc::mem_fun(this, &Game::serverWriteError));
+}
+
 // Write error occurred on client socket
 void Game::clientWriteError(const Glib::ustring &e)
 {
 	m_ClientSockets.clear();
-	network_error("I/O error on client socket");
+	Glib::ustring msg("Write error on client socket: ");
+	msg.append(e);
+	network_error(msg);
+}
+
+// Write error occurred on server socket
+void Game::serverWriteError(const Glib::ustring &e)
+{
+	m_ServerSocket.reset();
+	Glib::ustring msg("Write error on server socket: ");
+	msg.append(e);
+	network_error(msg);
 }
 
 // Handle events on client sockets
@@ -172,6 +197,67 @@ bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> 
 					if (sock != (*i))
 						(*i)->writeChars(netbuf, 4);
 				}
+			}
+		}
+
+		return true;
+	}
+}
+
+// Handle events on the server socket
+bool Game::handleServerSock(Glib::IOCondition cond)
+{
+	if (cond != Glib::IO_IN)
+	{
+		m_ServerSocket.reset();
+		network_error("I/O error on server socket");
+		return false;
+	}
+	else
+	{
+		// Are we expecting to be sent a move at the moment?
+		if (m_GameType.isPlayerType(m_BoardState.getPlayer(), pt_local))
+		{
+			m_ServerSocket.reset();
+			network_error("Server disconnected or unexpected data received");
+			return false;
+		}
+		
+		// Read in all or part of a move
+		size_t read = 0;
+		try {
+			m_ServerSocket->getChannel()->read(netbuf + netbufsize, 4 - netbufsize, read);
+		}
+		catch (Glib::IOChannelError &e)
+		{
+			m_ServerSocket.reset();
+			network_error("Error reading from server socket");
+			return false;
+		}
+		if (read == 0)
+		{
+			m_ServerSocket.reset();
+			network_error("Server disconnected");
+			return false;
+		}
+		netbufsize += read;
+		
+		if (netbufsize == 4)
+		{
+			// We read in all the data.  Display the move that was made.
+			netbufsize = 0;
+			// Make the player's move, if it's valid.
+			if (validMove(netbuf[0], netbuf[1], netbuf[2], netbuf[3]))
+			{
+				// Highlight the square we're going to move then
+				// make the actual move in 0.5 second time increments
+				// (to let people see what's going on).
+				onSquareClicked(netbuf[0], netbuf[1]);
+				// Let the board redraw to highlight the selected piece
+				while (Gtk::Main::events_pending())
+					Gtk::Main::iteration();
+				Glib::usleep(500000);
+				onSquareClicked(netbuf[2], netbuf[3]);
 			}
 		}
 
@@ -280,6 +366,17 @@ void Game::onSquareClicked(const int x, const int y)
 				// If the game has ended, close the client sockets.
 				if (gameover)
 					m_ClientSockets.clear();
+			}
+
+			// Send move to server if we're a client and it
+			// was a local player.
+			if (haveserversocket && m_GameType.typeOf(endplayer) == pt_local)
+			{
+				netbuf[0] = xsel;
+				netbuf[1] = ysel;
+				netbuf[2] = x;
+				netbuf[3] = y;
+				m_ServerSocket->writeChars(netbuf, 4);
 			}
 		}
 	}
