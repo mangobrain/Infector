@@ -244,6 +244,7 @@ void GameWindow::onConnect()
 		
 		m_pGame.reset(new Game(m_pBoard, gt));
 		m_pGame->giveServerSocket(m_pClientStatusDialog->getServerSocket());
+		m_pClientStatusDialog->clearServerSocketRef();
 		
 		onMoveMade(0, 0, 0, 0, false);
 
