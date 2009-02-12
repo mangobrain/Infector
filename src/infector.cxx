@@ -246,8 +246,6 @@ void GameWindow::onConnect()
 		m_pGame->giveServerSocket(m_pClientStatusDialog->getServerSocket());
 		m_pClientStatusDialog->clearServerSocketRef();
 		
-		onMoveMade(0, 0, 0, 0, false);
-
 		// Set status bar to initial state
 		onMoveMade(0, 0, 0, 0, false);
 		
