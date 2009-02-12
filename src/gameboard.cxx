@@ -52,6 +52,7 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::X
 {
 	// Connect mouse click events to the onClick handler
 	signal_button_press_event().connect(sigc::mem_fun(this, &GameBoard::onClick));
+	set_sensitive(true);
 
 	// The widget is painted directly by us, but we'll leave the library
 	// to do its own double buffering, thanks.
@@ -364,9 +365,6 @@ void GameBoard::newGame(Game *g, const BoardState *b, const GameType *gt)
 	// Refresh the board
 	setBackground();
 	queue_draw();
-	
-	// Enable user interaction if the first player's a local human
-	set_sensitive(m_pGameType->player_1 == pt_local);
 }
 
 // Set the widget's background pixmap to the empty board
