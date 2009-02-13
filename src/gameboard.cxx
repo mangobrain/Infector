@@ -115,19 +115,24 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 					if (current->getPieceAt(j, i) != pc_no_such_square)
 					{
 						bool draw = true;
+						float r = 0, g = 0, b = 0;
 						switch (current->getPieceAt(j, i))
 						{
 							case pc_player_1:
 								cr->set_source_rgb(1, 0, 0);
+								r = 0.8;
 								break;
 							case pc_player_2:
 								cr->set_source_rgb(0, 1, 0);
+								g = 0.8;
 								break;
 							case pc_player_3:
 								cr->set_source_rgb(0, 0, 1);
+								b = 0.8;
 								break;
 							case pc_player_4:
 								cr->set_source_rgb(1, 1, 0);
+								r = 0.8; g = 0.8;
 								break;
 							default:
 								draw = false;
@@ -142,7 +147,12 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 							cr->rel_line_to(-hxinc, 0);
 							
 							cr->close_path();
-							cr->fill();
+							cr->fill_preserve();
+							cr->clip_preserve();
+							cr->set_source_rgb(r, g, b);
+							cr->unset_dash();
+							cr->stroke();
+							cr->reset_clip();
 						}
 						// Highlight currently selected square and possible moves
 						int xsel, ysel;
@@ -194,19 +204,24 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 				for (int j = 0; j < bw; ++j)
 				{
 					bool draw = true;
+					float r = 0, g = 0, b = 0;
 					switch (current->getPieceAt(j, i))
 					{
 						case pc_player_1:
 							cr->set_source_rgb(1, 0, 0);
+							r = 0.8;
 							break;
 						case pc_player_2:
 							cr->set_source_rgb(0, 1, 0);
+							g = 0.8;
 							break;
 						case pc_player_3:
 							cr->set_source_rgb(0, 0, 1);
+							b = 0.8;
 							break;
 						case pc_player_4:
 							cr->set_source_rgb(1, 1, 0);
+							r = 0.8; g = 0.8;
 							break;
 						default:
 							draw = false;
@@ -214,7 +229,12 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 					if (draw)
 					{
 						cr->rectangle(x, y, xinc, yinc);
-						cr->fill();
+						cr->fill_preserve();
+						cr->clip_preserve();
+						cr->set_source_rgb(r, g, b);
+						cr->unset_dash();
+						cr->stroke();
+						cr->reset_clip();
 					}
 					
 					// Highlight currently selected square and possible moves
@@ -415,9 +435,9 @@ void GameBoard::setBackground()
 							cr->set_source_rgb(0.5, 0.5, 0.5);
 					} else {
 						if (j % 2)
-							cr->set_source_rgb(0.25, 0.25, 0.25);
-						else
 							cr->set_source_rgb(0.4, 0.4, 0.4);
+						else
+							cr->set_source_rgb(0.7, 0.7, 0.7);
 					}
 					
 					cr->move_to(x, y);
