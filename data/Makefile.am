@@ -20,7 +20,9 @@ dist_pkgdata_DATA = infector.glade
 # Distribute original scalable icon, and various pre-rendered
 # icons, so that we don't depend on RSVG being present for installation
 
-EXTRA_DIST = infector.svg
+# Also distribute .desktop.in file (processed at install time)
+
+EXTRA_DIST = infector.svg infector.desktop.in
 
 dist-hook: $(SIZES:%=infector-%.png)
 	cp -p $(srcdir)/infector-*.png $(distdir)/
@@ -34,27 +36,41 @@ SIZES = 16 22 24 32 48 64 72 96 128
 infector-%.png: infector.svg
 	rsvg -w $* -h $* $< $@
 
+# Rule for generating .desktop file from .desktop.in
+infector.desktop: infector.desktop.in
+	rm -f $@ $@.tmp
+	$(SED) -e s'|@bindir[@]|$(bindir)|g' $< >$@.tmp
+	mv $@.tmp $@
+
 # Use xdg-utils to install and uninstall pre-rendered icons.
 # I'd love to use it for the scalable icon as well, but
 # support for that appears to have been dropped:
 # http://lists.freedesktop.org/archives/portland/2006-September/000862.html
 # https://bugs.freedesktop.org/show_bug.cgi?id=7837
 
-install-data-local: $(SIZES:%=infector-%.png)
+# Also use xdg-util to install and uninstall .desktop file.
+
+install-data-local: $(SIZES:%=infector-%.png) infector.desktop
 	for i in $(SIZES); do \
 		xdg-icon-resource install --novendor --noupdate --size $$i \
 			infector-$$i.png infector; \
 	done
 	xdg-icon-resource forceupdate
+	xdg-desktop-menu install --novendor infector.desktop
 
 uninstall-local:
 	for i in $(SIZES); do \
 		xdg-icon-resource uninstall --noupdate --size $$i infector; \
 	done
 	xdg-icon-resource forceupdate
+	xdg-desktop-menu uninstall infector.desktop
 
 # Pre-rendered icons are considered built by the maintainer, because
 # they are generated (not handmade) but distributed.  Delete them during
 # maintainerclean.
 maintainer-clean-local:
 	rm -f infector-*.png
+
+# .desktop file is built by make
+clean-local:
+	rm -f infector.desktop

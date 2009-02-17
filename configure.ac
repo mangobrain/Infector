@@ -60,6 +60,9 @@ case "$host_os" in
 esac
 AM_CONDITIONAL(MINGW, test "x$win" = "xtrue")
 
+dnl # Sed is used to parse infector.desktop.in
+AC_PROG_SED
+
 dnl # All done.  Spit out the result.
 AC_CONFIG_FILES([
 	Makefile
