@@ -382,6 +382,11 @@ void GameBoard::newGame(Game *g, const BoardState *b, const GameType *gt)
 	bw = m_pGameType->w;
 	bh = m_pGameType->h;
 
+	// Store board shape so that later on, when the game has ended,
+	// the board doesn't magically flip from hexagonal back to square
+	// on the next on_expose
+	m_DefaultGameType.square = m_pGameType->square;
+
 	// Refresh the board
 	setBackground();
 	queue_draw();
