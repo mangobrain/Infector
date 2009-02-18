@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.5 on Tue Feb 10 22:42:22 2009 -->
+<!--Generated with glade3 3.4.5 on Wed Feb 18 22:07:50 2009 -->
 <glade-interface>
   <widget class="GtkWindow" id="mainwindow">
     <property name="title">Infector</property>
     <property name="default_width">400</property>
     <property name="default_height">400</property>
+    <property name="icon_name">infector</property>
     <child>
       <widget class="GtkVBox" id="vbox">
         <property name="visible">True</property>
@@ -199,6 +200,7 @@
     <property name="resizable">False</property>
     <property name="modal">True</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="icon_name">infector</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="transient_for">mainwindow</property>
     <property name="has_separator">False</property>
@@ -239,16 +241,77 @@
                         <property name="column_spacing">12</property>
                         <property name="row_spacing">6</property>
                         <child>
-                          <widget class="GtkComboBox" id="numplayerscombo">
+                          <widget class="GtkComboBox" id="boardshapecombo">
                             <property name="visible">True</property>
-                            <property name="items">2
-4</property>
+                            <property name="items" translatable="yes">Square
+Hexagonal</property>
                           </widget>
                           <packing>
                             <property name="left_attach">2</property>
                             <property name="right_attach">3</property>
-                            <property name="top_attach">2</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkLabel" id="boardshapelabel">
+                            <property name="visible">True</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">_Board shape:</property>
+                            <property name="use_underline">True</property>
+                            <property name="mnemonic_widget">boardshapecombo</property>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="x_options">GTK_FILL</property>
+                            <property name="y_options"></property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkLabel" id="boardsizelabel">
+                            <property name="visible">True</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">Board _size:</property>
+                            <property name="use_underline">True</property>
+                            <property name="mnemonic_widget">boardsizecombo</property>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                            <property name="x_options">GTK_FILL</property>
+                            <property name="y_options"></property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkComboBox" id="boardsizecombo">
+                            <property name="visible">True</property>
+                            <property name="items">5x5
+8x8
+10x10
+14x14
+20x20</property>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">2</property>
+                            <property name="right_attach">3</property>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkImage" id="propsimage">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                            <property name="yalign">0</property>
+                            <property name="stock">gtk-dialog-question</property>
+                            <property name="icon_size">6</property>
+                          </widget>
+                          <packing>
                             <property name="bottom_attach">3</property>
+                            <property name="x_options">GTK_FILL</property>
                             <property name="y_options">GTK_FILL</property>
                           </packing>
                         </child>
@@ -270,77 +333,16 @@
                           </packing>
                         </child>
                         <child>
-                          <widget class="GtkImage" id="propsimage">
+                          <widget class="GtkComboBox" id="numplayerscombo">
                             <property name="visible">True</property>
-                            <property name="xalign">0</property>
-                            <property name="yalign">0</property>
-                            <property name="stock">gtk-dialog-question</property>
-                            <property name="icon_size">6</property>
+                            <property name="items">2
+4</property>
                           </widget>
                           <packing>
+                            <property name="left_attach">2</property>
+                            <property name="right_attach">3</property>
+                            <property name="top_attach">2</property>
                             <property name="bottom_attach">3</property>
-                            <property name="x_options">GTK_FILL</property>
-                            <property name="y_options">GTK_FILL</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkComboBox" id="boardsizecombo">
-                            <property name="visible">True</property>
-                            <property name="items">5x5
-8x8
-10x10
-14x14
-20x20</property>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">2</property>
-                            <property name="right_attach">3</property>
-                            <property name="top_attach">1</property>
-                            <property name="bottom_attach">2</property>
-                            <property name="y_options">GTK_FILL</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkLabel" id="boardsizelabel">
-                            <property name="visible">True</property>
-                            <property name="xalign">1</property>
-                            <property name="label" translatable="yes">Board _size:</property>
-                            <property name="use_underline">True</property>
-                            <property name="mnemonic_widget">boardsizecombo</property>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
-                            <property name="top_attach">1</property>
-                            <property name="bottom_attach">2</property>
-                            <property name="x_options">GTK_FILL</property>
-                            <property name="y_options"></property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkLabel" id="boardshapelabel">
-                            <property name="visible">True</property>
-                            <property name="xalign">1</property>
-                            <property name="label" translatable="yes">_Board shape:</property>
-                            <property name="use_underline">True</property>
-                            <property name="mnemonic_widget">boardshapecombo</property>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
-                            <property name="x_options">GTK_FILL</property>
-                            <property name="y_options"></property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkComboBox" id="boardshapecombo">
-                            <property name="visible">True</property>
-                            <property name="items" translatable="yes">Square
-Hexagonal</property>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">2</property>
-                            <property name="right_attach">3</property>
                             <property name="y_options">GTK_FILL</property>
                           </packing>
                         </child>
@@ -381,86 +383,33 @@ Hexagonal</property>
                         <property name="column_spacing">12</property>
                         <property name="row_spacing">6</property>
                         <child>
-                          <widget class="GtkComboBox" id="greencombo">
-                            <property name="visible">True</property>
-                            <property name="items" translatable="yes">Human
-Computer
-Networked</property>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">2</property>
-                            <property name="right_attach">3</property>
-                            <property name="top_attach">1</property>
-                            <property name="bottom_attach">2</property>
-                            <property name="y_options">GTK_FILL</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkComboBox" id="redcombo">
-                            <property name="visible">True</property>
-                            <property name="items" translatable="yes">Human
-Computer
-Networked</property>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">2</property>
-                            <property name="right_attach">3</property>
-                            <property name="y_options">GTK_FILL</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkComboBox" id="bluecombo">
-                            <property name="items" translatable="yes">Human
-Computer
-Networked</property>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">2</property>
-                            <property name="right_attach">3</property>
-                            <property name="top_attach">2</property>
-                            <property name="bottom_attach">3</property>
-                            <property name="y_options">GTK_FILL</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkComboBox" id="yellowcombo">
-                            <property name="items" translatable="yes">Human
-Computer
-Networked</property>
-                          </widget>
-                          <packing>
-                            <property name="left_attach">2</property>
-                            <property name="right_attach">3</property>
-                            <property name="top_attach">3</property>
-                            <property name="bottom_attach">4</property>
-                            <property name="y_options">GTK_FILL</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkImage" id="playersimage">
-                            <property name="visible">True</property>
-                            <property name="xalign">0</property>
-                            <property name="yalign">0</property>
-                            <property name="icon_size">6</property>
-                            <property name="icon_name">stock_people</property>
-                          </widget>
-                          <packing>
-                            <property name="bottom_attach">4</property>
-                            <property name="x_options">GTK_FILL</property>
-                            <property name="y_options">GTK_FILL</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkLabel" id="redlabel">
-                            <property name="visible">True</property>
+                          <widget class="GtkLabel" id="yellowlabel">
                             <property name="xalign">1</property>
-                            <property name="label" translatable="yes">_Red:</property>
+                            <property name="label" translatable="yes">_Yellow:</property>
                             <property name="use_underline">True</property>
-                            <property name="mnemonic_widget">redcombo</property>
+                            <property name="mnemonic_widget">yellowcombo</property>
                           </widget>
                           <packing>
                             <property name="left_attach">1</property>
                             <property name="right_attach">2</property>
+                            <property name="top_attach">3</property>
+                            <property name="bottom_attach">4</property>
+                            <property name="x_options">GTK_FILL</property>
+                            <property name="y_options"></property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkLabel" id="bluelabel">
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">B_lue:</property>
+                            <property name="use_underline">True</property>
+                            <property name="mnemonic_widget">bluecombo</property>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="top_attach">2</property>
+                            <property name="bottom_attach">3</property>
                             <property name="x_options">GTK_FILL</property>
                             <property name="y_options"></property>
                           </packing>
@@ -483,35 +432,88 @@ Networked</property>
                           </packing>
                         </child>
                         <child>
-                          <widget class="GtkLabel" id="bluelabel">
+                          <widget class="GtkLabel" id="redlabel">
+                            <property name="visible">True</property>
                             <property name="xalign">1</property>
-                            <property name="label" translatable="yes">B_lue:</property>
+                            <property name="label" translatable="yes">_Red:</property>
                             <property name="use_underline">True</property>
-                            <property name="mnemonic_widget">bluecombo</property>
+                            <property name="mnemonic_widget">redcombo</property>
                           </widget>
                           <packing>
                             <property name="left_attach">1</property>
                             <property name="right_attach">2</property>
-                            <property name="top_attach">2</property>
-                            <property name="bottom_attach">3</property>
                             <property name="x_options">GTK_FILL</property>
                             <property name="y_options"></property>
                           </packing>
                         </child>
                         <child>
-                          <widget class="GtkLabel" id="yellowlabel">
-                            <property name="xalign">1</property>
-                            <property name="label" translatable="yes">_Yellow:</property>
-                            <property name="use_underline">True</property>
-                            <property name="mnemonic_widget">yellowcombo</property>
+                          <widget class="GtkImage" id="playersimage">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                            <property name="yalign">0</property>
+                            <property name="icon_size">6</property>
+                            <property name="icon_name">stock_people</property>
                           </widget>
                           <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
-                            <property name="top_attach">3</property>
                             <property name="bottom_attach">4</property>
                             <property name="x_options">GTK_FILL</property>
-                            <property name="y_options"></property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkComboBox" id="yellowcombo">
+                            <property name="items" translatable="yes">Human
+Computer
+Networked</property>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">2</property>
+                            <property name="right_attach">3</property>
+                            <property name="top_attach">3</property>
+                            <property name="bottom_attach">4</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkComboBox" id="bluecombo">
+                            <property name="items" translatable="yes">Human
+Computer
+Networked</property>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">2</property>
+                            <property name="right_attach">3</property>
+                            <property name="top_attach">2</property>
+                            <property name="bottom_attach">3</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkComboBox" id="redcombo">
+                            <property name="visible">True</property>
+                            <property name="items" translatable="yes">Human
+Computer
+Networked</property>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">2</property>
+                            <property name="right_attach">3</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkComboBox" id="greencombo">
+                            <property name="visible">True</property>
+                            <property name="items" translatable="yes">Human
+Computer
+Networked</property>
+                          </widget>
+                          <packing>
+                            <property name="left_attach">2</property>
+                            <property name="right_attach">3</property>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                            <property name="y_options">GTK_FILL</property>
                           </packing>
                         </child>
                       </widget>
@@ -577,12 +579,13 @@ Networked</property>
     <property name="resizable">False</property>
     <property name="modal">True</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="icon_name">infector</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="transient_for">mainwindow</property>
     <property name="has_separator">False</property>
     <property name="program_name">Infector</property>
     <property name="version">0.1</property>
-    <property name="copyright">Copyright © 2008 Philip Allison</property>
+    <property name="copyright">Copyright © 2008-2009 Philip Allison</property>
     <property name="website">http://infector.mangobrain.co.uk/</property>
     <property name="license">Infector is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -597,6 +600,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</property>
     <property name="authors">Philip Allison &lt;sane@not.co.uk&gt;</property>
+    <property name="logo_icon_name">infector</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="aboutdialog-vbox">
         <property name="visible">True</property>
@@ -623,6 +627,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
     <property name="resizable">False</property>
     <property name="modal">True</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="icon_name">infector</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="transient_for">mainwindow</property>
     <property name="has_separator">False</property>
@@ -758,33 +763,63 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                               <placeholder/>
                             </child>
                             <child>
-                              <widget class="GtkButton" id="ssclientkick4">
+                              <widget class="GtkLabel" id="ssclientlabel1">
                                 <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="receives_default">True</property>
-                                <property name="response_id">0</property>
-                                <child>
-                                  <widget class="GtkImage" id="ssclientkickimage4">
-                                    <property name="visible">True</property>
-                                    <property name="stock">gtk-disconnect</property>
-                                  </widget>
-                                </child>
+                                <property name="xalign">0</property>
+                                <property name="mnemonic_widget">redcombo</property>
                               </widget>
                               <packing>
-                                <property name="left_attach">2</property>
-                                <property name="right_attach">3</property>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options"></property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkButton" id="ssclientkick3">
+                              <widget class="GtkLabel" id="ssclientlabel2">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="mnemonic_widget">redcombo</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options"></property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="ssclientlabel3">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="mnemonic_widget">redcombo</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options"></property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="ssclientlabel4">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="mnemonic_widget">redcombo</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options"></property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkButton" id="ssclientkick1">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <property name="response_id">0</property>
                                 <child>
-                                  <widget class="GtkImage" id="ssclientkickimage3">
+                                  <widget class="GtkImage" id="ssclientkickimage1">
                                     <property name="visible">True</property>
                                     <property name="stock">gtk-disconnect</property>
                                   </widget>
@@ -793,8 +828,6 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                               <packing>
                                 <property name="left_attach">2</property>
                                 <property name="right_attach">3</property>
-                                <property name="top_attach">2</property>
-                                <property name="bottom_attach">3</property>
                               </packing>
                             </child>
                             <child>
@@ -818,13 +851,13 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkButton" id="ssclientkick1">
+                              <widget class="GtkButton" id="ssclientkick3">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <property name="response_id">0</property>
                                 <child>
-                                  <widget class="GtkImage" id="ssclientkickimage1">
+                                  <widget class="GtkImage" id="ssclientkickimage3">
                                     <property name="visible">True</property>
                                     <property name="stock">gtk-disconnect</property>
                                   </widget>
@@ -833,56 +866,28 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                               <packing>
                                 <property name="left_attach">2</property>
                                 <property name="right_attach">3</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="ssclientlabel4">
-                                <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="mnemonic_widget">redcombo</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options"></property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="ssclientlabel3">
-                                <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="mnemonic_widget">redcombo</property>
-                              </widget>
-                              <packing>
                                 <property name="top_attach">2</property>
                                 <property name="bottom_attach">3</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options"></property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="ssclientlabel2">
+                              <widget class="GtkButton" id="ssclientkick4">
                                 <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="mnemonic_widget">redcombo</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                                <property name="response_id">0</property>
+                                <child>
+                                  <widget class="GtkImage" id="ssclientkickimage4">
+                                    <property name="visible">True</property>
+                                    <property name="stock">gtk-disconnect</property>
+                                  </widget>
+                                </child>
                               </widget>
                               <packing>
-                                <property name="top_attach">1</property>
-                                <property name="bottom_attach">2</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options"></property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="ssclientlabel1">
-                                <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="mnemonic_widget">redcombo</property>
-                              </widget>
-                              <packing>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options"></property>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
                               </packing>
                             </child>
                           </widget>
@@ -942,79 +947,23 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                             <property name="column_spacing">6</property>
                             <property name="row_spacing">6</property>
                             <child>
-                              <widget class="GtkLabel" id="ssyellowclient">
+                              <widget class="GtkLabel" id="ssgamedescription">
                                 <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="use_markup">True</property>
                               </widget>
                               <packing>
-                                <property name="left_attach">1</property>
                                 <property name="right_attach">2</property>
-                                <property name="top_attach">4</property>
-                                <property name="bottom_attach">5</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="ssblueclient">
+                              <widget class="GtkLabel" id="ssredlabel">
                                 <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="use_markup">True</property>
+                                <property name="xalign">1</property>
+                                <property name="label" translatable="yes">Red:</property>
+                                <property name="mnemonic_widget">redcombo</property>
                               </widget>
                               <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="ssgreenclient">
-                                <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="use_markup">True</property>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">2</property>
-                                <property name="bottom_attach">3</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="ssredclient">
-                                <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="use_markup">True</property>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="ssyellowlabel">
-                                <property name="xalign">1</property>
-                                <property name="label" translatable="yes">Yellow:</property>
-                                <property name="mnemonic_widget">yellowcombo</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">4</property>
-                                <property name="bottom_attach">5</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options"></property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="ssbluelabel">
-                                <property name="xalign">1</property>
-                                <property name="label" translatable="yes">Blue:</property>
-                                <property name="mnemonic_widget">bluecombo</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
                                 <property name="x_options">GTK_FILL</property>
                                 <property name="y_options"></property>
                               </packing>
@@ -1034,25 +983,81 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="ssredlabel">
-                                <property name="visible">True</property>
+                              <widget class="GtkLabel" id="ssbluelabel">
                                 <property name="xalign">1</property>
-                                <property name="label" translatable="yes">Red:</property>
-                                <property name="mnemonic_widget">redcombo</property>
+                                <property name="label" translatable="yes">Blue:</property>
+                                <property name="mnemonic_widget">bluecombo</property>
                               </widget>
                               <packing>
-                                <property name="top_attach">1</property>
-                                <property name="bottom_attach">2</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
                                 <property name="x_options">GTK_FILL</property>
                                 <property name="y_options"></property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="ssgamedescription">
-                                <property name="visible">True</property>
+                              <widget class="GtkLabel" id="ssyellowlabel">
+                                <property name="xalign">1</property>
+                                <property name="label" translatable="yes">Yellow:</property>
+                                <property name="mnemonic_widget">yellowcombo</property>
                               </widget>
                               <packing>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options"></property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="ssredclient">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
                                 <property name="right_attach">2</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="ssgreenclient">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="ssblueclient">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="ssyellowclient">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
                               </packing>
                             </child>
                           </widget>
@@ -1119,6 +1124,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
     <property name="resizable">False</property>
     <property name="modal">True</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="icon_name">infector</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="transient_for">mainwindow</property>
     <property name="has_separator">False</property>
@@ -1155,39 +1161,15 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                     <property name="column_spacing">6</property>
                     <property name="row_spacing">6</property>
                     <child>
-                      <widget class="GtkButton" id="clientconnectbutton">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="can_default">True</property>
-                        <property name="has_default">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="label" translatable="yes">gtk-connect</property>
-                        <property name="use_stock">True</property>
-                        <property name="image_position">GTK_POS_TOP</property>
-                        <property name="response_id">0</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">2</property>
-                        <property name="right_attach">3</property>
-                        <property name="bottom_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkEntry" id="clientaddrentry">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="clientaddrlabel">
+                      <widget class="GtkLabel" id="clientportlabel">
                         <property name="visible">True</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">Address:</property>
+                        <property name="label" translatable="yes">Port:</property>
                       </widget>
+                      <packing>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                      </packing>
                     </child>
                     <child>
                       <widget class="GtkSpinButton" id="clientportspin">
@@ -1209,13 +1191,37 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="clientportlabel">
+                      <widget class="GtkLabel" id="clientaddrlabel">
                         <property name="visible">True</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">Port:</property>
+                        <property name="label" translatable="yes">Address:</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkEntry" id="clientaddrentry">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
                       </widget>
                       <packing>
-                        <property name="top_attach">1</property>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkButton" id="clientconnectbutton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="can_default">True</property>
+                        <property name="has_default">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="label" translatable="yes">gtk-connect</property>
+                        <property name="use_stock">True</property>
+                        <property name="image_position">GTK_POS_TOP</property>
+                        <property name="response_id">0</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">2</property>
+                        <property name="right_attach">3</property>
                         <property name="bottom_attach">2</property>
                       </packing>
                     </child>
@@ -1268,79 +1274,23 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                             <property name="column_spacing">6</property>
                             <property name="row_spacing">6</property>
                             <child>
-                              <widget class="GtkLabel" id="csyellowclient">
+                              <widget class="GtkLabel" id="csgamedescription">
                                 <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="use_markup">True</property>
                               </widget>
                               <packing>
-                                <property name="left_attach">1</property>
                                 <property name="right_attach">2</property>
-                                <property name="top_attach">4</property>
-                                <property name="bottom_attach">5</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="csblueclient">
+                              <widget class="GtkLabel" id="csredlabel">
                                 <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="use_markup">True</property>
+                                <property name="xalign">1</property>
+                                <property name="label" translatable="yes">Red:</property>
+                                <property name="mnemonic_widget">redcombo</property>
                               </widget>
                               <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="csgreenclient">
-                                <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="use_markup">True</property>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">2</property>
-                                <property name="bottom_attach">3</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="csredclient">
-                                <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="use_markup">True</property>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="csyellowlabel">
-                                <property name="xalign">1</property>
-                                <property name="label" translatable="yes">Yellow:</property>
-                                <property name="mnemonic_widget">yellowcombo</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">4</property>
-                                <property name="bottom_attach">5</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options"></property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="csbluelabel">
-                                <property name="xalign">1</property>
-                                <property name="label" translatable="yes">Blue:</property>
-                                <property name="mnemonic_widget">bluecombo</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
                                 <property name="x_options">GTK_FILL</property>
                                 <property name="y_options"></property>
                               </packing>
@@ -1360,25 +1310,81 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="csredlabel">
-                                <property name="visible">True</property>
+                              <widget class="GtkLabel" id="csbluelabel">
                                 <property name="xalign">1</property>
-                                <property name="label" translatable="yes">Red:</property>
-                                <property name="mnemonic_widget">redcombo</property>
+                                <property name="label" translatable="yes">Blue:</property>
+                                <property name="mnemonic_widget">bluecombo</property>
                               </widget>
                               <packing>
-                                <property name="top_attach">1</property>
-                                <property name="bottom_attach">2</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
                                 <property name="x_options">GTK_FILL</property>
                                 <property name="y_options"></property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="csgamedescription">
-                                <property name="visible">True</property>
+                              <widget class="GtkLabel" id="csyellowlabel">
+                                <property name="xalign">1</property>
+                                <property name="label" translatable="yes">Yellow:</property>
+                                <property name="mnemonic_widget">yellowcombo</property>
                               </widget>
                               <packing>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options"></property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="csredclient">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
                                 <property name="right_attach">2</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="csgreenclient">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="csblueclient">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="csyellowclient">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
                               </packing>
                             </child>
                           </widget>
