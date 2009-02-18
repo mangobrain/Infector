@@ -21,7 +21,7 @@ infector_SOURCES = infector.cxx gameboard.cxx game.cxx boardstate.cxx \
 	newgamedialog.cxx ai.cxx serverstatusdialog.cxx socket.cxx \
 	clientstatusdialog.cxx ai.hxx boardstate.hxx clientstatusdialog.hxx \
 	gameboard.hxx game.hxx gametype.hxx gamewindow.hxx newgamedialog.hxx \
-	serverstatusdialog.hxx socket.hxx
+	serverstatusdialog.hxx socket.hxx infector-i18n.hxx
 infector_CXXFLAGS = $(GTKMM_CFLAGS) $(GLADEMM_CFLAGS) $(AM_CXXFLAGS)
 infector_LDADD = $(GTKMM_LIBS) $(GLADEMM_LIBS) $(AM_LIBS)
 infector_CPPFLAGS = -D__INFECTOR_PKGDATADIR='"$(pkgdatadir)"' \
