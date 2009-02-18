@@ -1,0 +1,6 @@
+data/infector.glade
+src/clientstatusdialog.cxx
+src/game.cxx
+src/infector.cxx
+src/serverstatusdialog.cxx
+data/infector.desktop.in.in

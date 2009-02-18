@@ -24,6 +24,7 @@
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
+#include "infector-i18n.hxx"
 
 // Language headers
 #include <memory>
@@ -81,6 +82,15 @@ void onAboutEmail(Gtk::AboutDialog &d, const Glib::ustring &addr)
 // Entry point
 int main(int argc, char *argv[])
 {
+#ifdef ENABLE_NLS
+	// Tell gettext where to find messages for our application's domain
+	bindtextdomain(GETTEXT_PACKAGE, __INFECTOR_LOCALEDIR);
+	// Messages are all in UTF-8
+	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+	// Switch to our application's domain for string retrieval
+	textdomain(GETTEXT_PACKAGE);
+#endif
+
 	Gtk::Main kit(argc, argv);
 
 	// Install hooks for clicked URLs and email addresses in about dialogues
@@ -88,7 +98,7 @@ int main(int argc, char *argv[])
 	Gtk::AboutDialog::set_email_hook(sigc::ptr_fun(onAboutEmail));
 
 	// Load main Glade file
-	Glib::RefPtr<Gnome::Glade::Xml> refXml = Gnome::Glade::Xml::create(PKGDATADIR "/infector.glade");
+	Glib::RefPtr<Gnome::Glade::Xml> refXml = Gnome::Glade::Xml::create(__INFECTOR_PKGDATADIR "/infector.glade");
 	
 	// Instantiate main window & run Glib main loop
 	GameWindow *pGw;
@@ -278,54 +288,54 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 	m_pStatusbar->pop();
 	if (s1 >= 0)
 	{
-		std::ostringstream os; os << "R: " << s1;
+		std::ostringstream os; os << _("R: ") << s1;
 		m_pRedStatusbar->push(os.str());
 	} else
-		m_pRedStatusbar->push("N/A");
+		m_pRedStatusbar->push(_("N/A"));
 	if (s2 >= 0)
 	{
-		std::ostringstream os; os << "G: " << s2;
+		std::ostringstream os; os << _("G: ") << s2;
 		m_pGreenStatusbar->push(os.str());
 	} else
-		m_pGreenStatusbar->push("N/A");
+		m_pGreenStatusbar->push(_("N/A"));
 	if (s3 >= 0)
 	{
-		std::ostringstream os; os << "B: " << s3;
+		std::ostringstream os; os << _("B: ") << s3;
 		m_pBlueStatusbar->push(os.str());
 	} else
-		m_pBlueStatusbar->push("N/A");
+		m_pBlueStatusbar->push(_("N/A"));
 	if (s4 >= 0)
 	{
-		std::ostringstream os; os << "Y: " << s4;
+		std::ostringstream os; os << _("Y: ") << s4;
 		m_pYellowStatusbar->push(os.str());
 	} else
-		m_pYellowStatusbar->push("N/A");
+		m_pYellowStatusbar->push(_("N/A"));
 	
 	if (gameover)
 	{
-		m_pStatusbar->push("Game over");
-		Glib::ustring message("Tie: ");
+		m_pStatusbar->push(_("Game over"));
+		Glib::ustring message(_("Tie: "));
 		
 		if (s1 > s2 && s1 > s3 && s1 > s4)
-			message = "Red wins!";
+			message = _("Red wins!");
 		else if (s2 > s1 && s2 > s3 && s2 > s4)
-			message = "Green wins!";
+			message = _("Green wins!");
 		else if (s3 > s2 && s3 > s1 && s3 > s4)
-			message = "Blue wins!";
+			message = _("Blue wins!");
 		else if (s4 > s2 && s4 > s3 && s4 > s1)
-			message = "Yellow wins!";
+			message = _("Yellow wins!");
 		else {
 			// Work out who the tie is between
 			int max = std::max(std::max(s1, s2), std::max(s3, s4));
 			std::ostringstream tiemsg;
 			if (s1 == max)
-				tiemsg << "red, ";
+				tiemsg << _("red, ");
 			if (s2 == max)
-				tiemsg << "green, ";
+				tiemsg << _("green, ");
 			if (s3 == max)
-				tiemsg << "blue, ";
+				tiemsg << _("blue, ");
 			if (s4 == max)
-				tiemsg << "yellow, ";
+				tiemsg << _("yellow, ");
 			message.append(tiemsg.str().substr(0, tiemsg.str().length() - 2));
 		}
 
@@ -340,16 +350,16 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 		switch (m_pGame->getBoardState().getPlayer())
 		{
 			case pc_player_1:
-				m_pStatusbar->push("Red to play");
+				m_pStatusbar->push(_("Red to play"));
 				break;
 			case pc_player_2:
-				m_pStatusbar->push("Green to play");
+				m_pStatusbar->push(_("Green to play"));
 				break;
 			case pc_player_3:
-				m_pStatusbar->push("Blue to play");
+				m_pStatusbar->push(_("Blue to play"));
 				break;
 			default:
-				m_pStatusbar->push("Yellow to play");
+				m_pStatusbar->push(_("Yellow to play"));
 				break;
 		}
 	}

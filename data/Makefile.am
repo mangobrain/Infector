@@ -20,9 +20,9 @@ dist_pkgdata_DATA = infector.glade
 # Distribute original scalable icon, and various pre-rendered
 # icons, so that we don't depend on RSVG being present for installation
 
-# Also distribute .desktop.in file (processed at install time)
+# Also distribute the .desktop.in.in (un-expanded, untranslated) files.
 
-EXTRA_DIST = infector.svg infector.desktop.in
+EXTRA_DIST = infector.svg infector.desktop.in.in
 
 dist-hook: $(SIZES:%=infector-%.png)
 	cp -p $(srcdir)/infector-*.png $(distdir)/
@@ -36,11 +36,19 @@ SIZES = 16 22 24 32 48 64 72 96 128
 infector-%.png: infector.svg
 	rsvg -w $* -h $* $< $@
 
-# Rule for generating .desktop file from .desktop.in
-infector.desktop: infector.desktop.in
+# Rule for generating .desktop.in file from .desktop.in.in.
+# This converts the "bindir" placeholder in the ".in.in" file
+# into a fully expanded literal in ".in".  The ".in" file is
+# then processed for translations by intltool.
+infector.desktop.in: infector.desktop.in.in
 	rm -f $@ $@.tmp
 	$(SED) -e s'|@bindir[@]|$(bindir)|g' $< >$@.tmp
 	mv $@.tmp $@
+
+# Translate infector.desktop.in into infector.desktop.
+# This will happen on "make install", as the only thing which
+# depends on infector.desktop itself is install-data-local.
+@INTLTOOL_DESKTOP_RULE@
 
 # Use xdg-utils to install and uninstall pre-rendered icons.
 # I'd love to use it for the scalable icon as well, but
@@ -72,5 +80,4 @@ maintainer-clean-local:
 	rm -f infector-*.png
 
 # .desktop file is built by make
-clean-local:
-	rm -f infector.desktop
+CLEANFILES = infector.desktop infector.desktop.in

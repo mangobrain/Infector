@@ -24,6 +24,7 @@
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
+#include "infector-i18n.hxx"
 
 // Language headers
 #include <cstring>
@@ -115,10 +116,10 @@ bool setPlayerDescription(const playertype pt, Gtk::Label *label, int target_row
 	switch (pt)
 	{
 		case pt_ai:
-			label->set_label("Computer");
+			label->set_label(_("Computer"));
 			return true;
 		case pt_local:
-			label->set_label("Local");
+			label->set_label(_("Local"));
 			return true;
 		case pt_none:
 			return false;
@@ -128,7 +129,7 @@ bool setPlayerDescription(const playertype pt, Gtk::Label *label, int target_row
 				// unless one of the client combo boxes is set to the
 				// row for this player - in which case set it to the
 				// description of that client.
-				label->set_label("<i>Empty</i>");
+				label->set_label(_("<i>Empty</i>"));
 				if (clientcombos != NULL)
 				{
 					for (size_t i = 0; i < 4; ++i)
@@ -191,14 +192,14 @@ void ServerStatusDialog::setGameDetails(const GameType &gt)
 	// Build game description string
 	Glib::ustring description;
 	if (gt.square)
-		description = "Square board, ";
+		description = _("Square board, ");
 	else
-		description = "Hexagonal board, ";
+		description = _("Hexagonal board, ");
 	description += Glib::ustring::compose("%1x%2, ", gt.w, gt.h);
 	if ((!gt.square) || (gt.player_3 == pt_none))
-		description += "2 players";
+		description += _("2 players");
 	else
-		description += "4 players";
+		description += _("4 players");
 	
 	// Put it on UI
 	m_pGameDescription->set_label(description);
@@ -247,28 +248,28 @@ void ServerStatusDialog::setGameDetails(const GameType &gt)
 	for (size_t i = 0; i < 4; ++i)
 	{
 		m_aClientComboBoxes[i].clear_items();
-		m_aClientComboBoxes[i].append_text("None");
+		m_aClientComboBoxes[i].append_text(_("None"));
 		int currentrow = 1;
 		if (gt.player_1 == pt_remote)
 		{
-			m_aClientComboBoxes[i].append_text("Red");
+			m_aClientComboBoxes[i].append_text(_("Red"));
 			redrow = currentrow++;
 		}
 		if (gt.player_2 == pt_remote)
 		{
-			m_aClientComboBoxes[i].append_text("Green");
+			m_aClientComboBoxes[i].append_text(_("Green"));
 			greenrow = currentrow++;
 		}
 		if (gt.square)
 		{
 			if (gt.player_3 == pt_remote)
 			{
-				m_aClientComboBoxes[i].append_text("Blue");
+				m_aClientComboBoxes[i].append_text(_("Blue"));
 				bluerow = currentrow++;
 			}
 			if (gt.player_4 == pt_remote)
 			{
-				m_aClientComboBoxes[i].append_text("Yellow");
+				m_aClientComboBoxes[i].append_text(_("Yellow"));
 				yellowrow = currentrow++;
 			}
 		}
@@ -426,7 +427,7 @@ void ServerStatusDialog::clientWriteError(const Glib::ustring &e, const int s)
 {
 	// Disconnect the failed client and show an error message
 	removeClient(s);
-	Glib::ustring m("Client write error: ");
+	Glib::ustring m(_("Client write error: "));
 	m.append(e);
 	errPop(m.c_str());
 }
@@ -539,7 +540,7 @@ bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, const int s)
 		
 		setGUIFromClientState();
 	} else {
-		errPop("Error on listening socket");
+		errPop(_("Error on listening socket"));
 		response(Gtk::RESPONSE_CANCEL);
 	}
 	return true;

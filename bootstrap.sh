@@ -20,6 +20,7 @@
 # Bootstrap: get a local copy ready for building, from scratch.
 
 # Run the following, in order:
+# * glib-gettextize and intltoolize: prepare package for i18n
 # * aclocal: create `aclocal.m4' from `configure.ac'
 # * autoheader: create `config.h.in' (or other named header file) from
 #   `configure.ac'
@@ -31,4 +32,4 @@
 #
 # One is then in a position to `configure; make; make install'. :)
 
-aclocal && autoheader && automake --add-missing --copy && autoconf
+glib-gettextize --copy --force && intltoolize --copy --force --automake && aclocal --force && autoheader --force && automake --add-missing --force-missing --copy && autoconf --force

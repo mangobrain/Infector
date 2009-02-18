@@ -38,6 +38,9 @@ AC_CONFIG_HEADERS([config.h])
 dnl # Output the command-line options given to this script
 AC_DEFINE_UNQUOTED([CONFIGURE_OPTS],["$ac_configure_args"],[Options given to ./configure])
 
+dnl # Use intltool for i18n.
+AC_PROG_INTLTOOL([0.23])
+
 dnl # Infector uses gtkmm and glademm.
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4 >= 2.12])
@@ -63,11 +66,20 @@ AM_CONDITIONAL(MINGW, test "x$win" = "xtrue")
 dnl # Sed is used to parse infector.desktop.in
 AC_PROG_SED
 
+dnl # Variables necessary for i18n.
+AC_SUBST([GETTEXT_PACKAGE], [infector])
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"], [gettext package name])
+
+dnl # Available translations
+ALL_LINGUAS=""
+AM_GLIB_GNU_GETTEXT
+
 dnl # All done.  Spit out the result.
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
 	data/Makefile
+	po/Makefile.in
 ])
 dnl	doc/Makefile
 AC_OUTPUT

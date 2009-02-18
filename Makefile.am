@@ -15,5 +15,5 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Infector.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = src data #doc
-EXTRA_DIST = bootstrap.sh
+SUBDIRS = src data po #doc
+EXTRA_DIST = bootstrap.sh intltool-extract.in intltool-merge.in intltool-update.in

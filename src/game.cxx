@@ -24,6 +24,7 @@
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
+#include "infector-i18n.hxx"
 
 // Language headers
 #include <cstdlib>
@@ -103,7 +104,7 @@ void Game::giveServerSocket(const Glib::RefPtr<Socket> &serversock)
 void Game::clientWriteError(const Glib::ustring &e)
 {
 	m_ClientSockets.clear();
-	Glib::ustring msg("Write error on client socket: ");
+	Glib::ustring msg(_("Write error on client socket: "));
 	msg.append(e);
 	network_error(msg);
 }
@@ -112,7 +113,7 @@ void Game::clientWriteError(const Glib::ustring &e)
 void Game::serverWriteError(const Glib::ustring &e)
 {
 	m_ServerSocket.reset();
-	Glib::ustring msg("Write error on server socket: ");
+	Glib::ustring msg(_("Write error on server socket: "));
 	msg.append(e);
 	network_error(msg);
 }
@@ -123,7 +124,7 @@ bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> 
 	if (cond != Glib::IO_IN)
 	{
 		m_ClientSockets.clear();
-		network_error("I/O error on client socket");
+		network_error(_("I/O error on client socket"));
 		return false;
 	}
 	else
@@ -146,7 +147,7 @@ bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> 
 		if (m_BoardState.getPlayer() != sock->getPlayer())
 		{
 			m_ClientSockets.clear();
-			network_error("Client disconnected or unexpected data received");
+			network_error(_("Client disconnected or unexpected data received"));
 			return false;
 		}
 		
@@ -157,13 +158,13 @@ bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> 
 		catch (Glib::IOChannelError &e)
 		{
 			m_ClientSockets.clear();
-			network_error("Error reading from client socket");
+			network_error(_("Error reading from client socket"));
 			return false;
 		}
 		if (read == 0)
 		{
 			m_ClientSockets.clear();
-			network_error("Client disconnected");
+			network_error(_("Client disconnected"));
 			return false;
 		}
 		netbufsize += read;
@@ -210,7 +211,7 @@ bool Game::handleServerSock(Glib::IOCondition cond)
 	if (cond != Glib::IO_IN)
 	{
 		m_ServerSocket.reset();
-		network_error("I/O error on server socket");
+		network_error(_("I/O error on server socket"));
 		return false;
 	}
 	else
@@ -219,7 +220,7 @@ bool Game::handleServerSock(Glib::IOCondition cond)
 		if (m_GameType.isPlayerType(m_BoardState.getPlayer(), pt_local))
 		{
 			m_ServerSocket.reset();
-			network_error("Server disconnected or unexpected data received");
+			network_error(_("Server disconnected or unexpected data received"));
 			return false;
 		}
 		
@@ -231,13 +232,13 @@ bool Game::handleServerSock(Glib::IOCondition cond)
 		catch (Glib::IOChannelError &e)
 		{
 			m_ServerSocket.reset();
-			network_error("Error reading from server socket");
+			network_error(_("Error reading from server socket"));
 			return false;
 		}
 		if (read == 0)
 		{
 			m_ServerSocket.reset();
-			network_error("Server disconnected");
+			network_error(_("Server disconnected"));
 			return false;
 		}
 		netbufsize += read;

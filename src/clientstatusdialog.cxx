@@ -24,6 +24,7 @@
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
+#include "infector-i18n.hxx"
 
 // Language headers
 #include <cerrno>
@@ -182,11 +183,11 @@ const char *getLabel(char p)
 	switch (p)
 	{
 		case 0:
-			return "Host";
+			return _("Host");
 		case 1:
-			return "Computer";
+			return _("Computer");
 		default:
-			return "<i>Empty</i>";
+			return _("<i>Empty</i>");
 	}
 }
 
@@ -195,7 +196,7 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 {
 	if (cond != Glib::IO_IN)
 	{
-		errPop("Error on server socket");
+		errPop(_("Error on server socket"));
 		response(Gtk::RESPONSE_CANCEL);
 		return false;
 	} else {
@@ -224,14 +225,14 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 			}
 			catch (Glib::IOChannelError &e)
 			{
-				errPop("Error reading from server");
+				errPop(_("Error reading from server"));
 				response(Gtk::RESPONSE_CANCEL);
 				delete[] buf;
 				return false;
 			}
 			if (read == 0)
 			{
-				errPop("Server disconnected");
+				errPop(_("Server disconnected"));
 				response(Gtk::RESPONSE_CANCEL);
 				delete[] buf;
 				return false;
@@ -277,7 +278,7 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 						|| (netbuf.at(6) != 2 && netbuf.at(7) != 0)
 						|| (netbuf.at(8) != 2 && netbuf.at(9) != 0))
 					{
-						errPop("Invalid data from server");
+						errPop(_("Invalid data from server"));
 						response(Gtk::RESPONSE_CANCEL);
 						return false;
 					}
@@ -366,14 +367,14 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 					// Build game description string
 					Glib::ustring description;
 					if (m_GameType.square)
-						description = "Square board, ";
+						description = _("Square board, ");
 					else
-						description = "Hexagonal board, ";
+						description = _("Hexagonal board, ");
 					description += Glib::ustring::compose("%1x%2, ", m_GameType.w, m_GameType.h);
 					if ((!m_GameType.square) || (m_GameType.player_3 == pt_none))
-						description += "2 players";
+						description += _("2 players");
 					else
-						description += "4 players";
+						description += _("4 players");
 					m_pGameDescription->set_label(description);
 					
 					// Get ready to receive an updated set of game details
@@ -384,7 +385,7 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 			}
 			return true;
 		} else {
-			errPop("Unexpected data from server");
+			errPop(_("Unexpected data from server"));
 			response(Gtk::RESPONSE_CANCEL);
 			return false;
 		}
