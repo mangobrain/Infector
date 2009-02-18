@@ -1,4 +1,4 @@
-# Copyright 2008 Philip Allison <sane@not.co.uk>
+# Copyright 2008-2009 Philip Allison <sane@not.co.uk>
 
 #    This file is part of infector.
 #
