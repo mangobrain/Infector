@@ -46,10 +46,15 @@
 
 // System headers
 #include <sys/types.h>
+#include <unistd.h>
+#ifdef MINGW
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <sys/socket.h>
 #include <netdb.h>
-#include <unistd.h>
 #include <arpa/inet.h>
+#endif
 
 //
 // Implementation
@@ -340,13 +345,25 @@ void ServerStatusDialog::onApply()
 	addrinfo hints;
 	memset(&hints, 0, sizeof(hints));
 	// Use IPv4 or v6
+	// Only IPv4 on Windows, because XP is so braindead
+	// TODO - support v6 on Vista?
+#ifdef MINGW
+	hints.ai_family = AF_INET;
+#else
 	hints.ai_family = AF_UNSPEC;
+#endif
 	// Use TCP
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 	// Get a listening socket address on all available interface types
 	// Service (port) is specified numerically
+	// TODO - Make this test more fine-grained, as ADDRCONFIG and
+	// NUMERICSERV *are* available on Vista and above
+#ifdef MINGW
+	hints.ai_flags = AI_PASSIVE;
+#else
 	hints.ai_flags = AI_ADDRCONFIG | AI_PASSIVE | AI_NUMERICSERV;
+#endif
 	// Do it
 	addrinfo* results;
 	int result = getaddrinfo(NULL, ostr.str().c_str(), &hints, &results);
@@ -371,12 +388,20 @@ void ServerStatusDialog::onApply()
 			} else {
 				// Bind it to the current address
 				int val = 1;
+#ifdef MINGW
+				setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char*)(&val), sizeof(int));
+#else
 				setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(int));
+#endif
 				if (bind(s, current->ai_addr, current->ai_addrlen) < 0)
 				{
 					errPop(strerror(errno));
 					response(Gtk::RESPONSE_CANCEL);
+#ifdef MINGW
+					closesocket(s);
+#else
 					close(s);
+#endif
 					break;
 				} else {
 					// Start it listening
@@ -384,7 +409,11 @@ void ServerStatusDialog::onApply()
 					{
 						errPop(strerror(errno));
 						response(Gtk::RESPONSE_CANCEL);
+#ifdef MINGW
+						closesocket(s);
+#else
 						close(s);
+#endif
 						break;
 					} else {
 						// Connect it to signal handlers to be monitored
@@ -492,10 +521,15 @@ bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, const int s)
 		if (clientsockets.size() == requiredclients)
 		{
 			// TODO - Send client a "server full" message
+#ifdef MINGW
+			closesocket(newsock);
+#else
 			close(newsock);
+#endif
 			return true;
 		}
-		
+
+#ifndef MINGW		
 		// Check ss_family of newaddr to see if it's a sockaddr_in
 		// or a sockaddr_in6.  Convert the client address to a string
 		// accordingly.
@@ -511,6 +545,11 @@ bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, const int s)
 				result = inet_ntop(newaddr.ss_family,
 					&(((sockaddr_in6 *) &newaddr)->sin6_addr), buf, INET6_ADDRSTRLEN);
 		}
+#else
+		// TODO - IPv6 on Vista
+		char *buf = inet_ntoa(((sockaddr_in *) &newaddr)->sin_addr);
+		const char *result = buf;
+#endif
 		if (result == NULL)
 		{
 			errPop(strerror(errno));

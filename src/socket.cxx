@@ -34,9 +34,13 @@
 
 // System headers
 #include <sys/types.h>
+#ifdef MINGW
+#include <winsock2.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#endif
 
 //
 // Implementation
@@ -44,13 +48,21 @@
 
 // Constructor - take socket, set options & construct IOChannel
 Socket::Socket(const int socket)
+#ifdef MINGW
+	: m_socket(socket), m_pIOChannel(Glib::IOChannel::create_from_win32_socket(socket))
+#else
 	: m_socket(socket), m_pIOChannel(Glib::IOChannel::create_from_fd(socket))
+#endif
 {
 	// Set TCP_NODELAY on the socket - we want data to be sent out
 	// as soon as possible, regardless of the potentially tiny amounts
 	// being sent.
 	int val = 1;
+#ifdef MINGW
+	setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, (char*)(&val), sizeof(int));
+#else
 	setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(int));
+#endif
 	
 	// Set the IOChannel to non-blocking
 	m_pIOChannel->set_flags(Glib::IO_FLAG_NONBLOCK);

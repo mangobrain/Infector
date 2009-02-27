@@ -37,8 +37,13 @@
 
 // System headers
 #include <sys/types.h>
+#ifdef MINGW
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <sys/socket.h>
 #include <netdb.h>
+#endif
 
 // Project headers
 #include "gametype.hxx"
@@ -133,13 +138,24 @@ void ClientStatusDialog::onConnect()
 	addrinfo hints;
 	memset(&hints, 0, sizeof(hints));
 	// Use IPv4 or v6
+	// TODO - support v6 on Vista?
+#ifdef MINGW
+	hints.ai_family = AF_INET;
+#else
 	hints.ai_family = AF_UNSPEC;
+#endif
 	// Use TCP
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 	// Get a socket address on any available interface type
 	// Service (port) is specified numerically
+	// TODO - Make this test more fine-grained, as ADDRCONFIG and
+	// NUMERICSERV *are* available on Vista and above
+#ifdef MINGW
+	hints.ai_flags = 0;
+#else
 	hints.ai_flags = AI_ADDRCONFIG | AI_NUMERICSERV;
+#endif
 	// Do it
 	addrinfo* results;
 	int result = getaddrinfo(NULL, ostr.str().c_str(), &hints, &results);
@@ -165,7 +181,11 @@ void ClientStatusDialog::onConnect()
 		{
 			errPop(strerror(errno));
 			response(Gtk::RESPONSE_CANCEL);
+#ifdef MINGW
+			closesocket(s);
+#else
 			close(s);
+#endif
 			return;
 		}
 		// Create a Socket object from it
