@@ -18,14 +18,14 @@ dnl    along with Infector.  If not, see <http://www.gnu.org/licenses/>.
 dnl # Specify autoconf version requirements
 dnl # Not strictly necessary - but it's the version on my system,
 dnl # so for now, we'll pretend it's the required version.
-AC_PREREQ([2.56])
+AC_PREREQ([2.61])
 
 dnl # Initialise autoconf and automake
 dnl # Also specify automake version requirements (again, the version used
 dnl # development will suffice for now).
-AC_INIT([infector], [0.1], [sane@not.co.uk])
+AC_INIT([infector], [0.2], [sane@not.co.uk])
 AC_CONFIG_SRCDIR([src/infector.cxx])
-AM_INIT_AUTOMAKE([1.7.1])
+AM_INIT_AUTOMAKE([1.10])
 
 dnl # Infector is written in C++, of course.  :)
 AC_PROG_CXX
@@ -54,9 +54,11 @@ win=false
 case "$host_os" in
 	mingw*)
 		win=true
-		LIBS="-lwsock32 ${LIBS}"
-		CXXFLAGS="-mthreads ${CXXFLAGS}"
+		LIBS="-lwsock32 -lws2_32 ${LIBS}"
+		CXXFLAGS="-mthreads -Wl,-subsystem,windows ${CXXFLAGS}"
 		AC_DEFINE([MINGW],[1],[Define if building for Windows (MinGW)])
+		AC_DEFINE([_WIN32_WINNT],[0x0502],[Define if building for Windows])
+		AC_DEFINE([WINVER],[0x0502],[Define if building for Windows])
 		;;
 	*)
 		;;
