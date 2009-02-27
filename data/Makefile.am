@@ -24,6 +24,10 @@ dist_pkgdata_DATA = infector.glade
 
 EXTRA_DIST = infector.svg infector.desktop.in.in
 
+# Rest of this isn't going to work on Windows, so don't bother
+
+if !MINGW
+
 dist-hook: $(SIZES:%=infector-%.png)
 	cp -p $(srcdir)/infector-*.png $(distdir)/
 
@@ -81,3 +85,12 @@ maintainer-clean-local:
 
 # .desktop file is built by make
 CLEANFILES = infector.desktop infector.desktop.in
+
+else
+
+# On Windows, we want the .ico file, a pre-rendered image for the
+# "About" dialogue, and the stock_people image for the server status
+# dialogue.
+dist_pkgdata_DATA += infector.ico infector.png stock_people.png
+
+endif
