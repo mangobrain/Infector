@@ -584,7 +584,7 @@ Networked</property>
     <property name="transient_for">mainwindow</property>
     <property name="has_separator">False</property>
     <property name="program_name">Infector</property>
-    <property name="version">0.1</property>
+    <property name="version">0.2</property>
     <property name="copyright">Copyright © 2008-2009 Philip Allison</property>
     <property name="website">http://infector.mangobrain.co.uk/</property>
     <property name="license">Infector is free software: you can redistribute it and/or modify
