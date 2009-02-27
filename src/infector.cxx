@@ -39,6 +39,9 @@
 #include <libglademm.h>
 
 // System headers
+#ifdef MINGW
+#include <winsock2.h>
+#endif
 
 // Project headers
 #include "gametype.hxx"
@@ -91,7 +94,21 @@ int main(int argc, char *argv[])
 	textdomain(GETTEXT_PACKAGE);
 #endif
 
+#ifdef MINGW
+	// Start up Winsock 2.2
+	WORD wsver = MAKEWORD(2, 2);
+	WSADATA data;
+	WSAStartup(wsver, &data);
+#endif
+
 	Gtk::Main kit(argc, argv);
+
+#ifdef MINGW
+	// Find "people" icon for server status dialogue,
+	// and "infector" icon for about dialogue
+	Glib::RefPtr<Gtk::IconTheme> it(Gtk::IconTheme::get_default());
+	it->append_search_path(__INFECTOR_PKGDATADIR);
+#endif
 
 	// Install hooks for clicked URLs and email addresses in about dialogues
 	Gtk::AboutDialog::set_url_hook(sigc::ptr_fun(onAboutURL));
@@ -103,7 +120,15 @@ int main(int argc, char *argv[])
 	// Instantiate main window & run Glib main loop
 	GameWindow *pGw;
 	refXml->get_widget_derived("mainwindow", pGw);
+#ifdef MINGW
+	// Set window icon
+	pGw->set_icon_from_file(__INFECTOR_PKGDATADIR "/infector.ico");
+#endif
 	kit.run(*pGw);
+
+#ifdef MINGW
+	WSACleanup();
+#endif
 	
 	delete pGw;
 	return 0;
@@ -340,7 +365,7 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 		}
 
 		m_pBoard->endGame();
-			
+
 		Gtk::MessageDialog *m = new Gtk::MessageDialog(*this, message, false,
 			Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
 		m->run();

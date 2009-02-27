@@ -24,5 +24,12 @@ infector_SOURCES = infector.cxx gameboard.cxx game.cxx boardstate.cxx \
 	serverstatusdialog.hxx socket.hxx infector-i18n.hxx
 infector_CXXFLAGS = $(GTKMM_CFLAGS) $(GLADEMM_CFLAGS) $(AM_CXXFLAGS)
 infector_LDADD = $(GTKMM_LIBS) $(GLADEMM_LIBS) $(AM_LIBS)
+
+# Use relative paths on Windows.
+if MINGW
+infector_CPPFLAGS = -D__INFECTOR_PKGDATADIR='"../share/infector"' \
+	-D__INFECTOR_LOCALEDIR='"../share/locale"' -I$(top_srcdir) $(AM_CPPFLAGS)
+else
 infector_CPPFLAGS = -D__INFECTOR_PKGDATADIR='"$(pkgdatadir)"' \
 	-D__INFECTOR_LOCALEDIR='"$(localedir)"' -I$(top_srcdir) $(AM_CPPFLAGS)
+endif
