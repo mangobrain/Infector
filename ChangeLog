@@ -1,3 +1,50 @@
+2009-03-01  Philip Allison <sane@not.co.uk>
+
+	* data/infector.glade: Add proper title to client status dialogue Oops
+	- just noticed that the title of the client status dialogue was
+	"infector".  It is now "Join Network Game".
+
+2009-02-27  Philip Allison <sane@not.co.uk>
+
+	* data/Makefile.am: Changes to data files to accomodate Windows On
+	Windows, we want pre-rendered icon files and about dialogue
+	images.  Also, the "stock_people" image seems to be missing from the
+	GTK+ runtime package for Windows, so include it here.  Change the data
+	makefile to not bother doing the bits which aren't necessary on
+	Windows, such as rendering out various icon sizes and installing a
+	.desktop file.
+
+2009-02-27  Philip Allison <sane@not.co.uk>
+
+	* data/infector.glade: Bump version number in About dialogue to 0.2
+
+2009-02-27  Philip Allison <sane@not.co.uk>
+
+	* configure.ac: MinGW tweaks; bump to 0.2 Make the application compile
+	and link cleanly under MinGW.  This
+	includes bumping the required versions of autoconf/automake, as we need
+	(for example) a newer aclocal than was previously being asked for if
+	we're going to successfully rebuild the build scripts.  Tentatively
+	bump the version number to 0.2 to reflect recent work.
+
+2009-02-27  Philip Allison <sane@not.co.uk>
+
+	* src/Makefile.am, src/infector.cxx: More MinGW-specific changes Start
+	up Winsock when the application is launched, and perform
+	various icon-related operations so that the application "looks right"
+	on Windows.  Also, use relative paths for finding data files, not
+	absolute paths, since the install prefix after compilation is not
+	fixed.
+
+2009-02-27  Philip Allison <sane@not.co.uk>
+
+	* src/clientstatusdialog.cxx, src/serverstatusdialog.cxx,
+	src/socket.cxx: Make networking code compile under MinGW
+
+2009-02-18  Philip Allison <sane@not.co.uk>
+
+	* ChangeLog: Add changelog with help of git2cl
+
 2009-02-18  Philip Allison <sane@not.co.uk>
 
 	* NEWS: Add news about upcoming 0.1 tag
