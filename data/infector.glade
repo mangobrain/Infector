@@ -1121,6 +1121,7 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
   </widget>
   <widget class="GtkDialog" id="clientstatusdialog">
     <property name="border_width">5</property>
+    <property name="title" translatable="yes">Join Network Game</property>
     <property name="resizable">False</property>
     <property name="modal">True</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
