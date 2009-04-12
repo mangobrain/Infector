@@ -1,3 +1,11 @@
+2009-04-13  Philip Allison <sane@not.co.uk>
+
+	* po/cs.po: Update Czech translation for 0.3
+
+2009-04-13  Philip Allison <sane@not.co.uk>
+
+	* ChangeLog, NEWS: Update ChangeLog and NEWS for 0.3 release
+
 2009-04-12  Philip Allison <sane@not.co.uk>
 
 	* configure.ac: Version bump to 0.3 following recent changes
