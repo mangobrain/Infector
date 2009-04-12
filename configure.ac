@@ -1,4 +1,4 @@
-dnl Copyright 2008 Philip Allison <sane@not.co.uk>
+dnl Copyright 2008-2009 Philip Allison <sane@not.co.uk>
 
 dnl    This file is part of Infector.
 dnl
@@ -73,7 +73,7 @@ AC_SUBST([GETTEXT_PACKAGE], [infector])
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"], [gettext package name])
 
 dnl # Available translations
-ALL_LINGUAS=""
+ALL_LINGUAS="cs"
 AM_GLIB_GNU_GETTEXT
 
 dnl # All done.  Spit out the result.
