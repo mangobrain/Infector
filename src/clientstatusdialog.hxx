@@ -23,22 +23,24 @@ class ClientStatusDialog: public Gtk::Dialog
 	public:
 		// Constructor - called by glademm by get_widget_derived
 		ClientStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
+		
+		~ClientStatusDialog()
+		{
+			delete serversock;
+		};
 
 		// Return game details
 		void getGameType(GameType &gt) const {
 			gt = m_GameType;
 		};
 
-		// Return a reference pointer to the server connection
-		const Glib::RefPtr<Socket> &getServerSocket() const
+		// Return a pointer to the server connection and reset our
+		// own pointer to NULL, effectively handing over the object
+		Socket *getServerSocket()
 		{
-			return serversock;
-		};
-		
-		// Clear our reference to server connection
-		void clearServerSocketRef()
-		{
-			serversock.reset();
+			Socket *result = serversock;
+			serversock = NULL;
+			return result;
 		};
 		
 		// Set GUI to default state
@@ -61,7 +63,7 @@ class ClientStatusDialog: public Gtk::Dialog
 		GameType m_GameType;
 		
 		// Connection to server
-		Glib::RefPtr<Socket> serversock;
+		Socket *serversock;
 		
 		// Socket event handler connections
 		sigc::connection sockeventconn;

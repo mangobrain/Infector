@@ -71,12 +71,15 @@ void ClientStatusDialog::on_response(int response_id)
 {
 	sockeventconn.disconnect();
 	if (response_id != Gtk::RESPONSE_OK)
-		serversock.reset();
+	{
+		delete serversock;
+		serversock = NULL;
+	}
 }
 
 // Constructor - called by glademm by get_widget_derived
 ClientStatusDialog::ClientStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
-	: Gtk::Dialog(cobject)
+	: Gtk::Dialog(cobject), serversock(NULL)
 {
 	refXml->get_widget("clientportspin", m_pPortSpin);
 	refXml->get_widget("clientaddrentry", m_pAddressEntry);
@@ -189,7 +192,7 @@ void ClientStatusDialog::onConnect()
 			return;
 		}
 		// Create a Socket object from it
-		serversock = Glib::RefPtr<Socket>(new Socket(s));
+		serversock = new Socket(s);
 		// Attach the underlying IOChannel to our event handler
 		sockeventconn = Glib::signal_io().connect(
 			sigc::mem_fun(this, &ClientStatusDialog::handleServerSock),
@@ -382,6 +385,26 @@ bool ClientStatusDialog::handleServerSock(Glib::IOCondition cond)
 								netbuf.substr(13 + rl + gl + bl, yl).c_str());
 						else
 							m_pYellowClient->set_label(getLabel(netbuf.at(8)));
+					}
+					
+					// Mark client's own details in bold
+					Glib::ustring boldclient("<b>");
+					Gtk::Label *clientlabel = NULL;
+					
+					if (m_GameType.player_1 == pt_local)
+						clientlabel = m_pRedClient;
+					else if (m_GameType.player_2 == pt_local)
+						clientlabel = m_pGreenClient;
+					else if (m_GameType.player_3 == pt_local)
+						clientlabel = m_pBlueClient;
+					else if (m_GameType.player_4 == pt_local)
+						clientlabel = m_pYellowClient;
+					
+					if (clientlabel != NULL)
+					{
+						boldclient.append(clientlabel->get_label());
+						boldclient.append("</b>");
+						clientlabel->set_label(boldclient);
 					}
 					
 					// Build game description string
