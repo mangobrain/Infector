@@ -30,6 +30,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <deque>
+#include <memory>
 
 // Library headers
 #include <gtkmm.h>
@@ -51,7 +52,7 @@
 
 // Constructor
 Game::Game(GameBoard* b, GameType &gt)
-	: m_GameType(gt), m_BoardState(&m_GameType), haveserversocket(false), netbufsize(0), m_pAI(NULL)
+	: m_GameType(gt), m_BoardState(&m_GameType), m_pServerSocket(NULL), netbufsize(0), m_pAI(NULL)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother
@@ -71,59 +72,96 @@ Game::Game(GameBoard* b, GameType &gt)
 	}
 }
 
+// Destructor
+Game::~Game()
+{
+	destroyServerSocket();
+	destroyClientSockets();
+}
+
 // Extra initialisation for servers - give list of client sockets
-void Game::giveClientSockets(const std::deque<Glib::RefPtr<ClientSocket> > &clientsocks)
+void Game::giveClientSockets(const std::deque<ClientSocket*> &clientsocks)
 {
 	// Take a copy of client sockets, and connect up network event handlers
-	for (std::deque<Glib::RefPtr<ClientSocket> >::const_iterator i = clientsocks.begin();
+	for (std::deque<ClientSocket*>::const_iterator i = clientsocks.begin();
 		i != clientsocks.end(); ++i)
 	{
-		m_ClientSockets.push_back(*i);
-		Glib::signal_io().connect(
+		m_pClientSockets.push_back(*i);
+		clientsockeventconns.push_back(Glib::signal_io().connect(
 			sigc::bind(sigc::mem_fun(this, &Game::handleClientSocks), *i),
-				(*i)->getChannel(), Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL);
+				(*i)->getChannel(), Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL));
 		(*i)->write_error.connect(sigc::mem_fun(this, &Game::clientWriteError));
 	}
 }
 
 // Extra initialisation for clients - give server socket
-void Game::giveServerSocket(const Glib::RefPtr<Socket> &serversock)
+void Game::giveServerSocket(Socket *serversock)
 {
 	// Take a reference to the socket
-	m_ServerSocket = serversock;
-	haveserversocket = true;
+	m_pServerSocket = serversock;
 
 	// Set up network event handlers
-	Glib::signal_io().connect(
-		sigc::mem_fun(this, &Game::handleServerSock), m_ServerSocket->getChannel(),
+	serversockeventconn = Glib::signal_io().connect(
+		sigc::mem_fun(this, &Game::handleServerSock), m_pServerSocket->getChannel(),
 			Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL);
-	m_ServerSocket->write_error.connect(sigc::mem_fun(this, &Game::serverWriteError));
+	m_pServerSocket->write_error.connect(sigc::mem_fun(this, &Game::serverWriteError));
 }
 
 // Write error occurred on client socket
 void Game::clientWriteError(const Glib::ustring &e)
 {
-	m_ClientSockets.clear();
+	destroyClientSockets();
 	Glib::ustring msg(_("Write error on client socket: "));
 	msg.append(e);
 	network_error(msg);
 }
 
+// Destroy all client sockets and clear client socket list
+void Game::destroyClientSockets()
+{
+	if (!m_pClientSockets.empty())
+	{
+		for (std::deque<sigc::connection>::iterator i = clientsockeventconns.begin();
+			i != clientsockeventconns.end(); ++i)
+		{
+			i->disconnect();
+		}
+		clientsockeventconns.clear();
+		for (std::deque<ClientSocket*>::iterator i = m_pClientSockets.begin();
+			i != m_pClientSockets.end(); ++i)
+		{
+			delete *i;
+		}
+		m_pClientSockets.clear();
+	}
+}
+
+// Destroy server socket
+void Game::destroyServerSocket()
+{
+	if (m_pServerSocket != NULL)
+	{
+		serversockeventconn.disconnect();
+		delete m_pServerSocket;
+		m_pServerSocket = NULL;
+	}
+}
+
 // Write error occurred on server socket
 void Game::serverWriteError(const Glib::ustring &e)
 {
-	m_ServerSocket.reset();
+	destroyServerSocket();
 	Glib::ustring msg(_("Write error on server socket: "));
 	msg.append(e);
 	network_error(msg);
 }
 
 // Handle events on client sockets
-bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> sock)
+bool Game::handleClientSocks(Glib::IOCondition cond, ClientSocket *sock)
 {
 	if (cond != Glib::IO_IN)
 	{
-		m_ClientSockets.clear();
+		destroyClientSockets();
 		network_error(_("I/O error on client socket"));
 		return false;
 	}
@@ -146,7 +184,7 @@ bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> 
 		// If it isn't this client's turn, a network error has occurred.
 		if (m_BoardState.getPlayer() != sock->getPlayer())
 		{
-			m_ClientSockets.clear();
+			destroyClientSockets();
 			network_error(_("Client disconnected or unexpected data received"));
 			return false;
 		}
@@ -157,13 +195,13 @@ bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> 
 		}
 		catch (Glib::IOChannelError &e)
 		{
-			m_ClientSockets.clear();
+			destroyClientSockets();
 			network_error(_("Error reading from client socket"));
 			return false;
 		}
 		if (read == 0)
 		{
-			m_ClientSockets.clear();
+			destroyClientSockets();
 			network_error(_("Client disconnected"));
 			return false;
 		}
@@ -191,8 +229,8 @@ bool Game::handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> 
 				// their opponent's moves, but it's the simplest way to
 				// ensure we don't start receiving another move before
 				// the game state has advanced to the next player's turn.
-				for (std::deque<Glib::RefPtr<ClientSocket> >::const_iterator i = m_ClientSockets.begin();
-					i != m_ClientSockets.end(); ++i)
+				for (std::deque<ClientSocket*>::const_iterator i = m_pClientSockets.begin();
+					i != m_pClientSockets.end(); ++i)
 				{
 					// Don't send the move back to the client we received it from
 					if (sock != (*i))
@@ -210,7 +248,7 @@ bool Game::handleServerSock(Glib::IOCondition cond)
 {
 	if (cond != Glib::IO_IN)
 	{
-		m_ServerSocket.reset();
+		destroyServerSocket();
 		network_error(_("I/O error on server socket"));
 		return false;
 	}
@@ -219,7 +257,7 @@ bool Game::handleServerSock(Glib::IOCondition cond)
 		// Are we expecting to be sent a move at the moment?
 		if (m_GameType.isPlayerType(m_BoardState.getPlayer(), pt_local))
 		{
-			m_ServerSocket.reset();
+			destroyServerSocket();
 			network_error(_("Server disconnected or unexpected data received"));
 			return false;
 		}
@@ -227,17 +265,17 @@ bool Game::handleServerSock(Glib::IOCondition cond)
 		// Read in all or part of a move
 		size_t read = 0;
 		try {
-			m_ServerSocket->getChannel()->read(netbuf + netbufsize, 4 - netbufsize, read);
+			m_pServerSocket->getChannel()->read(netbuf + netbufsize, 4 - netbufsize, read);
 		}
 		catch (Glib::IOChannelError &e)
 		{
-			m_ServerSocket.reset();
+			destroyServerSocket();
 			network_error(_("Error reading from server socket"));
 			return false;
 		}
 		if (read == 0)
 		{
-			m_ServerSocket.reset();
+			destroyServerSocket();
 			network_error(_("Server disconnected"));
 			return false;
 		}
@@ -348,7 +386,7 @@ void Game::onSquareClicked(const int x, const int y)
 			// Send move to network clients if we're a server and it
 			// was a local player/AI that made the move (the move has
 			// already been echoed if it was received over the network)
-			if (!m_ClientSockets.empty())
+			if (!m_pClientSockets.empty())
 			{
 				playertype pt = m_GameType.typeOf(endplayer);
 				if (pt == pt_ai || pt == pt_local)
@@ -357,8 +395,8 @@ void Game::onSquareClicked(const int x, const int y)
 					netbuf[1] = ysel;
 					netbuf[2] = x;
 					netbuf[3] = y;
-					for (std::deque<Glib::RefPtr<ClientSocket> >::const_iterator i = m_ClientSockets.begin();
-						i != m_ClientSockets.end(); ++i)
+					for (std::deque<ClientSocket*>::const_iterator i = m_pClientSockets.begin();
+						i != m_pClientSockets.end(); ++i)
 					{
 						(*i)->writeChars(netbuf, 4);
 					}
@@ -366,24 +404,29 @@ void Game::onSquareClicked(const int x, const int y)
 
 				// If the game has ended, close the client sockets.
 				if (gameover)
-					m_ClientSockets.clear();
+					destroyClientSockets();
 			}
 
 			// Send move to server if we're a client and it
 			// was a local player.
-			if (haveserversocket && m_GameType.typeOf(endplayer) == pt_local)
+			if (m_pServerSocket != NULL && m_GameType.typeOf(endplayer) == pt_local)
 			{
 				netbuf[0] = xsel;
 				netbuf[1] = ysel;
 				netbuf[2] = x;
 				netbuf[3] = y;
-				m_ServerSocket->writeChars(netbuf, 4);
+				m_pServerSocket->writeChars(netbuf, 4);
 			}
 		}
 	}
 }
 
-const BoardState& Game::getBoardState() const
+const BoardState &Game::getBoardState() const
 {
 	return m_BoardState;
+}
+
+const GameType &Game::getGameType() const
+{
+	return m_GameType;
 }

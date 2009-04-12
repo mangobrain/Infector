@@ -30,13 +30,16 @@ class Game: public sigc::trackable
 		// Constructor - pass in game board so we can pick up
 		// on emitted signals when it is clicked, and pass in
 		// game properties (board size, number of players, etc.)
-		Game(GameBoard* b, GameType &gt);
+		Game(GameBoard *b, GameType &gt);
+		
+		// Destructor - destroy client and server sockets
+		~Game();
 		
 		// Extra initialisation for servers - give list of client sockets
-		void giveClientSockets(const std::deque<Glib::RefPtr<ClientSocket> > &clientsocks);
+		void giveClientSockets(const std::deque<ClientSocket*> &clientsocks);
 		
 		// Extra initialisation for clients - include server socket
-		void giveServerSocket(const Glib::RefPtr<Socket> &serversock);
+		void giveServerSocket(Socket *serversock);
 	
 		// Signals we can emit
 		sigc::signal<void, const int, const int, const int, const int, const bool>
@@ -45,7 +48,8 @@ class Game: public sigc::trackable
 		sigc::signal<void> select_piece;
 		sigc::signal<void, const Glib::ustring&> network_error;
 		
-		const BoardState& getBoardState() const;
+		const BoardState &getBoardState() const;
+		const GameType &getGameType() const;
 
 	private:
 		// Game properties
@@ -55,17 +59,20 @@ class Game: public sigc::trackable
 		BoardState m_BoardState;
 		
 		// Client sockets, if acting as network server
-		std::deque<Glib::RefPtr<ClientSocket> > m_ClientSockets;
+		std::deque<ClientSocket*> m_pClientSockets;
 
 		// Server socket, if acting as network client
-		Glib::RefPtr<Socket> m_ServerSocket;
-		bool haveserversocket;
+		Socket *m_pServerSocket;
+		
+		// Socket event handler connections
+		sigc::connection serversockeventconn;
+		std::deque<sigc::connection> clientsockeventconns;
 
 		// Event handlers
 		// Board clicked
 		void onSquareClicked(const int x, const int y);
 		// Client sockets
-		bool handleClientSocks(Glib::IOCondition cond, Glib::RefPtr<ClientSocket> sock);
+		bool handleClientSocks(Glib::IOCondition cond, ClientSocket *sock);
 		void clientWriteError(const Glib::ustring &e);
 		// Server sockets
 		bool handleServerSock(Glib::IOCondition cond);
@@ -73,7 +80,13 @@ class Game: public sigc::trackable
 		
 		// See if a particular move is valid for the current player
 		bool validMove(const int ax, const int ay, const int bx, const int by) const;
+
+		// Destroy all client sockets and clear client socket list
+		void destroyClientSockets();
 		
+		// Destroy server socket
+		void destroyServerSocket();
+
 		// Network input buffer
 		char netbuf[4];
 		// Number of bytes read for the current remote player's move
