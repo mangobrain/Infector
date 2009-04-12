@@ -27,6 +27,7 @@
 
 // Language headers
 #include <cstdlib>
+#include <memory>
 
 // Library headers
 #include <gtkmm.h>
