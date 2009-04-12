@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: infector 0.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-10 21:38+0100\n"
+"POT-Creation-Date: 2009-04-13 00:13+0100\n"
 "PO-Revision-Date: 2009-03-10 23:30+0100\n"
 "Last-Translator: Petr Pisar <petr.pisar@atlas.cz>\n"
 "Language-Team: Czech <translation-team-cs@lists.sourceforge.net>\n"
@@ -172,11 +172,11 @@ msgstr ""
 msgid "gtk-quit"
 msgstr ""
 
-#: ../src/clientstatusdialog.cxx:206
+#: ../src/clientstatusdialog.cxx:209
 msgid "Host"
 msgstr "Server"
 
-#: ../src/clientstatusdialog.cxx:208 ../src/serverstatusdialog.cxx:124
+#: ../src/clientstatusdialog.cxx:211 ../src/serverstatusdialog.cxx:124
 msgid "Computer"
 msgstr "Počítač"
 
@@ -184,156 +184,163 @@ msgstr "Počítač"
 #. unless one of the client combo boxes is set to the
 #. row for this player - in which case set it to the
 #. description of that client.
-#: ../src/clientstatusdialog.cxx:210 ../src/serverstatusdialog.cxx:137
+#: ../src/clientstatusdialog.cxx:213 ../src/serverstatusdialog.cxx:137
 msgid "<i>Empty</i>"
 msgstr "<i>Nikdo</i>"
 
-#: ../src/clientstatusdialog.cxx:219
+#: ../src/clientstatusdialog.cxx:222
 msgid "Error on server socket"
 msgstr "Chyba v socketu serveru"
 
-#: ../src/clientstatusdialog.cxx:248
+#: ../src/clientstatusdialog.cxx:251
 msgid "Error reading from server"
 msgstr "Chyba při čtení ze serveru"
 
-#: ../src/clientstatusdialog.cxx:255 ../src/game.cxx:241
+#: ../src/clientstatusdialog.cxx:258 ../src/game.cxx:279
 msgid "Server disconnected"
 msgstr "Server odpojen"
 
-#: ../src/clientstatusdialog.cxx:301
+#: ../src/clientstatusdialog.cxx:304
 msgid "Invalid data from server"
 msgstr "Chybná data ze serveru"
 
-#: ../src/clientstatusdialog.cxx:390 ../src/serverstatusdialog.cxx:200
+#: ../src/clientstatusdialog.cxx:413 ../src/serverstatusdialog.cxx:195
 msgid "Square board, "
 msgstr "Čtvercová deska, "
 
-#: ../src/clientstatusdialog.cxx:392 ../src/serverstatusdialog.cxx:202
+#: ../src/clientstatusdialog.cxx:415 ../src/serverstatusdialog.cxx:197
 msgid "Hexagonal board, "
 msgstr "Šestiúhelníková deska, "
 
-#: ../src/clientstatusdialog.cxx:395 ../src/serverstatusdialog.cxx:205
+#: ../src/clientstatusdialog.cxx:418 ../src/serverstatusdialog.cxx:200
 msgid "2 players"
 msgstr "2 hráči"
 
-#: ../src/clientstatusdialog.cxx:397 ../src/serverstatusdialog.cxx:207
+#: ../src/clientstatusdialog.cxx:420 ../src/serverstatusdialog.cxx:202
 msgid "4 players"
 msgstr "4 hráči"
 
-#: ../src/clientstatusdialog.cxx:408
+#: ../src/clientstatusdialog.cxx:431
 msgid "Unexpected data from server"
 msgstr "Neočekávaná data ze serveru"
 
-#: ../src/game.cxx:107
+#: ../src/game.cxx:114
 msgid "Write error on client socket: "
 msgstr "Chyba při zápisu do socketu klienta: "
 
-#: ../src/game.cxx:116
+#: ../src/game.cxx:154
 msgid "Write error on server socket: "
 msgstr "Chyba při zápisu do socketu serveru: "
 
-#: ../src/game.cxx:127
+#: ../src/game.cxx:165
 msgid "I/O error on client socket"
 msgstr "I/O chyba v socketu klientu"
 
-#: ../src/game.cxx:150
+#: ../src/game.cxx:188
 msgid "Client disconnected or unexpected data received"
 msgstr "Klient se odpojil nebo byla přijata neočekávaná data"
 
-#: ../src/game.cxx:161
+#: ../src/game.cxx:199
 msgid "Error reading from client socket"
 msgstr "Chyba při čtení ze socketu klienta"
 
-#: ../src/game.cxx:167
+#: ../src/game.cxx:205
 msgid "Client disconnected"
 msgstr "Klient odpojen"
 
-#: ../src/game.cxx:214
+#: ../src/game.cxx:252
 msgid "I/O error on server socket"
 msgstr "I/O chyba v socketu serveru"
 
-#: ../src/game.cxx:223
+#: ../src/game.cxx:261
 msgid "Server disconnected or unexpected data received"
 msgstr "Server se odpojil nebo byla přijata neočekávaná data"
 
-#: ../src/game.cxx:235
+#: ../src/game.cxx:273
 msgid "Error reading from server socket"
 msgstr "Chyba při čtení ze socketu serveru"
 
-#: ../src/infector.cxx:316
+#. Show a message telling the current player what colour they are
+# XXX This was machine translated!  Updates welcome
+#: ../src/infector.cxx:281
+msgid "You are playing as "
+msgstr "Nacházíte se hraje jako "
+
+#: ../src/infector.cxx:284 ../src/infector.cxx:376
+msgid "red"
+msgstr "červený"
+
+#: ../src/infector.cxx:286 ../src/infector.cxx:378
+msgid "green"
+msgstr "zelený"
+
+#: ../src/infector.cxx:288 ../src/infector.cxx:380
+msgid "blue"
+msgstr "modrý"
+
+#: ../src/infector.cxx:290 ../src/infector.cxx:382
+msgid "yellow"
+msgstr "žlutý"
+
+#: ../src/infector.cxx:333
 msgid "R: "
 msgstr "Č: "
 
-#: ../src/infector.cxx:319 ../src/infector.cxx:325 ../src/infector.cxx:331
-#: ../src/infector.cxx:337
+#: ../src/infector.cxx:336 ../src/infector.cxx:342 ../src/infector.cxx:348
+#: ../src/infector.cxx:354
 msgid "N/A"
 msgstr "−"
 
-#: ../src/infector.cxx:322
+#: ../src/infector.cxx:339
 msgid "G: "
 msgstr "Z: "
 
-#: ../src/infector.cxx:328
+#: ../src/infector.cxx:345
 msgid "B: "
 msgstr "M: "
 
-#: ../src/infector.cxx:334
+#: ../src/infector.cxx:351
 msgid "Y: "
 msgstr "Ž: "
 
-#: ../src/infector.cxx:341
+#. The game is over - pop up a win/draw message
+#: ../src/infector.cxx:360
 msgid "Game over"
 msgstr "Konec hry"
 
-#: ../src/infector.cxx:342
+#: ../src/infector.cxx:361
 msgid "Tie: "
 msgstr "Pole: "
 
-#: ../src/infector.cxx:345
+#: ../src/infector.cxx:364
 msgid "Red wins!"
 msgstr "Vyhrál červený!"
 
-#: ../src/infector.cxx:347
+#: ../src/infector.cxx:366
 msgid "Green wins!"
 msgstr "Vyhrál zelený!"
 
-#: ../src/infector.cxx:349
+#: ../src/infector.cxx:368
 msgid "Blue wins!"
 msgstr "Vyhrál modrý!"
 
-#: ../src/infector.cxx:351
+#: ../src/infector.cxx:370
 msgid "Yellow wins!"
 msgstr "Vyhrál žlutý!"
 
-#: ../src/infector.cxx:357
-msgid "red, "
-msgstr "červený, "
-
-#: ../src/infector.cxx:359
-msgid "green, "
-msgstr "zelený, "
-
-#: ../src/infector.cxx:361
-msgid "blue, "
-msgstr "modrý, "
-
-#: ../src/infector.cxx:363
-msgid "yellow, "
-msgstr "žlutý, "
-
-#: ../src/infector.cxx:378
+#: ../src/infector.cxx:411
 msgid "Red to play"
 msgstr "Červený na tahu"
 
-#: ../src/infector.cxx:381
+#: ../src/infector.cxx:414
 msgid "Green to play"
 msgstr "Zelený na tahu"
 
-#: ../src/infector.cxx:384
+#: ../src/infector.cxx:417
 msgid "Blue to play"
 msgstr "Modrý na tahu"
 
-#: ../src/infector.cxx:387
+#: ../src/infector.cxx:420
 msgid "Yellow to play"
 msgstr "Žlutý na tahu"
 
@@ -341,31 +348,31 @@ msgstr "Žlutý na tahu"
 msgid "Local"
 msgstr "Místní"
 
-#: ../src/serverstatusdialog.cxx:256
+#: ../src/serverstatusdialog.cxx:251
 msgid "None"
 msgstr "Žádný"
 
-#: ../src/serverstatusdialog.cxx:260
+#: ../src/serverstatusdialog.cxx:255
 msgid "Red"
 msgstr "Červený"
 
-#: ../src/serverstatusdialog.cxx:265
+#: ../src/serverstatusdialog.cxx:260
 msgid "Green"
 msgstr "Zelený"
 
-#: ../src/serverstatusdialog.cxx:272
+#: ../src/serverstatusdialog.cxx:267
 msgid "Blue"
 msgstr "Modrý"
 
-#: ../src/serverstatusdialog.cxx:277
+#: ../src/serverstatusdialog.cxx:272
 msgid "Yellow"
 msgstr "Žlutý"
 
-#: ../src/serverstatusdialog.cxx:459
+#: ../src/serverstatusdialog.cxx:461
 msgid "Client write error: "
 msgstr "Chyba zápisu klienta: "
 
-#: ../src/serverstatusdialog.cxx:582
+#: ../src/serverstatusdialog.cxx:585
 msgid "Error on listening socket"
 msgstr "Chyba na naslouchajícím socketu"
 
