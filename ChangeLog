@@ -1,15 +1,73 @@
+2009-04-12  Philip Allison <sane@not.co.uk>
+
+	* configure.ac: Version bump to 0.3 following recent changes
+
+2009-04-12  Philip Allison <sane@not.co.uk>
+
+	* src/infector.cxx: Make it easier to know when it's your turn
+	Add a popup following successful connection to a network server,
+	which tells the user which colour they are playing as.	Use hacks
+	to enable Pango markup on the status bar, so that the text can be
+	displayed in bold if a local human player needs to take action.
+
+2009-04-12  Philip Allison <sane@not.co.uk>
+
+	* src/game.cxx, src/game.hxx: Code updates and bug fixes Bring code
+	into line with the fact that ServerStatusDialog and ClientStatusDialog
+	now return pointers, not Glib::RefPtrs, to their socket objects.
+	Also store socket event handler connections, so we can explicitly
+	disconnect event handlers in response to socket errors.  This fixes a
+	bug whereby the server wouldn't shut down other client connections if
+	an error occurred on one of the client sockets, and would subsequently
+	hang if the user then tried to start a new game.  Additionally,
+	add a getGameType method, so GameWindow can retrieve the current
+	GameType without having to store a local copy/pointer.
+
+2009-04-12  Philip Allison <sane@not.co.uk>
+
+	* src/gameboard.cxx: Fix a missing include Fix missing include
+	of <memory>, which causes compilation failures on newer, stricter
+	versions of GCC.
+
+2009-04-12  Philip Allison <sane@not.co.uk>
+
+	* src/clientstatusdialog.cxx, src/clientstatusdialog.hxx: Use Socket
+	pointers; put local client info in bold Make serversock a simple
+	pointer to a Socket, not a Glib::RefPtr, to bring in line with the
+	interface now provided by ServerStatusDialog.  Also, show information
+	pertaining to the local client in bold in the game details display,
+	so that players can distinguish which colour they are currently
+	assigned to.
+
+2009-04-12  Philip Allison <sane@not.co.uk>
+
+	* src/serverstatusdialog.cxx, src/serverstatusdialog.hxx: Don't put
+	Glib::RefPtrs in STL containers Change clientsockets to a container
+	of simple ClientSocket pointers, because reference counting seems
+	to go strange if a Glib::RefPtr is put inside an STL container,
+	making life difficult when the Game class tries to clear up the
+	client sockets later on.
+
+2009-04-12  Philip Allison <sane@not.co.uk>
+
+	* configure.ac, po/cs.po: Add Czech translation from Petr Pisar
+
 2009-03-01  Philip Allison <sane@not.co.uk>
 
-	* data/infector.glade: Add proper title to client status dialogue Oops
-	- just noticed that the title of the client status dialogue was
+	* ChangeLog, NEWS: Update ChangeLog and NEWS for 0.2
+
+2009-03-01  Philip Allison <sane@not.co.uk>
+
+	* data/infector.glade: Add proper title to client status dialogue
+	Oops - just noticed that the title of the client status dialogue was
 	"infector".  It is now "Join Network Game".
 
 2009-02-27  Philip Allison <sane@not.co.uk>
 
 	* data/Makefile.am: Changes to data files to accomodate Windows On
-	Windows, we want pre-rendered icon files and about dialogue
-	images.  Also, the "stock_people" image seems to be missing from the
-	GTK+ runtime package for Windows, so include it here.  Change the data
+	Windows, we want pre-rendered icon files and about dialogue images.
+	Also, the "stock_people" image seems to be missing from the GTK+
+	runtime package for Windows, so include it here.  Change the data
 	makefile to not bother doing the bits which aren't necessary on
 	Windows, such as rendering out various icon sizes and installing a
 	.desktop file.
@@ -20,21 +78,21 @@
 
 2009-02-27  Philip Allison <sane@not.co.uk>
 
-	* configure.ac: MinGW tweaks; bump to 0.2 Make the application compile
-	and link cleanly under MinGW.  This
-	includes bumping the required versions of autoconf/automake, as we need
-	(for example) a newer aclocal than was previously being asked for if
-	we're going to successfully rebuild the build scripts.  Tentatively
-	bump the version number to 0.2 to reflect recent work.
+	* configure.ac: MinGW tweaks; bump to 0.2 Make the application
+	compile and link cleanly under MinGW.  This includes bumping the
+	required versions of autoconf/automake, as we need (for example)
+	a newer aclocal than was previously being asked for if we're going
+	to successfully rebuild the build scripts.  Tentatively bump the
+	version number to 0.2 to reflect recent work.
 
 2009-02-27  Philip Allison <sane@not.co.uk>
 
-	* src/Makefile.am, src/infector.cxx: More MinGW-specific changes Start
-	up Winsock when the application is launched, and perform
-	various icon-related operations so that the application "looks right"
-	on Windows.  Also, use relative paths for finding data files, not
-	absolute paths, since the install prefix after compilation is not
-	fixed.
+	* src/Makefile.am, src/infector.cxx: More MinGW-specific changes
+	Start up Winsock when the application is launched, and perform
+	various icon-related operations so that the application "looks
+	right" on Windows.  Also, use relative paths for finding data files,
+	not absolute paths, since the install prefix after compilation is
+	not fixed.
 
 2009-02-27  Philip Allison <sane@not.co.uk>
 
