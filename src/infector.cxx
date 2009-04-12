@@ -277,9 +277,26 @@ void GameWindow::onConnect()
 		GameType gt;
 		m_pClientStatusDialog->getGameType(gt);
 		
+		// Show a message telling the current player what colour they are
+		Glib::ustring msg(_("You are playing as "));
+
+		if (gt.player_1 == pt_local)
+			msg.append(_("red"));
+		else if (gt.player_2 == pt_local)
+			msg.append(_("green"));
+		else if (gt.player_3 == pt_local)
+			msg.append(_("blue"));
+		else if (gt.player_4 == pt_local)
+			msg.append(_("yellow"));
+
+		Gtk::MessageDialog *m = new Gtk::MessageDialog((Gtk::Window&)(*this),
+			msg, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
+		m->run();
+		m->hide();
+		delete m;
+		
 		m_pGame.reset(new Game(m_pBoard, gt));
 		m_pGame->giveServerSocket(m_pClientStatusDialog->getServerSocket());
-		m_pClientStatusDialog->clearServerSocketRef();
 		
 		// Set status bar to initial state
 		onMoveMade(0, 0, 0, 0, false);
@@ -336,8 +353,10 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 	} else
 		m_pYellowStatusbar->push(_("N/A"));
 	
+	// Set the status bar message
 	if (gameover)
 	{
+		// The game is over - pop up a win/draw message
 		m_pStatusbar->push(_("Game over"));
 		Glib::ustring message(_("Tie: "));
 		
@@ -354,13 +373,13 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 			int max = std::max(std::max(s1, s2), std::max(s3, s4));
 			std::ostringstream tiemsg;
 			if (s1 == max)
-				tiemsg << _("red, ");
+				tiemsg << _("red") << ", ";
 			if (s2 == max)
-				tiemsg << _("green, ");
+				tiemsg << _("green") << ", ";
 			if (s3 == max)
-				tiemsg << _("blue, ");
+				tiemsg << _("blue") << ", ";
 			if (s4 == max)
-				tiemsg << _("yellow, ");
+				tiemsg << _("yellow") << ", ";
 			message.append(tiemsg.str().substr(0, tiemsg.str().length() - 2));
 		}
 
@@ -371,21 +390,44 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 		m->run();
 		m->hide();
 		delete m;
-	} else {
-		switch (m_pGame->getBoardState().getPlayer())
+	}
+	else
+	{
+		// The game is not over - set the status bar to indicate whose turn
+		// it is next.  Put it in bold if it's a local human player.
+		Glib::ustring msg;
+		bool localplayer = false;
+		piece currentplayer = m_pGame->getBoardState().getPlayer();
+
+		if (m_pGame->getGameType().typeOf(currentplayer) == pt_local)
+		{
+			msg.append("<b>");
+			localplayer = true;
+		}
+
+		switch (currentplayer)
 		{
 			case pc_player_1:
-				m_pStatusbar->push(_("Red to play"));
+				msg.append(_("Red to play"));
 				break;
 			case pc_player_2:
-				m_pStatusbar->push(_("Green to play"));
+				msg.append(_("Green to play"));
 				break;
 			case pc_player_3:
-				m_pStatusbar->push(_("Blue to play"));
+				msg.append(_("Blue to play"));
 				break;
 			default:
-				m_pStatusbar->push(_("Yellow to play"));
+				msg.append(_("Yellow to play"));
 				break;
 		}
+
+		if (localplayer)
+			msg.append("</b>");
+
+		// XXX BIG HACK to get at the label on the status bar directly.
+		// Status bars don't officially support Pango markup, but labels do.
+		Gtk::Bin *b = (Gtk::Bin*)(m_pStatusbar->children()[0].get_widget());
+		Gtk::Label *l = (Gtk::Label*)(b->get_child());
+		l->set_markup(msg);
 	}
 }
