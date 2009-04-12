@@ -24,20 +24,28 @@ class ServerStatusDialog: public Gtk::Dialog
 		// Constructor - called by glademm by get_widget_derived
 		ServerStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
 		
+		// Destructor - destroy all client sockets
+		~ServerStatusDialog()
+		{
+			for (std::deque<ClientSocket*>::iterator i = clientsockets.begin();
+				i != clientsockets.end(); ++i)
+			{
+				delete *i;
+			}
+		};
+		
 		// Set game description label text, and set Clients and Game Details
 		// tables to their initial states
 		void setGameDetails(const GameType &gt);
 		
-		// Get client socket reference list - for retrieval by calling code
+		// Get client socket pointer list - for retrieval by calling code
 		// once a network game has successfully been established
-		const std::deque<Glib::RefPtr<ClientSocket> > &getClientSockets() const
+		const std::deque<ClientSocket*> &getClientSockets() const
 		{
 			return clientsockets;
 		};
 		
-		// Clear out references to client sockets (don't want them to stay
-		// open when the dialogue's closed, but cannot clear out references
-		// on our own before calling code has had a chance to retrieve them)
+		// Clear out pointers to client sockets
 		void clearClientSocketRefs()
 		{
 			clientsockets.clear();
@@ -80,7 +88,7 @@ class ServerStatusDialog: public Gtk::Dialog
 		
 		// IOChannel references for our sockets
 		std::list<Glib::RefPtr<Glib::IOChannel> > serverchannels;
-		std::deque<Glib::RefPtr<ClientSocket> > clientsockets;
+		std::deque<ClientSocket*> clientsockets;
 		
 		// Unassigned players
 		std::list<piece> remoteplayers;
