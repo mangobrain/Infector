@@ -23,7 +23,7 @@ AC_PREREQ([2.61])
 dnl # Initialise autoconf and automake
 dnl # Also specify automake version requirements (again, the version used
 dnl # development will suffice for now).
-AC_INIT([infector], [0.3], [sane@not.co.uk])
+AC_INIT([infector], [0.4], [sane@not.co.uk])
 AC_CONFIG_SRCDIR([src/infector.cxx])
 AM_INIT_AUTOMAKE([1.10])
 
@@ -41,10 +41,9 @@ AC_DEFINE_UNQUOTED([CONFIGURE_OPTS],["$ac_configure_args"],[Options given to ./c
 dnl # Use intltool for i18n.
 AC_PROG_INTLTOOL([0.23])
 
-dnl # Infector uses gtkmm and glademm.
+dnl # Infector uses gtkmm.
 PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4 >= 2.12])
-PKG_CHECK_MODULES([GLADEMM], [libglademm-2.4 >= 2.6])
+PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4 >= 2.16])
 
 dnl # Are we building on MinGW?
 AC_MSG_CHECKING(host os)
