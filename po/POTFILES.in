@@ -1,4 +1,5 @@
-data/infector.glade
+[type: gettext/glade]data/infector.ui
+[type: gettext/glade]data/menu.ui
 src/clientstatusdialog.cxx
 src/game.cxx
 src/infector.cxx
