@@ -22,7 +22,7 @@ class ClientStatusDialog: public Gtk::Dialog
 {
 	public:
 		// Constructor - called by glademm by get_widget_derived
-		ClientStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
+		ClientStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refXml);
 		
 		~ClientStatusDialog()
 		{
@@ -78,7 +78,7 @@ class ClientStatusDialog: public Gtk::Dialog
 		size_t bytesremaining;
 
 		// Reference to the Glade XML we were created from
-		Glib::RefPtr<Gnome::Glade::Xml> m_refXml;
+		Glib::RefPtr<Gtk::Builder> m_refXml;
 
 		// Override base classes' on_response method to
 		// disconnect our own event handlers from the server socket

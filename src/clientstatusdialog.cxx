@@ -33,7 +33,6 @@
 
 // Library headers
 #include <gtkmm.h>
-#include <libglademm.h>
 
 // System headers
 #include <sys/types.h>
@@ -78,7 +77,7 @@ void ClientStatusDialog::on_response(int response_id)
 }
 
 // Constructor - called by glademm by get_widget_derived
-ClientStatusDialog::ClientStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
+ClientStatusDialog::ClientStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refXml)
 	: Gtk::Dialog(cobject), serversock(NULL)
 {
 	refXml->get_widget("clientportspin", m_pPortSpin);

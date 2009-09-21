@@ -31,7 +31,6 @@
 
 // Library headers
 #include <gtkmm.h>
-#include <libglademm.h>
 
 // System headers
 
@@ -47,7 +46,7 @@
 //
 
 // Constructor
-GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
+GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refXml)
 	: Gtk::DrawingArea(cobject), m_DefaultGameType(), m_DefaultBoardState(&m_DefaultGameType),
 		m_pBoardState(NULL), m_pGameType(NULL), bw(m_DefaultGameType.w), bh(m_DefaultGameType.h)
 {

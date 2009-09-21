@@ -27,7 +27,6 @@
 
 // Library headers
 #include <gtkmm.h>
-#include <libglademm.h>
 
 // Project headers
 #include "gametype.hxx"
@@ -38,7 +37,7 @@
 //
 
 // Constructor
-NewGameDialog::NewGameDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
+NewGameDialog::NewGameDialog(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refXml)
 	: Gtk::Dialog(cobject)
 {
 	// When the number of players is changed, show/hide the player 3 & 4 type controls

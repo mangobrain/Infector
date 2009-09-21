@@ -34,7 +34,6 @@
 
 // Library headers
 #include <gtkmm.h>
-#include <libglademm.h>
 
 // System headers
 

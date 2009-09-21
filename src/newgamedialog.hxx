@@ -22,7 +22,7 @@ class NewGameDialog: public Gtk::Dialog
 {
 	public:
 		// Constructor - called by glademm by get_widget_derived
-		NewGameDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
+		NewGameDialog(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refXml);
 		
 		// Return game details
 		void getGameType(GameType &gt) const;

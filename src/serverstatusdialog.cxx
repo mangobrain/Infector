@@ -37,7 +37,6 @@
 
 // Library headers
 #include <gtkmm.h>
-#include <libglademm.h>
 
 // Project headers
 #include "gametype.hxx"
@@ -72,7 +71,7 @@ void ServerStatusDialog::errPop(const char *err) const
 }
 
 // Constructor
-ServerStatusDialog::ServerStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
+ServerStatusDialog::ServerStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refXml)
 	: Gtk::Dialog(cobject), m_pGameType(NULL), redrow(0), greenrow(0), bluerow(0), yellowrow(0), requiredclients(0)
 {
 	refXml->get_widget("serverportspin", m_pPortSpin);

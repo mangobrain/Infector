@@ -22,7 +22,7 @@ class ServerStatusDialog: public Gtk::Dialog
 {
 	public:
 		// Constructor - called by glademm by get_widget_derived
-		ServerStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
+		ServerStatusDialog(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refXml);
 		
 		// Destructor - destroy all client sockets
 		~ServerStatusDialog()

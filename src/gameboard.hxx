@@ -22,7 +22,7 @@ class GameBoard: public Gtk::DrawingArea
 {
 	public:
 		// Constructor - called by glademm by get_widget_derived
-		GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
+		GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refXml);
 
 		// Signals we can emit
 		sigc::signal<void, const int, const int> square_clicked;

@@ -22,10 +22,10 @@ class GameWindow: public Gtk::Window
 {
 	public:
 		// Constructor - called by glademm by get_widget_derived
-		GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml);
+		GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refXml);
 	private:
 		// Reference to the Glade XML we were created from
-		Glib::RefPtr<Gnome::Glade::Xml> m_refXml;
+		Glib::RefPtr<Gtk::Builder> m_refXml;
 
 		// Pointers to various dialogues, instantiated as needed
 		std::auto_ptr<Gtk::AboutDialog> m_pAboutDialog;
@@ -47,6 +47,10 @@ class GameWindow: public Gtk::Window
 		
 		// Statusbar for general info
 		Gtk::Statusbar *m_pStatusbar;
+		
+		// UI manager and action group for menus & toolbars
+		Glib::RefPtr<Gtk::UIManager> m_refUIMan;
+		Glib::RefPtr<Gtk::ActionGroup> m_refActGrp;
 
 		// Event handlers
 		void onAbout();

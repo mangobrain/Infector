@@ -36,7 +36,6 @@
 
 // Library headers
 #include <gtkmm.h>
-#include <libglademm.h>
 
 // System headers
 #ifdef MINGW
@@ -114,8 +113,8 @@ int main(int argc, char *argv[])
 	Gtk::AboutDialog::set_url_hook(sigc::ptr_fun(onAboutURL));
 	Gtk::AboutDialog::set_email_hook(sigc::ptr_fun(onAboutEmail));
 
-	// Load main Glade file
-	Glib::RefPtr<Gnome::Glade::Xml> refXml = Gnome::Glade::Xml::create(__INFECTOR_PKGDATADIR "/infector.glade");
+	// Load main GtkBuilder file
+	Glib::RefPtr<Gtk::Builder> refXml = Gtk::Builder::create_from_file(__INFECTOR_PKGDATADIR "/infector.ui");
 	
 	// Instantiate main window & run Glib main loop
 	GameWindow *pGw;
@@ -139,36 +138,37 @@ int main(int argc, char *argv[])
 // GameWindow class
 //
 
-GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gnome::Glade::Xml> &refXml)
+GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refXml)
 	: Gtk::Window(cobject), m_refXml(refXml), m_pAboutDialog(NULL), m_pNewGameDialog(NULL),
 	m_pGame(NULL)
 {
-	// Link the "About" menu item to the onAbout method
-	Gtk::MenuItem *pAbout;
-	m_refXml->get_widget("aboutmenuitem", pAbout);
-	pAbout->signal_activate().connect(sigc::mem_fun(this, &GameWindow::onAbout));
+	// Create ActionGroup for menu & toolbar items and their actions
+	m_refActGrp = Gtk::ActionGroup::create();
+	m_refActGrp->add(Gtk::Action::create("NewGame", Gtk::Stock::NEW),
+		sigc::mem_fun(this, &GameWindow::onNewGame));
+	m_refActGrp->add(Gtk::Action::create("Connect", Gtk::Stock::CONNECT),
+		sigc::mem_fun(this, &GameWindow::onConnect));
+	m_refActGrp->add(Gtk::Action::create("Quit", Gtk::Stock::QUIT),
+		sigc::ptr_fun(&Gtk::Main::quit));
+	m_refActGrp->add(Gtk::Action::create("About", Gtk::Stock::ABOUT),
+		sigc::mem_fun(this, &GameWindow::onAbout));
+	m_refActGrp->add(Gtk::Action::create("GameMenu", _("_Game")));
+	m_refActGrp->add(Gtk::Action::create("HelpMenu", Gtk::Stock::HELP));
 
-	// Link the "New" menu item & button to the onNewGame method
-	Gtk::MenuItem *pNewGame;
-	m_refXml->get_widget("newgamemenuitem", pNewGame);
-	pNewGame->signal_activate().connect(sigc::mem_fun(this, &GameWindow::onNewGame));
-	Gtk::ToolButton *pNewGameButton;
-	m_refXml->get_widget("newtoolbutton", pNewGameButton);
-	pNewGameButton->signal_clicked().connect(sigc::mem_fun(this, &GameWindow::onNewGame));
+	// Instantiate main menu & toolbar
+	m_refUIMan = Gtk::UIManager::create();
+	m_refUIMan->insert_action_group(m_refActGrp);
+	add_accel_group(m_refUIMan->get_accel_group());
+	m_refUIMan->add_ui_from_file(__INFECTOR_PKGDATADIR "/menu.ui");
 	
-	// Link the "Connect" menu item & button to the onConnect method
-	Gtk::MenuItem *pConnect;
-	m_refXml->get_widget("connectmenuitem", pConnect);
-	pConnect->signal_activate().connect(sigc::mem_fun(this, &GameWindow::onConnect));
-	Gtk::ToolButton *pConnectButton;
-	m_refXml->get_widget("connecttoolbutton", pConnectButton);
-	pConnectButton->signal_clicked().connect(sigc::mem_fun(this, &GameWindow::onConnect));
+	// Add menu & toolbar to main window vbox
+	Gtk::Widget *pMenubar = m_refUIMan->get_widget("/MenuBar");
+	Gtk::Widget *pToolbar = m_refUIMan->get_widget("/ToolBar");
+	Gtk::VBox *pVBox;
+	m_refXml->get_widget("vbox", pVBox);
+	pVBox->pack_start(*pMenubar, Gtk::PACK_SHRINK);
+	pVBox->pack_start(*pToolbar, Gtk::PACK_SHRINK);
 	
-	// Link the "Quit" menu item to the hide method
-	Gtk::MenuItem *pQuit;
-	m_refXml->get_widget("quitmenuitem", pQuit);
-	pQuit->signal_activate().connect(sigc::ptr_fun(&Gtk::Main::quit));
-
 	// Grab pointer to the widget on which the board is drawn
 	m_refXml->get_widget_derived("drawingarea", m_pBoard);
 	
