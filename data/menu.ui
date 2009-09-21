@@ -1,0 +1,18 @@
+<ui>
+	<menubar name="MenuBar">
+		<menu action="GameMenu">
+			<menuitem action="NewGame" />
+			<menuitem action="Connect" />
+			<separator />
+			<menuitem action="Quit" />
+		</menu>
+		<menu action="HelpMenu">
+			<menuitem action="About" />
+		</menu>
+	</menubar>
+	<toolbar name="ToolBar">
+		<toolitem action="NewGame" />
+		<separator />
+		<toolitem action="Connect" />
+	</toolbar>
+</ui>

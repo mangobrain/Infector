@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with infector.  If not, see <http://www.gnu.org/licenses/>.
 
-dist_pkgdata_DATA = infector.glade
+dist_pkgdata_DATA = infector.ui menu.ui
 
 # Distribute original scalable icon, and various pre-rendered
 # icons, so that we don't depend on RSVG being present for installation
