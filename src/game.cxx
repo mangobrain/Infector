@@ -51,7 +51,8 @@
 
 // Constructor
 Game::Game(GameBoard* b, GameType &gt)
-	: m_GameType(gt), m_BoardState(&m_GameType), m_pServerSocket(NULL), netbufsize(0), m_pAI(NULL)
+	: m_GameType(gt), m_BoardState(&m_GameType), m_gameover(false),
+	m_pServerSocket(NULL), netbufsize(0), m_pAI(NULL)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother
@@ -253,11 +254,14 @@ bool Game::handleServerSock(Glib::IOCondition cond)
 	}
 	else
 	{
-		// Are we expecting to be sent a move at the moment?
+		// Are we expecting to be sent a move at the moment? If not, it's
+		// an error.  "Input" in the form of the server disconnecting is,
+		// however, expected if we're a client and just won.
 		if (m_GameType.isPlayerType(m_BoardState.getPlayer(), pt_local))
 		{
 			destroyServerSocket();
-			network_error(_("Server disconnected or unexpected data received"));
+			if (!m_gameover)
+				network_error(_("Server disconnected or unexpected data received"));
 			return false;
 		}
 		
@@ -272,10 +276,14 @@ bool Game::handleServerSock(Glib::IOCondition cond)
 			network_error(_("Error reading from server socket"));
 			return false;
 		}
+		// Server disconnection isn't an error if the game has just ended
+		// (now that win dialogue is triggered only when the main loop is next
+		// idle, the server sends the last move then immediately disconnects)
 		if (read == 0)
 		{
 			destroyServerSocket();
-			network_error(_("Server disconnected"));
+			if (!m_gameover)
+				network_error(_("Server disconnected"));
 			return false;
 		}
 		netbufsize += read;
@@ -367,20 +375,19 @@ void Game::onSquareClicked(const int x, const int y)
 			// If we come full circle, the game has ended.
 			piece endplayer = m_BoardState.getPlayer();
 			piece nextplayer = m_BoardState.nextPlayer();
-			bool gameover = false;
 			while (!m_BoardState.canMove(nextplayer))
 			{
 				nextplayer = m_BoardState.nextPlayer();
 				if (nextplayer == endplayer)
 				{
-					gameover = true;
+					m_gameover = true;
 					break;
 				}
 			}
 			
 			// TODO - Change this to pass in a move structure.
 			// Will mean changing all onMoveMade signal handlers.
-			move_made(xsel, ysel, x, y, gameover);
+			move_made(xsel, ysel, x, y, m_gameover);
 
 			// Send move to network clients if we're a server and it
 			// was a local player/AI that made the move (the move has
@@ -402,7 +409,7 @@ void Game::onSquareClicked(const int x, const int y)
 				}
 
 				// If the game has ended, close the client sockets.
-				if (gameover)
+				if (m_gameover)
 					destroyClientSockets();
 			}
 

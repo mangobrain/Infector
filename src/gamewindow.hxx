@@ -58,6 +58,9 @@ class GameWindow: public Gtk::Window
 		void onConnect();
 		void onMoveMade(const int ax, const int ay, const int bx, const int by, const bool gameover);
 		void onNetworkError(const Glib::ustring &e);
+		
+		// Convenience function for showing an information dialogue
+		void infoDialog(Glib::ustring message);
 };
 
 #endif

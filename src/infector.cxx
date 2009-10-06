@@ -289,11 +289,9 @@ void GameWindow::onConnect()
 		else if (gt.player_4 == pt_local)
 			msg.append(_("yellow"));
 
-		Gtk::MessageDialog *m = new Gtk::MessageDialog((Gtk::Window&)(*this),
-			msg, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
-		m->run();
-		m->hide();
-		delete m;
+		// Queue display of message dialogue
+		Glib::signal_idle().connect_once(
+			sigc::bind(sigc::mem_fun(this, &GameWindow::infoDialog), msg));
 		
 		m_pGame.reset(new Game(m_pBoard, gt));
 		m_pGame->giveServerSocket(m_pClientStatusDialog->getServerSocket());
@@ -313,6 +311,16 @@ void GameWindow::onNetworkError(const Glib::ustring &e)
 	m_pBoard->endGame();
 	Gtk::MessageDialog *m = new Gtk::MessageDialog((Gtk::Window&)(*this), e, false,
 		Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+	m->run();
+	m->hide();
+	delete m;
+}
+
+// Convenience function for showing an information dialogue
+void GameWindow::infoDialog(Glib::ustring message)
+{
+	Gtk::MessageDialog *m = new Gtk::MessageDialog(*this, message, false,
+		Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
 	m->run();
 	m->hide();
 	delete m;
@@ -384,12 +392,12 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 		}
 
 		m_pBoard->endGame();
-
-		Gtk::MessageDialog *m = new Gtk::MessageDialog(*this, message, false,
-			Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
-		m->run();
-		m->hide();
-		delete m;
+		
+		// Don't pop up the message now, as this will block other callbacks
+		// assigned to the move_made signal.  Queue it for next time the main
+		// loop is idle.
+		Glib::signal_idle().connect_once(
+			sigc::bind(sigc::mem_fun(this, &GameWindow::infoDialog), message));
 	}
 	else
 	{

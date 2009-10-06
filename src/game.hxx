@@ -58,6 +58,9 @@ class Game: public sigc::trackable
 		// Board state
 		BoardState m_BoardState;
 		
+		// Whether or not the game is over
+		bool m_gameover;
+		
 		// Client sockets, if acting as network server
 		std::deque<ClientSocket*> m_pClientSockets;
 
