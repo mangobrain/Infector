@@ -1,29 +1,38 @@
 2009-10-06  Philip Allison <sane@not.co.uk>
 
-	* src/game.cxx: Fix end-game logic bug reported by Jan Engelhardt
-	When the game ends, the winning player should automatically capture
-	any empty squares, as this advances the board to the state it would
-	be in if the game was played until the board was full.  Without this,
-	it is possible for one player to block off all their opponent's moves
-	and lose the game, even though the number of empty squares remaining
-	would make their piece count highest if captured.
+	* ChangeLog: Update ChangeLog for 0.4 and reflow properly
+
+2009-10-06  Philip Allison <sane@not.co.uk>
+
+	* ChangeLog, NEWS: Update ChangeLog and NEWS for 0.4 Reflow ChangeLog
+	to 78 characters using vim
+
+2009-10-06  Philip Allison <sane@not.co.uk>
+
+	* src/game.cxx: Fix end-game logic bug reported by Jan Engelhardt When
+	the game ends, the winning player should automatically capture any
+	empty squares, as this advances the board to the state it would be in
+	if the game was played until the board was full.  Without this, it is
+	possible for one player to block off all their opponent's moves and
+	lose the game, even though the number of empty squares remaining would
+	make their piece count highest if captured.
 
 2009-10-06  Philip Allison <sane@not.co.uk>
 
 	* src/game.cxx, src/game.hxx, src/gamewindow.hxx, src/infector.cxx:
-	Make start & end pop-ups trigger on main loop idle Prevent sending
-	the last move of a game over the network from being delayed until the
-	win dialogue is closed by the winning player, by connecting a
-	function for displaying the dialogue to Glib::SignalIdle.  Use the
-	same technique for the "You are playing as..." dialogues on clients
-	at the start of a network game.
+	Make start & end pop-ups trigger on main loop idle Prevent sending the
+	last move of a game over the network from being delayed until the win
+	dialogue is closed by the winning player, by connecting a function for
+	displaying the dialogue to Glib::SignalIdle.  Use the same technique
+	for the "You are playing as..." dialogues on clients at the start of a
+	network game.
 
 2009-09-21  Philip Allison <sane@not.co.uk>
 
 	* po/POTFILES.in, po/cs.po: Update i18n support and Czech translation
-	Reference new GtkBuilder/UIManager files in POTFILES.in instead of
-	the old Glade file.  Update the Czech translation for use with the
-	new set of messages.
+	Reference new GtkBuilder/UIManager files in POTFILES.in instead of the
+	old Glade file.  Update the Czech translation for use with the new set
+	of messages.
 
 2009-09-21  Philip Allison <sane@not.co.uk>
 
@@ -69,24 +78,23 @@
 2009-04-12  Philip Allison <sane@not.co.uk>
 
 	* src/infector.cxx: Make it easier to know when it's your turn Add a
-	popup following successful connection to a network server, which
-	tells the user which colour they are playing as.  Use hacks to enable
-	Pango markup on the status bar, so that the text can be displayed in
-	bold if a local human player needs to take action.
+	popup following successful connection to a network server, which tells
+	the user which colour they are playing as.  Use hacks to enable Pango
+	markup on the status bar, so that the text can be displayed in bold if
+	a local human player needs to take action.
 
 2009-04-12  Philip Allison <sane@not.co.uk>
 
 	* src/game.cxx, src/game.hxx: Code updates and bug fixes Bring code
-	into line with the fact that ServerStatusDialog and
-	ClientStatusDialog now return pointers, not Glib::RefPtrs, to their
-	socket objects.  Also store socket event handler connections, so we
-	can explicitly disconnect event handlers in response to socket
-	errors.  This fixes a bug whereby the server wouldn't shut down other
-	client connections if an error occurred on one of the client sockets,
-	and would subsequently hang if the user then tried to start a new
-	game.  Additionally, add a getGameType method, so GameWindow can
-	retrieve the current GameType without having to store a local
-	copy/pointer.
+	into line with the fact that ServerStatusDialog and ClientStatusDialog
+	now return pointers, not Glib::RefPtrs, to their socket objects.  Also
+	store socket event handler connections, so we can explicitly
+	disconnect event handlers in response to socket errors.  This fixes a
+	bug whereby the server wouldn't shut down other client connections if
+	an error occurred on one of the client sockets, and would subsequently
+	hang if the user then tried to start a new game.  Additionally, add a
+	getGameType method, so GameWindow can retrieve the current GameType
+	without having to store a local copy/pointer.
 
 2009-04-12  Philip Allison <sane@not.co.uk>
 
@@ -100,18 +108,18 @@
 	pointers; put local client info in bold Make serversock a simple
 	pointer to a Socket, not a Glib::RefPtr, to bring in line with the
 	interface now provided by ServerStatusDialog.  Also, show information
-	pertaining to the local client in bold in the game details display,
-	so that players can distinguish which colour they are currently
-	assigned to.
+	pertaining to the local client in bold in the game details display, so
+	that players can distinguish which colour they are currently assigned
+	to.
 
 2009-04-12  Philip Allison <sane@not.co.uk>
 
 	* src/serverstatusdialog.cxx, src/serverstatusdialog.hxx: Don't put
-	Glib::RefPtrs in STL containers Change clientsockets to a container
-	of simple ClientSocket pointers, because reference counting seems to
-	go strange if a Glib::RefPtr is put inside an STL container, making
-	life difficult when the Game class tries to clear up the client
-	sockets later on.
+	Glib::RefPtrs in STL containers Change clientsockets to a container of
+	simple ClientSocket pointers, because reference counting seems to go
+	strange if a Glib::RefPtr is put inside an STL container, making life
+	difficult when the Game class tries to clear up the client sockets
+	later on.
 
 2009-04-12  Philip Allison <sane@not.co.uk>
 
@@ -123,8 +131,8 @@
 
 2009-03-01  Philip Allison <sane@not.co.uk>
 
-	* data/infector.glade: Add proper title to client status dialogue
-	Oops - just noticed that the title of the client status dialogue was
+	* data/infector.glade: Add proper title to client status dialogue Oops
+	- just noticed that the title of the client status dialogue was
 	"infector".  It is now "Join Network Game".
 
 2009-02-27  Philip Allison <sane@not.co.uk>
@@ -143,19 +151,19 @@
 
 2009-02-27  Philip Allison <sane@not.co.uk>
 
-	* configure.ac: MinGW tweaks; bump to 0.2 Make the application
-	compile and link cleanly under MinGW.  This includes bumping the
-	required versions of autoconf/automake, as we need (for example) a
-	newer aclocal than was previously being asked for if we're going to
+	* configure.ac: MinGW tweaks; bump to 0.2 Make the application compile
+	and link cleanly under MinGW.  This includes bumping the required
+	versions of autoconf/automake, as we need (for example) a newer
+	aclocal than was previously being asked for if we're going to
 	successfully rebuild the build scripts.  Tentatively bump the version
 	number to 0.2 to reflect recent work.
 
 2009-02-27  Philip Allison <sane@not.co.uk>
 
-	* src/Makefile.am, src/infector.cxx: More MinGW-specific changes
-	Start up Winsock when the application is launched, and perform
-	various icon-related operations so that the application "looks right"
-	on Windows.  Also, use relative paths for finding data files, not
+	* src/Makefile.am, src/infector.cxx: More MinGW-specific changes Start
+	up Winsock when the application is launched, and perform various
+	icon-related operations so that the application "looks right" on
+	Windows.  Also, use relative paths for finding data files, not
 	absolute paths, since the install prefix after compilation is not
 	fixed.
 
@@ -184,15 +192,14 @@
 2009-02-18  Philip Allison <sane@not.co.uk>
 
 	* Makefile.am, bootstrap.sh, configure.ac, data/Makefile.am,
-	data/infector.desktop.in, data/infector.desktop.in.in,
-	po/POTFILES.in, src/Makefile.am, src/clientstatusdialog.cxx,
-	src/game.cxx, src/infector.cxx, src/serverstatusdialog.cxx: Code &
-	build system changes for i18n The works: glib-gettextize and
-	intltoolize in bootstrap.sh, checks for intltool and gettext in
-	configure.ac, code changes including marking translatable strings,
-	changes to the processing of the .desktop file to include merging of
-	translations, and a list of files pertinent to the localisation
-	process.
+	data/infector.desktop.in, data/infector.desktop.in.in, po/POTFILES.in,
+	src/Makefile.am, src/clientstatusdialog.cxx, src/game.cxx,
+	src/infector.cxx, src/serverstatusdialog.cxx: Code & build system
+	changes for i18n The works: glib-gettextize and intltoolize in
+	bootstrap.sh, checks for intltool and gettext in configure.ac, code
+	changes including marking translatable strings, changes to the
+	processing of the .desktop file to include merging of translations,
+	and a list of files pertinent to the localisation process.
 
 2009-02-18  Philip Allison <sane@not.co.uk>
 
@@ -204,11 +211,11 @@
 
 2009-02-17  Philip Allison <sane@not.co.uk>
 
-	* configure.ac, data/Makefile.am, data/infector.desktop.in:
-	Distribute and install a .desktop file Use absolute path for Exec key
-	so we can run the game from non-standard installation prefixes.  This
-	means having a ".desktop.in" file, processed by make, but is
-	generally a good thing.
+	* configure.ac, data/Makefile.am, data/infector.desktop.in: Distribute
+	and install a .desktop file Use absolute path for Exec key so we can
+	run the game from non-standard installation prefixes.  This means
+	having a ".desktop.in" file, processed by make, but is generally a
+	good thing.
 
 2009-02-17  Philip Allison <sane@not.co.uk>
 
@@ -244,24 +251,23 @@
 
 2009-02-11  Philip Allison <philip.allison@smoothwall.net>
 
-	* src/game.cxx, src/game.hxx: Act as a network client Parse moves
-	sent from the server, and act on them; send moves to the server.
-	Currently seems to have a bug in that the local board doesn't become
-	sensitive when it's the client's turn.  Signed-off-by: Philip Allison
+	* src/game.cxx, src/game.hxx: Act as a network client Parse moves sent
+	from the server, and act on them; send moves to the server.  Currently
+	seems to have a bug in that the local board doesn't become sensitive
+	when it's the client's turn.  Signed-off-by: Philip Allison
 	<philip.allison@smoothwall.net>
 
 2009-02-11  Philip Allison <philip.allison@smoothwall.net>
 
-	* src/infector.cxx: Don't let ClientStatusDialog keep socket refs
-	Once the dialogue has responded, it doesn't need its own RefPtr to
-	the server socket any more; it's supposed to be under Game's control
-	now.  Signed-off-by: Philip Allison <philip.allison@smoothwall.net>
+	* src/infector.cxx: Don't let ClientStatusDialog keep socket refs Once
+	the dialogue has responded, it doesn't need its own RefPtr to the
+	server socket any more; it's supposed to be under Game's control now.
+	Signed-off-by: Philip Allison <philip.allison@smoothwall.net>
 
 2009-02-11  Philip Allison <philip.allison@smoothwall.net>
 
-	* src/serverstatusdialog.cxx: Send game start signal when OK button
-	is pressed Signed-off-by: Philip Allison
-	<philip.allison@smoothwall.net>
+	* src/serverstatusdialog.cxx: Send game start signal when OK button is
+	pressed Signed-off-by: Philip Allison <philip.allison@smoothwall.net>
 
 2009-02-10  Philip Allison <sane@not.co.uk>
 
@@ -294,11 +300,10 @@
 2009-02-10  Philip Allison <philip.allison@smoothwall.net>
 
 	* src/Makefile.am, src/clientstatusdialog.cxx,
-	src/clientstatusdialog.hxx, src/game.hxx: WIP - Bugfixes & quick
-	hacks to ClientStatusDialog Just enough changes to start to see the
-	client status dialogue in action.  Remarkably, it seems to be mostly
-	working.  Signed-off-by: Philip Allison
-	<philip.allison@smoothwall.net>
+	src/clientstatusdialog.hxx, src/game.hxx: WIP - Bugfixes & quick hacks
+	to ClientStatusDialog Just enough changes to start to see the client
+	status dialogue in action.  Remarkably, it seems to be mostly working.
+	Signed-off-by: Philip Allison <philip.allison@smoothwall.net>
 
 2009-02-10  Philip Allison <sane@not.co.uk>
 
@@ -318,9 +323,8 @@
 
 2009-02-08  Philip Allison <sane@not.co.uk>
 
-	* src/serverstatusdialog.cxx, src/serverstatusdialog.hxx: Handle
-	write errors on client sockets Also tidy up arguments to
-	sigc::mem_fun
+	* src/serverstatusdialog.cxx, src/serverstatusdialog.hxx: Handle write
+	errors on client sockets Also tidy up arguments to sigc::mem_fun
 
 2009-02-08  Philip Allison <sane@not.co.uk>
 
@@ -338,26 +342,25 @@
 2009-02-07  Philip Allison <sane@not.co.uk>
 
 	* src/game.cxx, src/game.hxx, src/gametype.hxx, src/infector.cxx: WIP
-	in-game network server code Pass client socket references to Game
-	from ServerStatusDialog when hosting of a network game is
-	successfully set up, and implement code for receiving & validating
-	moves sent by those clients, and for sending move details out to
-	clients as necessary.  Needs better error handling and more testing.
+	in-game network server code Pass client socket references to Game from
+	ServerStatusDialog when hosting of a network game is successfully set
+	up, and implement code for receiving & validating moves sent by those
+	clients, and for sending move details out to clients as necessary.
+	Needs better error handling and more testing.
 
 2009-02-07  Philip Allison <sane@not.co.uk>
 
 	* src/serverstatusdialog.hxx: Add methods for retrieving client
 	sockets Add methods which allow for calling code to retrieve the list
-	of client sockets, such that it can create its own references to
-	them, then wipe the references held by the server status dialogue so
-	they won't stay open longer than expected.
+	of client sockets, such that it can create its own references to them,
+	then wipe the references held by the server status dialogue so they
+	won't stay open longer than expected.
 
 2009-02-07  Philip Allison <sane@not.co.uk>
 
-	* src/gameboard.cxx: Finally figured out immediate redraws There is
-	no way to redraw the board "now" - at least, not that I can work out.
-	However, we *can* queue a redraw then immediately pump the event
-	loop.
+	* src/gameboard.cxx: Finally figured out immediate redraws There is no
+	way to redraw the board "now" - at least, not that I can work out.
+	However, we *can* queue a redraw then immediately pump the event loop.
 
 2009-02-07  Philip Allison <sane@not.co.uk>
 
@@ -371,14 +374,14 @@
 
 2009-01-29  Philip Allison <philip.allison@smoothwall.net>
 
-	* src/serverstatusdialog.cxx: Don't call sendGameDetails twice for
-	one event sendGameDetails is called from handleServerSocks when
-	clients connect.  It is also called from setGUIFromClientState, to
-	keep clients updated with other changes to the current state
-	(disconnecting clients, changing colour assignments, etc.).  Don't
-	call it from handleServerSocks, because handleServerSocks already
-	calls setGUIFromClientState, as it should. :) Signed-off-by: Philip
-	Allison <philip.allison@smoothwall.net>
+	* src/serverstatusdialog.cxx: Don't call sendGameDetails twice for one
+	event sendGameDetails is called from handleServerSocks when clients
+	connect.  It is also called from setGUIFromClientState, to keep
+	clients updated with other changes to the current state (disconnecting
+	clients, changing colour assignments, etc.).  Don't call it from
+	handleServerSocks, because handleServerSocks already calls
+	setGUIFromClientState, as it should. :) Signed-off-by: Philip Allison
+	<philip.allison@smoothwall.net>
 
 2009-01-26  Philip Allison <sane@not.co.uk>
 
@@ -387,12 +390,12 @@
 	src/serverstatusdialog.hxx: Send game details out to clients as they
 	change Wrap client IOChannels inside a ClientSocket object, which
 	handles non-blocking writes in the background on behalf of calling
-	code, but which makes a const reference to the IOChannel accessible
-	so that calling code can connect its own event handlers as well if it
+	code, but which makes a const reference to the IOChannel accessible so
+	that calling code can connect its own event handlers as well if it
 	wishes.  Reimplement client handling in ServerStatusDialog to use
-	ClientSockets, and create a method for serialising game details into
-	a binary blob, sending it out to all connected clients whenever
-	details change.
+	ClientSockets, and create a method for serialising game details into a
+	binary blob, sending it out to all connected clients whenever details
+	change.
 
 2009-01-18  Philip Allison <sane@not.co.uk>
 
@@ -404,8 +407,8 @@
 	manually; detecting when clients disconnect; manual kicking of
 	clients; detecting when all player colours have been assigned to a
 	player.  Still to do: send server status to clients when they connect
-	& when player assignments changed; return remote client information
-	to calling code.
+	& when player assignments changed; return remote client information to
+	calling code.
 
 2009-01-17  Philip Allison <sane@not.co.uk>
 
@@ -421,11 +424,10 @@
 	BoardState Remove methods which don't quite fit BoardState's remit,
 	and reduce the number of arguments to certain other methods, by
 	introducing a new GameType class for holding "constant" information
-	(information which doesn't change throughout the life of a game) for
-	a particular game.  Notably, clean up NewGameDialog by having it fill
-	in a GameType instead of different methods for returning different
-	properties, and remove all usage of bitsets for player type
-	detection.
+	(information which doesn't change throughout the life of a game) for a
+	particular game.  Notably, clean up NewGameDialog by having it fill in
+	a GameType instead of different methods for returning different
+	properties, and remove all usage of bitsets for player type detection.
 
 2009-01-15  Philip Allison <sane@not.co.uk>
 
@@ -448,18 +450,17 @@
 2008-10-11  Philip Allison <sane@not.co.uk>
 
 	* configure.ac: Detect if compiling with MinGW If building on MinGW,
-	set an Automake conditional to true, and define the MINGW
-	preprocessor symbol in config.h.  This will be used to allow
-	Windows-specific tweaks in the source (file paths, network code,
-	etc.).
+	set an Automake conditional to true, and define the MINGW preprocessor
+	symbol in config.h.  This will be used to allow Windows-specific
+	tweaks in the source (file paths, network code, etc.).
 
 2008-10-11  Philip Allison <sane@not.co.uk>
 
 	* src/Makefile.am, src/serverstatusdialog.cxx,
 	src/serverstatusdialog.hxx: Beginnings of network play Add WIP code
 	for the Host Game dialogue.  Currently this allows choosing a port
-	number, and will open listening sockets on all available interfaces
-	on that port.  Eventually this will accept connections from remote
+	number, and will open listening sockets on all available interfaces on
+	that port.  Eventually this will accept connections from remote
 	clients, allow the host to assign "Networked" players to those
 	clients, then return the network status - including client sockets -
 	back to the calling code when game setup is complete.
@@ -467,9 +468,8 @@
 2008-10-11  Philip Allison <sane@not.co.uk>
 
 	* src/newgamedialog.cxx, src/newgamedialog.hxx: Beginnings of network
-	support Convert getAIPlayers into a generic getPlayersOfType
-	function, and use it to implement both getAIPlayers and
-	getRemotePlayers.
+	support Convert getAIPlayers into a generic getPlayersOfType function,
+	and use it to implement both getAIPlayers and getRemotePlayers.
 
 2008-10-11  Philip Allison <sane@not.co.uk>
 
@@ -480,8 +480,8 @@
 
 2008-10-11  Philip Allison <sane@not.co.uk>
 
-	* data/infector.glade: Beginnings of network support Add a player
-	type of "Networked", and a dialogue which will allow server hosts to
+	* data/infector.glade: Beginnings of network support Add a player type
+	of "Networked", and a dialogue which will allow server hosts to
 	configure and start network games
 
 2008-10-10  Philip Allison <sane@not.co.uk>
@@ -514,34 +514,34 @@
 2008-07-10  Philip Allison <sane@not.co.uk>
 
 	* configure.ac, src/gameboard.cxx: Allow building on MinGW32 Drop the
-	version requirements of autoconf & automake to those in current
-	stable MinGW development packages, and stop using a deprecated
-	function of Gtk::Style.
+	version requirements of autoconf & automake to those in current stable
+	MinGW development packages, and stop using a deprecated function of
+	Gtk::Style.
 
 2008-07-10  Philip Allison <sane@not.co.uk>
 
 	* src/ai.cxx, src/ai.hxx, src/gameboard.cxx: Go back to the drawing
-	board and implement a simpler, faster AI concept AI is no longer
-	based on minimax, instead it works purely by looking at the current
-	player's possible moves, concentrating on a detailed board state
-	evaluation function instead of simulating opponent's moves.  The end
-	result is a lot faster than minimax because of the dramatic reduction
-	in number of moves evaluated, and seems to play the game on the
-	square board reasonably well, but for some reason isn't too brilliant
-	on the hexagonal game board.  Also fix a couple of bugs so that the
-	game functions correctly when player 1 is an AI player, and tweak the
-	move signalling code of AI players so that it's easier to see what
-	moves are being made.
+	board and implement a simpler, faster AI concept AI is no longer based
+	on minimax, instead it works purely by looking at the current player's
+	possible moves, concentrating on a detailed board state evaluation
+	function instead of simulating opponent's moves.  The end result is a
+	lot faster than minimax because of the dramatic reduction in number of
+	moves evaluated, and seems to play the game on the square board
+	reasonably well, but for some reason isn't too brilliant on the
+	hexagonal game board.  Also fix a couple of bugs so that the game
+	functions correctly when player 1 is an AI player, and tweak the move
+	signalling code of AI players so that it's easier to see what moves
+	are being made.
 
 2008-07-01  Philip Allison <sane@not.co.uk>
 
 	* src/ai.cxx: Add some useful debug output to the AI Can see what's
 	going on now.  In the two-player game, the "suicidal" green player
-	*is* actually doing the best it can in the end game (it may as well
-	go out with 3 pieces captured than with 2 grown), so the questions
-	that remain are: 1) Why so slow? 2) Why does it play such a crap
-	opening game? Number 1 will hopefully be solved by more sensible code
-	in BoardState and alpha-beta pruning.  Number 2 is most likely the
+	*is* actually doing the best it can in the end game (it may as well go
+	out with 3 pieces captured than with 2 grown), so the questions that
+	remain are: 1) Why so slow? 2) Why does it play such a crap opening
+	game? Number 1 will hopefully be solved by more sensible code in
+	BoardState and alpha-beta pruning.  Number 2 is most likely the
 	ridiculously naive position evaluation function.
 
 2008-06-27  Philip Allison <sane@not.co.uk>
@@ -551,32 +551,31 @@
 	logic into BoardState and flesh out two-player AI Some game logic has
 	been moved to BoardState so that AI can be implemented with less
 	hassle.  Standard minimax AI has now been implemented, and works well
-	for the two player game, but not so well for the four-player game.
-	It takes too long without some form of pruning, allowing us only to
-	look one move ahead, and has a weak evaluation function - this means
-	a player cannot be truly risk averse; they may capture a lot of
-	pieces, but don't seem to spot the risk of any position they may be
-	put in.  Either that or it's just downright bug-ridden...
+	for the two player game, but not so well for the four-player game.  It
+	takes too long without some form of pruning, allowing us only to look
+	one move ahead, and has a weak evaluation function - this means a
+	player cannot be truly risk averse; they may capture a lot of pieces,
+	but don't seem to spot the risk of any position they may be put in.
+	Either that or it's just downright bug-ridden...
 
 2008-06-26  Philip Allison <sane@not.co.uk>
 
-	* src/ai.cxx, src/ai.hxx, src/gameboard.cxx: Back to the drawing
-	board - standard minimax AI Caching future moves was too memory
-	intensive and error prone, so scrap the whole scheme and go back to
-	standard minimax.  Still seems to have a bug or two to iron out; for
-	example, the computer won't make a move to eliminate another player
-	if it can, and doesn't play particularly cleverly in a four-player
-	game.  Its opening moves are also very predictable.
+	* src/ai.cxx, src/ai.hxx, src/gameboard.cxx: Back to the drawing board
+	- standard minimax AI Caching future moves was too memory intensive
+	and error prone, so scrap the whole scheme and go back to standard
+	minimax.  Still seems to have a bug or two to iron out; for example,
+	the computer won't make a move to eliminate another player if it can,
+	and doesn't play particularly cleverly in a four-player game.  Its
+	opening moves are also very predictable.
 
 2008-06-25  Philip Allison <sane@not.co.uk>
 
 	* src/ai.cxx, src/ai.hxx, src/boardstate.hxx: Trying to flesh out AI
 	code, but currently broken. :( Attempting to build & maintain a tree
-	of moves 4 levels deep, and follow link from root node to level 1
-	each time someone makes a move (discarding the now unneeded branches
-	and generating new leaf nodes from what's left).  However there seems
-	to be some memory corruption showing up during the deletion at
-	present.
+	of moves 4 levels deep, and follow link from root node to level 1 each
+	time someone makes a move (discarding the now unneeded branches and
+	generating new leaf nodes from what's left).  However there seems to
+	be some memory corruption showing up during the deletion at present.
 
 2008-06-25  Philip Allison <sane@not.co.uk>
 
@@ -605,14 +604,14 @@
 
 2008-06-21  Philip Allison <sane@not.co.uk>
 
-	* data/infector.glade, src/game.cxx, src/game.hxx,
-	src/gamewindow.hxx, src/infector.cxx: Keep track of scores, and show
-	status notifications during & after game Game object keeps track of
-	each player's score.  GameWindow now listens for the move_made
-	signal, and uses score information to display current game status in
-	the status bar.  The status bar is now actually a row of several
-	bars, as this is the simplest and visually cleanest way to have
-	multiple messages side-by-side.
+	* data/infector.glade, src/game.cxx, src/game.hxx, src/gamewindow.hxx,
+	src/infector.cxx: Keep track of scores, and show status notifications
+	during & after game Game object keeps track of each player's score.
+	GameWindow now listens for the move_made signal, and uses score
+	information to display current game status in the status bar.  The
+	status bar is now actually a row of several bars, as this is the
+	simplest and visually cleanest way to have multiple messages
+	side-by-side.
 
 2008-06-21  Philip Allison <sane@not.co.uk>
 
@@ -653,26 +652,26 @@
 2008-06-20  Philip Allison <sane@not.co.uk>
 
 	* src/boardstate.cxx, src/boardstate.hxx, src/gameboard.cxx: Start
-	work on hexagonal board rendering, plus general rendering
-	improvements Render the backaground of hexagonal boards correctly
-	(but not yet the pieces or valid move highlights).  Also, convert the
-	square board rendering to draw one big square in one of the two
-	colours, then overlay squares of the other, rather than draw many
-	individual squares.  This now looks nicer with antialiasing enabled
-	than the latter, so re-enable it. :)
+	work on hexagonal board rendering, plus general rendering improvements
+	Render the backaground of hexagonal boards correctly (but not yet the
+	pieces or valid move highlights).  Also, convert the square board
+	rendering to draw one big square in one of the two colours, then
+	overlay squares of the other, rather than draw many individual
+	squares.  This now looks nicer with antialiasing enabled than the
+	latter, so re-enable it. :)
 
 2008-06-18  Philip Allison <sane@not.co.uk>
 
 	* data/infector.glade, src/boardstate.cxx, src/boardstate.hxx,
 	src/game.cxx, src/game.hxx, src/infector.cxx, src/newgamedialog.cxx,
-	src/newgamedialog.hxx: Allow user to choose between 2 player
-	hexagonal or 2/4 player square games Add a "board shape" drop-down to
-	the new game dialogue, and a property accessor for it which is used
-	to set the game type accordingly, instead of hard-coding to
-	hexagonal.  Also, move setting the default state of the new game
-	dialogue into the NewGameDialog class, for cleanliness.  Enforce
-	valid game type constraints on the new game dialogue, so the user
-	can't - for example - set up a four-player game on a hexagonal board.
+	src/newgamedialog.hxx: Allow user to choose between 2 player hexagonal
+	or 2/4 player square games Add a "board shape" drop-down to the new
+	game dialogue, and a property accessor for it which is used to set the
+	game type accordingly, instead of hard-coding to hexagonal.  Also,
+	move setting the default state of the new game dialogue into the
+	NewGameDialog class, for cleanliness.  Enforce valid game type
+	constraints on the new game dialogue, so the user can't - for example
+	- set up a four-player game on a hexagonal board.
 
 2008-06-18  Philip Allison <sane@not.co.uk>
 
@@ -687,10 +686,10 @@
 	* src/boardstate.cxx, src/boardstate.hxx: Finish implementing
 	hexagonal board support in BoardState We now have proper
 	initialisation for hexagonal boards, and a new value in the "piece"
-	enumerated type for non-existent squares (holes). Added range
-	checking and a function for calculating the adjacency of surrounding
-	squares (for valid move checking & piece capturing) mean that Game
-	and GameBoard needn't care about the shape of the board itself.
+	enumerated type for non-existent squares (holes). Added range checking
+	and a function for calculating the adjacency of surrounding squares
+	(for valid move checking & piece capturing) mean that Game and
+	GameBoard needn't care about the shape of the board itself.
 
 2008-06-17  Philip Allison <sane@not.co.uk>
 
@@ -705,17 +704,17 @@
 	* src/game.cxx, src/game.hxx, src/gameboard.cxx, src/gameboard.hxx,
 	src/gamewindow.hxx: Flesh out game logic to allow a full game to be
 	played No AI yet, but piece capturing, turn skipping (if a player
-	can't make any valid moves, their turn is skipped) and game over
-	logic now exist.  A full game can be played by 2 or 4 local, human
-	players. :)
+	can't make any valid moves, their turn is skipped) and game over logic
+	now exist.  A full game can be played by 2 or 4 local, human players.
+	:)
 
 2008-06-12  Philip Allison <sane@not.co.uk>
 
 	* src/Makefile.am, src/infector.cxx, src/newgamedialog.cxx,
 	src/newgamedialog.hxx: Flesh out new game dialogue to actually set
 	game properties Turn the new game dialogue into a derived widget, and
-	use that widget to allow setting of game properties in response to
-	the user's interaction with the UI.  Note that the "type" of a player
+	use that widget to allow setting of game properties in response to the
+	user's interaction with the UI.  Note that the "type" of a player
 	isn't yet taken into account, because no AI has yet been implemented.
 
 2008-06-12  Philip Allison <sane@not.co.uk>
@@ -731,14 +730,13 @@
 	moves to be made Move info about current selected piece into the
 	BoardState object, so that GameBoard and Game aren't maintaining said
 	info separately from each other.  Add more methods for manipulating
-	the board to the BoardState object (it is basically going to be a
-	dumb container: the Game object will manipulate it, then fire off a
-	signal for the corresponding event; things connected to the signal
-	will then read the updated state from the container).  Implement
-	logic to allow valid moves to be made, updating the board state
-	accordingly.  Piece capturing & game end logic are not yet
-	implemented, and we still need some form of player type abstraction
-	to allow AI and network games.
+	the board to the BoardState object (it is basically going to be a dumb
+	container: the Game object will manipulate it, then fire off a signal
+	for the corresponding event; things connected to the signal will then
+	read the updated state from the container).  Implement logic to allow
+	valid moves to be made, updating the board state accordingly.  Piece
+	capturing & game end logic are not yet implemented, and we still need
+	some form of player type abstraction to allow AI and network games.
 
 2008-06-11  Philip Allison <sane@not.co.uk>
 
@@ -751,8 +749,8 @@
 	Game object, AIs, etc. without duplication.  Check when selecting a
 	piece to move that it is actually one of the current player's pieces.
 	Also, fix memory corruption on game start - std::auto_ptr::reset
-	actually deletes the currently owned object for us, so don't delete
-	it manually first.
+	actually deletes the currently owned object for us, so don't delete it
+	manually first.
 
 2008-06-11  Philip Allison <sane@not.co.uk>
 
@@ -766,12 +764,11 @@
 
 	* src/gameboard.cxx, src/gameboard.hxx: Speed up board rendering by
 	only drawing occupied squares Mark the drawing area for the board as
-	"app paintable" (basically a hint to the library that we've
-	overridden the expose event handler).  Render the empty board to a
-	static pixmap and set it as the widget's background, so we don't have
-	to redraw it every time the window is exposed - just when it's
-	resized.  Turn off Cairo's antialiasing - we want nicely
-	distinguishable squares, please.
+	"app paintable" (basically a hint to the library that we've overridden
+	the expose event handler).  Render the empty board to a static pixmap
+	and set it as the widget's background, so we don't have to redraw it
+	every time the window is exposed - just when it's resized.  Turn off
+	Cairo's antialiasing - we want nicely distinguishable squares, please.
 
 2008-06-10  Philip Allison <sane@not.co.uk>
 
@@ -799,9 +796,9 @@
 	src/gamewindow.hxx, src/infector.cxx: Maintain board's aspect ratio;
 	detect mouse clicks; minor code cleanups Wrap the drawing area
 	representing the game board in an aspect frame to maintain its aspect
-	ratio when resizing.  Prototype code for processing board clicks:
-	fire a signal with the grid reference of the clicked square.  Add a
-	few comments.
+	ratio when resizing.  Prototype code for processing board clicks: fire
+	a signal with the grid reference of the clicked square.  Add a few
+	comments.
 
 2008-06-05  Philip Allison <sane@not.co.uk>
 
@@ -831,9 +828,9 @@
 
 2008-05-31  Philip Allison <sane@not.co.uk>
 
-	* data/infector.glade: Set about dialogue as transient for main
-	window This means that the window manager knows which window to keep
-	the dialogue on top of, centre it on, etc.
+	* data/infector.glade: Set about dialogue as transient for main window
+	This means that the window manager knows which window to keep the
+	dialogue on top of, centre it on, etc.
 
 2008-05-31  Philip Allison <sane@not.co.uk>
 
