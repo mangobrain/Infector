@@ -381,6 +381,20 @@ void Game::onSquareClicked(const int x, const int y)
 				if (nextplayer == endplayer)
 				{
 					m_gameover = true;
+
+					// Make all remaining empty squares be owned by the
+					// winning player, to advance the board to the state
+					// it would be in if the game continued to be played
+					// to its logical conclusion.
+					for (int i = 0; i < m_GameType.w; ++i)
+					{
+						for (int j = 0; j < m_GameType.h; ++j)
+						{
+							if (m_BoardState.getPieceAt(i, j) == pc_player_none)
+								m_BoardState.setPieceAt(i, j, endplayer);
+						}
+					}
+
 					break;
 				}
 			}
