@@ -1,4 +1,4 @@
-# Copyright 2008-2009 Philip Allison <mangobrain@googlemail.com>
+# Copyright 2008-2009, 2012 Philip Allison <mangobrain@googlemail.com>
 
 #    This file is part of infector.
 #
@@ -29,7 +29,7 @@ EXTRA_DIST = infector.svg infector.desktop.in.in
 if !MINGW
 
 dist-hook: $(SIZES:%=infector-%.png)
-	cp -p $(srcdir)/infector-*.png $(distdir)/
+	cp -p ./infector-*.png $(distdir)/
 
 # Sizes (NxN) at which to render and install application icon
 SIZES = 16 22 24 32 48 64 72 96 128
