@@ -1,13 +1,13 @@
-2009-10-06  Philip Allison <sane@not.co.uk>
+2009-10-06  Philip Allison <mangobrain@googlemail.com>
 
 	* ChangeLog: Update ChangeLog for 0.4 and reflow properly
 
-2009-10-06  Philip Allison <sane@not.co.uk>
+2009-10-06  Philip Allison <mangobrain@googlemail.com>
 
 	* ChangeLog, NEWS: Update ChangeLog and NEWS for 0.4 Reflow ChangeLog
 	to 78 characters using vim
 
-2009-10-06  Philip Allison <sane@not.co.uk>
+2009-10-06  Philip Allison <mangobrain@googlemail.com>
 
 	* src/game.cxx: Fix end-game logic bug reported by Jan Engelhardt When
 	the game ends, the winning player should automatically capture any
@@ -17,7 +17,7 @@
 	lose the game, even though the number of empty squares remaining would
 	make their piece count highest if captured.
 
-2009-10-06  Philip Allison <sane@not.co.uk>
+2009-10-06  Philip Allison <mangobrain@googlemail.com>
 
 	* src/game.cxx, src/game.hxx, src/gamewindow.hxx, src/infector.cxx:
 	Make start & end pop-ups trigger on main loop idle Prevent sending the
@@ -27,20 +27,20 @@
 	for the "You are playing as..." dialogues on clients at the start of a
 	network game.
 
-2009-09-21  Philip Allison <sane@not.co.uk>
+2009-09-21  Philip Allison <mangobrain@googlemail.com>
 
 	* po/POTFILES.in, po/cs.po: Update i18n support and Czech translation
 	Reference new GtkBuilder/UIManager files in POTFILES.in instead of the
 	old Glade file.  Update the Czech translation for use with the new set
 	of messages.
 
-2009-09-21  Philip Allison <sane@not.co.uk>
+2009-09-21  Philip Allison <mangobrain@googlemail.com>
 
 	* configure.ac: Remove libglademm dependency; bump version to 0.4
 	Don't look for libglademm on the host system any more; instead, look
 	for a more recent gtkmm.  Change package version number to 0.4.
 
-2009-09-21  Philip Allison <sane@not.co.uk>
+2009-09-21  Philip Allison <mangobrain@googlemail.com>
 
 	* src/clientstatusdialog.cxx, src/clientstatusdialog.hxx,
 	src/game.cxx, src/gameboard.cxx, src/gameboard.hxx,
@@ -51,7 +51,7 @@
 	removing inclusion of libglademm, and using UIManager to instantiate
 	menus and toolbars.
 
-2009-09-21  Philip Allison <sane@not.co.uk>
+2009-09-21  Philip Allison <mangobrain@googlemail.com>
 
 	* data/Makefile.am, data/infector.glade, data/infector.ui,
 	data/menu.ui: Replace old Glade UI description with GtkBuilder Remove
@@ -59,23 +59,23 @@
 	GtkBuilder UI description.  Also translate old menus, menu items and
 	toolbar items into a UIManager description file.
 
-2009-04-13  Philip Allison <sane@not.co.uk>
+2009-04-13  Philip Allison <mangobrain@googlemail.com>
 
 	* ChangeLog: Updating ChangeLog for 0.3
 
-2009-04-13  Philip Allison <sane@not.co.uk>
+2009-04-13  Philip Allison <mangobrain@googlemail.com>
 
 	* po/cs.po: Update Czech translation for 0.3
 
-2009-04-13  Philip Allison <sane@not.co.uk>
+2009-04-13  Philip Allison <mangobrain@googlemail.com>
 
 	* ChangeLog, NEWS: Update ChangeLog and NEWS for 0.3 release
 
-2009-04-12  Philip Allison <sane@not.co.uk>
+2009-04-12  Philip Allison <mangobrain@googlemail.com>
 
 	* configure.ac: Version bump to 0.3 following recent changes
 
-2009-04-12  Philip Allison <sane@not.co.uk>
+2009-04-12  Philip Allison <mangobrain@googlemail.com>
 
 	* src/infector.cxx: Make it easier to know when it's your turn Add a
 	popup following successful connection to a network server, which tells
@@ -83,7 +83,7 @@
 	markup on the status bar, so that the text can be displayed in bold if
 	a local human player needs to take action.
 
-2009-04-12  Philip Allison <sane@not.co.uk>
+2009-04-12  Philip Allison <mangobrain@googlemail.com>
 
 	* src/game.cxx, src/game.hxx: Code updates and bug fixes Bring code
 	into line with the fact that ServerStatusDialog and ClientStatusDialog
@@ -96,13 +96,13 @@
 	getGameType method, so GameWindow can retrieve the current GameType
 	without having to store a local copy/pointer.
 
-2009-04-12  Philip Allison <sane@not.co.uk>
+2009-04-12  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx: Fix a missing include Fix missing include of
 	<memory>, which causes compilation failures on newer, stricter
 	versions of GCC.
 
-2009-04-12  Philip Allison <sane@not.co.uk>
+2009-04-12  Philip Allison <mangobrain@googlemail.com>
 
 	* src/clientstatusdialog.cxx, src/clientstatusdialog.hxx: Use Socket
 	pointers; put local client info in bold Make serversock a simple
@@ -112,7 +112,7 @@
 	that players can distinguish which colour they are currently assigned
 	to.
 
-2009-04-12  Philip Allison <sane@not.co.uk>
+2009-04-12  Philip Allison <mangobrain@googlemail.com>
 
 	* src/serverstatusdialog.cxx, src/serverstatusdialog.hxx: Don't put
 	Glib::RefPtrs in STL containers Change clientsockets to a container of
@@ -121,21 +121,21 @@
 	difficult when the Game class tries to clear up the client sockets
 	later on.
 
-2009-04-12  Philip Allison <sane@not.co.uk>
+2009-04-12  Philip Allison <mangobrain@googlemail.com>
 
 	* configure.ac, po/cs.po: Add Czech translation from Petr Pisar
 
-2009-03-01  Philip Allison <sane@not.co.uk>
+2009-03-01  Philip Allison <mangobrain@googlemail.com>
 
 	* ChangeLog, NEWS: Update ChangeLog and NEWS for 0.2
 
-2009-03-01  Philip Allison <sane@not.co.uk>
+2009-03-01  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade: Add proper title to client status dialogue Oops
 	- just noticed that the title of the client status dialogue was
 	"infector".  It is now "Join Network Game".
 
-2009-02-27  Philip Allison <sane@not.co.uk>
+2009-02-27  Philip Allison <mangobrain@googlemail.com>
 
 	* data/Makefile.am: Changes to data files to accomodate Windows On
 	Windows, we want pre-rendered icon files and about dialogue images.
@@ -145,11 +145,11 @@
 	Windows, such as rendering out various icon sizes and installing a
 	.desktop file.
 
-2009-02-27  Philip Allison <sane@not.co.uk>
+2009-02-27  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade: Bump version number in About dialogue to 0.2
 
-2009-02-27  Philip Allison <sane@not.co.uk>
+2009-02-27  Philip Allison <mangobrain@googlemail.com>
 
 	* configure.ac: MinGW tweaks; bump to 0.2 Make the application compile
 	and link cleanly under MinGW.  This includes bumping the required
@@ -158,7 +158,7 @@
 	successfully rebuild the build scripts.  Tentatively bump the version
 	number to 0.2 to reflect recent work.
 
-2009-02-27  Philip Allison <sane@not.co.uk>
+2009-02-27  Philip Allison <mangobrain@googlemail.com>
 
 	* src/Makefile.am, src/infector.cxx: More MinGW-specific changes Start
 	up Winsock when the application is launched, and perform various
@@ -167,29 +167,29 @@
 	absolute paths, since the install prefix after compilation is not
 	fixed.
 
-2009-02-27  Philip Allison <sane@not.co.uk>
+2009-02-27  Philip Allison <mangobrain@googlemail.com>
 
 	* src/clientstatusdialog.cxx, src/serverstatusdialog.cxx,
 	src/socket.cxx: Make networking code compile under MinGW
 
-2009-02-18  Philip Allison <sane@not.co.uk>
+2009-02-18  Philip Allison <mangobrain@googlemail.com>
 
 	* ChangeLog: Add changelog with help of git2cl
 
-2009-02-18  Philip Allison <sane@not.co.uk>
+2009-02-18  Philip Allison <mangobrain@googlemail.com>
 
 	* NEWS: Add news about upcoming 0.1 tag
 
-2009-02-18  Philip Allison <sane@not.co.uk>
+2009-02-18  Philip Allison <mangobrain@googlemail.com>
 
 	* data/Makefile.am: Update copyright dates on makefile
 
-2009-02-18  Philip Allison <sane@not.co.uk>
+2009-02-18  Philip Allison <mangobrain@googlemail.com>
 
 	* src/Makefile.am, src/infector-i18n.hxx: Oops - forgot the i18n
 	helper header
 
-2009-02-18  Philip Allison <sane@not.co.uk>
+2009-02-18  Philip Allison <mangobrain@googlemail.com>
 
 	* Makefile.am, bootstrap.sh, configure.ac, data/Makefile.am,
 	data/infector.desktop.in, data/infector.desktop.in.in, po/POTFILES.in,
@@ -201,15 +201,15 @@
 	processing of the .desktop file to include merging of translations,
 	and a list of files pertinent to the localisation process.
 
-2009-02-18  Philip Allison <sane@not.co.uk>
+2009-02-18  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade: Set window icons to application icon
 
-2009-02-18  Philip Allison <sane@not.co.uk>
+2009-02-18  Philip Allison <mangobrain@googlemail.com>
 
 	* src/Makefile.am: Add header files to infector_SOURCES
 
-2009-02-17  Philip Allison <sane@not.co.uk>
+2009-02-17  Philip Allison <mangobrain@googlemail.com>
 
 	* configure.ac, data/Makefile.am, data/infector.desktop.in: Distribute
 	and install a .desktop file Use absolute path for Exec key so we can
@@ -217,7 +217,7 @@
 	having a ".desktop.in" file, processed by make, but is generally a
 	good thing.
 
-2009-02-17  Philip Allison <sane@not.co.uk>
+2009-02-17  Philip Allison <mangobrain@googlemail.com>
 
 	* data/Makefile.am, data/infector.svg: Add application icon for
 	desktop menus Create a first attempt at an SVG icon for the
@@ -225,7 +225,7 @@
 	RSVG, and install them using xdg-utils.  Still missing an actual menu
 	entry - that comes next. :)
 
-2009-02-17  Philip Allison <sane@not.co.uk>
+2009-02-17  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx: Fix board shape bug upon ending hexagonal games
 
@@ -269,18 +269,18 @@
 	* src/serverstatusdialog.cxx: Send game start signal when OK button is
 	pressed Signed-off-by: Philip Allison <philip.allison@smoothwall.net>
 
-2009-02-10  Philip Allison <sane@not.co.uk>
+2009-02-10  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade: Improve label alignment on dialogues
 
-2009-02-10  Philip Allison <sane@not.co.uk>
+2009-02-10  Philip Allison <mangobrain@googlemail.com>
 
 	* src/clientstatusdialog.cxx, src/clientstatusdialog.hxx: Finish
 	(pending bugs) client status dialogue Parse board width & height in
 	game description headers; validate header data; display a full set of
 	game details on the UI
 
-2009-02-10  Philip Allison <sane@not.co.uk>
+2009-02-10  Philip Allison <mangobrain@googlemail.com>
 
 	* src/serverstatusdialog.cxx: Fix shortcomings & bugs in sending of
 	game details Board width & height were not included in the header;
@@ -288,12 +288,12 @@
 	round; number of players was sent incorrectly for games on hexagonal
 	boards
 
-2009-02-10  Philip Allison <sane@not.co.uk>
+2009-02-10  Philip Allison <mangobrain@googlemail.com>
 
 	* src/clientstatusdialog.cxx: Fix problems with receiving multiple
 	status updates
 
-2009-02-10  Philip Allison <sane@not.co.uk>
+2009-02-10  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade: Make client status dialogue modal
 
@@ -305,7 +305,7 @@
 	status dialogue in action.  Remarkably, it seems to be mostly working.
 	Signed-off-by: Philip Allison <philip.allison@smoothwall.net>
 
-2009-02-10  Philip Allison <sane@not.co.uk>
+2009-02-10  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade, src/Makefile.am, src/clientsocket.cxx,
 	src/clientsocket.hxx, src/clientstatusdialog.cxx,
@@ -314,19 +314,19 @@
 	src/serverstatusdialog.hxx, src/socket.cxx, src/socket.hxx: WIP -
 	Finishing off network code
 
-2009-02-08  Philip Allison <sane@not.co.uk>
+2009-02-08  Philip Allison <mangobrain@googlemail.com>
 
 	* src/game.cxx, src/game.hxx, src/gameboard.cxx, src/gameboard.hxx,
 	src/gamewindow.hxx, src/infector.cxx: Handle errors & disconnections
 	on client sockets Admittedly it just ends the game, but at least it
 	does so without crashing.  :)
 
-2009-02-08  Philip Allison <sane@not.co.uk>
+2009-02-08  Philip Allison <mangobrain@googlemail.com>
 
 	* src/serverstatusdialog.cxx, src/serverstatusdialog.hxx: Handle write
 	errors on client sockets Also tidy up arguments to sigc::mem_fun
 
-2009-02-08  Philip Allison <sane@not.co.uk>
+2009-02-08  Philip Allison <mangobrain@googlemail.com>
 
 	* src/clientsocket.cxx, src/clientsocket.hxx: Add error signal for
 	asynchronous write failures Add a write error signal, and emit it
@@ -334,12 +334,12 @@
 	directly itself, because this class does asynchronous writes.  Also,
 	use "this" for sigc::mem_fun, not "*this".
 
-2009-02-08  Philip Allison <sane@not.co.uk>
+2009-02-08  Philip Allison <mangobrain@googlemail.com>
 
 	* src/ai.cxx, src/newgamedialog.cxx: Tidy up sigc::mem_fun arguments
 	Always use "this", not a mixture of "this" and "*this"
 
-2009-02-07  Philip Allison <sane@not.co.uk>
+2009-02-07  Philip Allison <mangobrain@googlemail.com>
 
 	* src/game.cxx, src/game.hxx, src/gametype.hxx, src/infector.cxx: WIP
 	in-game network server code Pass client socket references to Game from
@@ -348,7 +348,7 @@
 	clients, and for sending move details out to clients as necessary.
 	Needs better error handling and more testing.
 
-2009-02-07  Philip Allison <sane@not.co.uk>
+2009-02-07  Philip Allison <mangobrain@googlemail.com>
 
 	* src/serverstatusdialog.hxx: Add methods for retrieving client
 	sockets Add methods which allow for calling code to retrieve the list
@@ -356,17 +356,17 @@
 	then wipe the references held by the server status dialogue so they
 	won't stay open longer than expected.
 
-2009-02-07  Philip Allison <sane@not.co.uk>
+2009-02-07  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx: Finally figured out immediate redraws There is no
 	way to redraw the board "now" - at least, not that I can work out.
 	However, we *can* queue a redraw then immediately pump the event loop.
 
-2009-02-07  Philip Allison <sane@not.co.uk>
+2009-02-07  Philip Allison <mangobrain@googlemail.com>
 
 	* src/ai.cxx: Came across a typo in comments
 
-2009-02-07  Philip Allison <sane@not.co.uk>
+2009-02-07  Philip Allison <mangobrain@googlemail.com>
 
 	* src/clientsocket.cxx: Make client sockets unbuffered Disable Glib's
 	buffering on client sockets, which is stopping sockets from behaving
@@ -383,7 +383,7 @@
 	setGUIFromClientState, as it should. :) Signed-off-by: Philip Allison
 	<philip.allison@smoothwall.net>
 
-2009-01-26  Philip Allison <sane@not.co.uk>
+2009-01-26  Philip Allison <mangobrain@googlemail.com>
 
 	* src/Makefile.am, src/clientinfo.hxx, src/clientsocket.cxx,
 	src/clientsocket.hxx, src/infector.cxx, src/serverstatusdialog.cxx,
@@ -397,7 +397,7 @@
 	binary blob, sending it out to all connected clients whenever details
 	change.
 
-2009-01-18  Philip Allison <sane@not.co.uk>
+2009-01-18  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade, src/clientinfo.hxx, src/infector.cxx,
 	src/serverstatusdialog.cxx, src/serverstatusdialog.hxx: Flesh out
@@ -410,12 +410,12 @@
 	& when player assignments changed; return remote client information to
 	calling code.
 
-2009-01-17  Philip Allison <sane@not.co.uk>
+2009-01-17  Philip Allison <mangobrain@googlemail.com>
 
 	* src/infector.cxx, src/newgamedialog.cxx: Remove some unnecessary
 	includes following cleanup
 
-2009-01-17  Philip Allison <sane@not.co.uk>
+2009-01-17  Philip Allison <mangobrain@googlemail.com>
 
 	* src/ai.cxx, src/ai.hxx, src/boardstate.cxx, src/boardstate.hxx,
 	src/game.cxx, src/game.hxx, src/gameboard.cxx, src/gameboard.hxx,
@@ -429,16 +429,16 @@
 	a GameType instead of different methods for returning different
 	properties, and remove all usage of bitsets for player type detection.
 
-2009-01-15  Philip Allison <sane@not.co.uk>
+2009-01-15  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade: Tweak UI setup to remove GTK deprecation
 	warnings
 
-2009-01-15  Philip Allison <sane@not.co.uk>
+2009-01-15  Philip Allison <mangobrain@googlemail.com>
 
 	* src/serverstatusdialog.cxx: Fix accept() call
 
-2008-10-11  Philip Allison <sane@not.co.uk>
+2008-10-11  Philip Allison <mangobrain@googlemail.com>
 
 	* src/serverstatusdialog.cxx, src/serverstatusdialog.hxx: WIP
 	implementation of server socket event handler Accept new connections
@@ -447,14 +447,14 @@
 	dialogue is closed.  Also put in TODOs documenting future work
 	necessary to process client connections properly.
 
-2008-10-11  Philip Allison <sane@not.co.uk>
+2008-10-11  Philip Allison <mangobrain@googlemail.com>
 
 	* configure.ac: Detect if compiling with MinGW If building on MinGW,
 	set an Automake conditional to true, and define the MINGW preprocessor
 	symbol in config.h.  This will be used to allow Windows-specific
 	tweaks in the source (file paths, network code, etc.).
 
-2008-10-11  Philip Allison <sane@not.co.uk>
+2008-10-11  Philip Allison <mangobrain@googlemail.com>
 
 	* src/Makefile.am, src/serverstatusdialog.cxx,
 	src/serverstatusdialog.hxx: Beginnings of network play Add WIP code
@@ -465,44 +465,44 @@
 	clients, then return the network status - including client sockets -
 	back to the calling code when game setup is complete.
 
-2008-10-11  Philip Allison <sane@not.co.uk>
+2008-10-11  Philip Allison <mangobrain@googlemail.com>
 
 	* src/newgamedialog.cxx, src/newgamedialog.hxx: Beginnings of network
 	support Convert getAIPlayers into a generic getPlayersOfType function,
 	and use it to implement both getAIPlayers and getRemotePlayers.
 
-2008-10-11  Philip Allison <sane@not.co.uk>
+2008-10-11  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gamewindow.hxx, src/infector.cxx: Beginnings of network support
 	Add support for creating the server status dialogue to the main game
 	creation code.  Will pop up the dialogue if any players of type
 	"Networked" are chosen in the main new game dialogue.
 
-2008-10-11  Philip Allison <sane@not.co.uk>
+2008-10-11  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade: Beginnings of network support Add a player type
 	of "Networked", and a dialogue which will allow server hosts to
 	configure and start network games
 
-2008-10-10  Philip Allison <sane@not.co.uk>
+2008-10-10  Philip Allison <mangobrain@googlemail.com>
 
 	* src/infector.cxx: Try gnome-open for emails in about dialogue
 	Gnome-open can be used for opening default mail client, not just
 	xdg-email.
 
-2008-10-10  Philip Allison <sane@not.co.uk>
+2008-10-10  Philip Allison <mangobrain@googlemail.com>
 
 	* src/game.cxx, src/game.hxx, src/infector.cxx: Remove duplicate
 	getScores method
 
-2008-10-10  Philip Allison <sane@not.co.uk>
+2008-10-10  Philip Allison <mangobrain@googlemail.com>
 
 	* src/ai.hxx: Explain why BoardState is passed in to AI() It is not
 	obvious why a BoardState reference is passed in to AI's constructor,
 	seeing as the Game object passed in has a getBoardState function, but
 	AIs are constructed during the constructor for Game.
 
-2008-10-10  Philip Allison <sane@not.co.uk>
+2008-10-10  Philip Allison <mangobrain@googlemail.com>
 
 	* Makefile.am, README, bootstrap.sh, configure.ac,
 	data/infector.glade, src/Makefile.am, src/ai.cxx, src/ai.hxx,
@@ -511,14 +511,14 @@
 	src/infector.cxx, src/newgamedialog.cxx, src/newgamedialog.hxx:
 	Capitalise I on project name
 
-2008-07-10  Philip Allison <sane@not.co.uk>
+2008-07-10  Philip Allison <mangobrain@googlemail.com>
 
 	* configure.ac, src/gameboard.cxx: Allow building on MinGW32 Drop the
 	version requirements of autoconf & automake to those in current stable
 	MinGW development packages, and stop using a deprecated function of
 	Gtk::Style.
 
-2008-07-10  Philip Allison <sane@not.co.uk>
+2008-07-10  Philip Allison <mangobrain@googlemail.com>
 
 	* src/ai.cxx, src/ai.hxx, src/gameboard.cxx: Go back to the drawing
 	board and implement a simpler, faster AI concept AI is no longer based
@@ -533,7 +533,7 @@
 	signalling code of AI players so that it's easier to see what moves
 	are being made.
 
-2008-07-01  Philip Allison <sane@not.co.uk>
+2008-07-01  Philip Allison <mangobrain@googlemail.com>
 
 	* src/ai.cxx: Add some useful debug output to the AI Can see what's
 	going on now.  In the two-player game, the "suicidal" green player
@@ -544,7 +544,7 @@
 	BoardState and alpha-beta pruning.  Number 2 is most likely the
 	ridiculously naive position evaluation function.
 
-2008-06-27  Philip Allison <sane@not.co.uk>
+2008-06-27  Philip Allison <mangobrain@googlemail.com>
 
 	* src/ai.cxx, src/boardstate.cxx, src/boardstate.hxx, src/game.cxx,
 	src/game.hxx, src/gameboard.cxx, src/infector.cxx: Move piece capture
@@ -558,7 +558,7 @@
 	but don't seem to spot the risk of any position they may be put in.
 	Either that or it's just downright bug-ridden...
 
-2008-06-26  Philip Allison <sane@not.co.uk>
+2008-06-26  Philip Allison <mangobrain@googlemail.com>
 
 	* src/ai.cxx, src/ai.hxx, src/gameboard.cxx: Back to the drawing board
 	- standard minimax AI Caching future moves was too memory intensive
@@ -568,7 +568,7 @@
 	and doesn't play particularly cleverly in a four-player game.  Its
 	opening moves are also very predictable.
 
-2008-06-25  Philip Allison <sane@not.co.uk>
+2008-06-25  Philip Allison <mangobrain@googlemail.com>
 
 	* src/ai.cxx, src/ai.hxx, src/boardstate.hxx: Trying to flesh out AI
 	code, but currently broken. :( Attempting to build & maintain a tree
@@ -577,16 +577,16 @@
 	generating new leaf nodes from what's left).  However there seems to
 	be some memory corruption showing up during the deletion at present.
 
-2008-06-25  Philip Allison <sane@not.co.uk>
+2008-06-25  Philip Allison <mangobrain@googlemail.com>
 
 	* src/ai.cxx, src/ai.hxx: Start work on proper minimax AI with
 	heuristic move scoring
 
-2008-06-25  Philip Allison <sane@not.co.uk>
+2008-06-25  Philip Allison <mangobrain@googlemail.com>
 
 	* src/game.cxx: Don't try to capture our own pieces
 
-2008-06-24  Philip Allison <sane@not.co.uk>
+2008-06-24  Philip Allison <mangobrain@googlemail.com>
 
 	* src/Makefile.am, src/ai.cxx, src/ai.hxx, src/boardstate.cxx,
 	src/boardstate.hxx, src/game.cxx, src/game.hxx, src/gameboard.cxx,
@@ -597,12 +597,12 @@
 	currently consists of picking a move at random from the set of
 	possible moves.
 
-2008-06-23  Philip Allison <sane@not.co.uk>
+2008-06-23  Philip Allison <mangobrain@googlemail.com>
 
 	* src/ai.hxx, src/boardstate.cxx, src/boardstate.hxx, src/game.cxx,
 	src/game.hxx: Incomplete start at AI player support
 
-2008-06-21  Philip Allison <sane@not.co.uk>
+2008-06-21  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade, src/game.cxx, src/game.hxx, src/gamewindow.hxx,
 	src/infector.cxx: Keep track of scores, and show status notifications
@@ -613,43 +613,43 @@
 	simplest and visually cleanest way to have multiple messages
 	side-by-side.
 
-2008-06-21  Philip Allison <sane@not.co.uk>
+2008-06-21  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx: Oops - forgot to advance to next square when
 	testing clicks against hexagons
 
-2008-06-21  Philip Allison <sane@not.co.uk>
+2008-06-21  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx: Fix more warnings in point-in-hexagon test
 
-2008-06-21  Philip Allison <sane@not.co.uk>
+2008-06-21  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx: Fix warnings & syntax errors in hexagon click
 	test
 
-2008-06-21  Philip Allison <sane@not.co.uk>
+2008-06-21  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx: Point-in-hexagon test to allow proper piece
 	selection on hexagonal board
 
-2008-06-21  Philip Allison <sane@not.co.uk>
+2008-06-21  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx: Fix move highlights on hexagonal board
 
-2008-06-21  Philip Allison <sane@not.co.uk>
+2008-06-21  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx: Draw pieces & move highlights correctly on
 	hexagonal board
 
-2008-06-21  Philip Allison <sane@not.co.uk>
+2008-06-21  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx: More testing
 
-2008-06-21  Philip Allison <sane@not.co.uk>
+2008-06-21  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx: Testing
 
-2008-06-20  Philip Allison <sane@not.co.uk>
+2008-06-20  Philip Allison <mangobrain@googlemail.com>
 
 	* src/boardstate.cxx, src/boardstate.hxx, src/gameboard.cxx: Start
 	work on hexagonal board rendering, plus general rendering improvements
@@ -660,7 +660,7 @@
 	squares.  This now looks nicer with antialiasing enabled than the
 	latter, so re-enable it. :)
 
-2008-06-18  Philip Allison <sane@not.co.uk>
+2008-06-18  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade, src/boardstate.cxx, src/boardstate.hxx,
 	src/game.cxx, src/game.hxx, src/infector.cxx, src/newgamedialog.cxx,
@@ -673,7 +673,7 @@
 	constraints on the new game dialogue, so the user can't - for example
 	- set up a four-player game on a hexagonal board.
 
-2008-06-18  Philip Allison <sane@not.co.uk>
+2008-06-18  Philip Allison <mangobrain@googlemail.com>
 
 	* src/game.cxx, src/gameboard.cxx: Make Game and GameBoard use new
 	abstraction features of BoardState Game and GameBoard now use
@@ -681,7 +681,7 @@
 	longer bother to perform their own range checking on grid squares.
 	Board type is currently hard-coded to hexagonal for testing purposes.
 
-2008-06-18  Philip Allison <sane@not.co.uk>
+2008-06-18  Philip Allison <mangobrain@googlemail.com>
 
 	* src/boardstate.cxx, src/boardstate.hxx: Finish implementing
 	hexagonal board support in BoardState We now have proper
@@ -691,7 +691,7 @@
 	(for valid move checking & piece capturing) mean that Game and
 	GameBoard needn't care about the shape of the board itself.
 
-2008-06-17  Philip Allison <sane@not.co.uk>
+2008-06-17  Philip Allison <mangobrain@googlemail.com>
 
 	* src/boardstate.cxx, src/boardstate.hxx, src/game.cxx,
 	src/gameboard.cxx: Beginnings of hexagonal board support Implement
@@ -699,7 +699,7 @@
 	offset per column, allowing us to implement a six-sided board.  We
 	will eventually be able to play Hexxagon as well as Ataxx. :)
 
-2008-06-12  Philip Allison <sane@not.co.uk>
+2008-06-12  Philip Allison <mangobrain@googlemail.com>
 
 	* src/game.cxx, src/game.hxx, src/gameboard.cxx, src/gameboard.hxx,
 	src/gamewindow.hxx: Flesh out game logic to allow a full game to be
@@ -708,7 +708,7 @@
 	now exist.  A full game can be played by 2 or 4 local, human players.
 	:)
 
-2008-06-12  Philip Allison <sane@not.co.uk>
+2008-06-12  Philip Allison <mangobrain@googlemail.com>
 
 	* src/Makefile.am, src/infector.cxx, src/newgamedialog.cxx,
 	src/newgamedialog.hxx: Flesh out new game dialogue to actually set
@@ -717,13 +717,13 @@
 	user's interaction with the UI.  Note that the "type" of a player
 	isn't yet taken into account, because no AI has yet been implemented.
 
-2008-06-12  Philip Allison <sane@not.co.uk>
+2008-06-12  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade: Minor UI tweaks Board not clickable on startup
 	(will be set sensitive when a game is started).  New game widget not
 	resizable.
 
-2008-06-12  Philip Allison <sane@not.co.uk>
+2008-06-12  Philip Allison <mangobrain@googlemail.com>
 
 	* src/boardstate.cxx, src/boardstate.hxx, src/game.cxx, src/game.hxx,
 	src/gameboard.cxx, src/gameboard.hxx: Beginnings of game logic: allow
@@ -738,7 +738,7 @@
 	capturing & game end logic are not yet implemented, and we still need
 	some form of player type abstraction to allow AI and network games.
 
-2008-06-11  Philip Allison <sane@not.co.uk>
+2008-06-11  Philip Allison <mangobrain@googlemail.com>
 
 	* src/Makefile.am, src/boardstate.cxx, src/boardstate.hxx,
 	src/game.cxx, src/game.hxx, src/gameboard.cxx, src/gameboard.hxx,
@@ -752,7 +752,7 @@
 	actually deletes the currently owned object for us, so don't delete it
 	manually first.
 
-2008-06-11  Philip Allison <sane@not.co.uk>
+2008-06-11  Philip Allison <mangobrain@googlemail.com>
 
 	* src/game.cxx, src/game.hxx, src/gameboard.cxx, src/gameboard.hxx:
 	Unfinished: highlight possible moves when selecting a square Needs to
@@ -760,7 +760,7 @@
 	colour, and also only highlight valid moves (have a move-validity
 	signal emitted by GameBoard, checked by Game?)
 
-2008-06-10  Philip Allison <sane@not.co.uk>
+2008-06-10  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gameboard.cxx, src/gameboard.hxx: Speed up board rendering by
 	only drawing occupied squares Mark the drawing area for the board as
@@ -770,12 +770,12 @@
 	every time the window is exposed - just when it's resized.  Turn off
 	Cairo's antialiasing - we want nicely distinguishable squares, please.
 
-2008-06-10  Philip Allison <sane@not.co.uk>
+2008-06-10  Philip Allison <mangobrain@googlemail.com>
 
 	* src/infector.cxx: Make the "quit" entry in the menu actually quit
 	the app
 
-2008-06-10  Philip Allison <sane@not.co.uk>
+2008-06-10  Philip Allison <mangobrain@googlemail.com>
 
 	* src/game.cxx, src/game.hxx, src/gameboard.cxx, src/gameboard.hxx,
 	src/infector.cxx: Flesh out Game and GameBoard a bit more Add some
@@ -784,13 +784,13 @@
 	new game.  Set default board state when starting a new game.  Test
 	graphics for populated board squares.
 
-2008-06-09  Philip Allison <sane@not.co.uk>
+2008-06-09  Philip Allison <mangobrain@googlemail.com>
 
 	* src/Makefile.am, src/game.cxx, src/game.hxx, src/gamewindow.hxx,
 	src/infector.cxx: Dummy game logic object which just logs clicked
 	squares
 
-2008-06-09  Philip Allison <sane@not.co.uk>
+2008-06-09  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade, src/gameboard.cxx, src/gameboard.hxx,
 	src/gamewindow.hxx, src/infector.cxx: Maintain board's aspect ratio;
@@ -800,24 +800,24 @@
 	a signal with the grid reference of the clicked square.  Add a few
 	comments.
 
-2008-06-05  Philip Allison <sane@not.co.uk>
+2008-06-05  Philip Allison <mangobrain@googlemail.com>
 
 	* src/Makefile.am, src/gameboard.cxx, src/gameboard.hxx,
 	src/gamewindow.hxx, src/infector.cxx: Add GameBoard class Add a class
 	for drawing the current state of the game board, and some debug code
 	which just draws a red & blue checkerboard pattern.
 
-2008-06-05  Philip Allison <sane@not.co.uk>
+2008-06-05  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gamewindow.hxx, src/infector.cxx: Add showing off "new game"
 	dialogue
 
-2008-06-05  Philip Allison <sane@not.co.uk>
+2008-06-05  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade: Tidy up Glade file: mark dialogues modal,
 	transient for main window, etc.
 
-2008-05-31  Philip Allison <sane@not.co.uk>
+2008-05-31  Philip Allison <mangobrain@googlemail.com>
 
 	* configure.ac, src/gamewindow.hxx, src/infector.cxx: Add clicked URL
 	and clicked email hooks To make the website URL and author email
@@ -826,37 +826,37 @@
 	hackish and should not be used as an example, but should work for
 	people with GNOME and/or xdg-utils installed.
 
-2008-05-31  Philip Allison <sane@not.co.uk>
+2008-05-31  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade: Set about dialogue as transient for main window
 	This means that the window manager knows which window to keep the
 	dialogue on top of, centre it on, etc.
 
-2008-05-31  Philip Allison <sane@not.co.uk>
+2008-05-31  Philip Allison <mangobrain@googlemail.com>
 
 	* data/infector.glade: Fix about dialogue title & new game dialogue
 	name
 
-2008-05-31  Philip Allison <sane@not.co.uk>
+2008-05-31  Philip Allison <mangobrain@googlemail.com>
 
 	* src/Makefile.am, src/gamewindow.hxx, src/infector.cxx: Use
 	libglademm to instantiate main window from Glade file
 
-2008-05-31  Philip Allison <sane@not.co.uk>
+2008-05-31  Philip Allison <mangobrain@googlemail.com>
 
 	* Makefile.am: Add data subdirectory to build
 
-2008-05-31  Philip Allison <sane@not.co.uk>
+2008-05-31  Philip Allison <mangobrain@googlemail.com>
 
 	* configure.ac: Add detection of libglademm to configure.ac
 
-2008-05-31  Philip Allison <sane@not.co.uk>
+2008-05-31  Philip Allison <mangobrain@googlemail.com>
 
 	* data/Makefile.am, data/about.glade, data/infector.glade,
 	data/newgame.glade: Merge three Glade files into one and fix some
 	minor issues
 
-2008-05-30  Philip Allison <sane@not.co.uk>
+2008-05-30  Philip Allison <mangobrain@googlemail.com>
 
 	* data/Makefile.am, data/about.glade, data/infector.glade,
 	data/newgame.glade: Add some Glade files describing UI elements Going
@@ -864,12 +864,12 @@
 	programmatically.  Add some Glade files describing the main window,
 	the about dialogue, and the "new game" dialogue.
 
-2008-05-29  Philip Allison <sane@not.co.uk>
+2008-05-29  Philip Allison <mangobrain@googlemail.com>
 
 	* src/gamewindow.hxx, src/infector.cxx: Fix "Gtk::RefPtr" (should be
 	Glib) & flesh out UI a little with a toolbar
 
-2008-05-26  Philip Allison <sane@not.co.uk>
+2008-05-26  Philip Allison <mangobrain@googlemail.com>
 
 	* Initial test code commit
 

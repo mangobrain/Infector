@@ -1,4 +1,4 @@
-dnl Copyright 2008-2009 Philip Allison <sane@not.co.uk>
+dnl Copyright 2008-2009 Philip Allison <mangobrain@googlemail.com>
 
 dnl    This file is part of Infector.
 dnl
@@ -23,7 +23,7 @@ AC_PREREQ([2.61])
 dnl # Initialise autoconf and automake
 dnl # Also specify automake version requirements (again, the version used
 dnl # development will suffice for now).
-AC_INIT([infector], [0.4], [sane@not.co.uk])
+AC_INIT([infector], [0.4], [mangobrain@googlemail.com])
 AC_CONFIG_SRCDIR([src/infector.cxx])
 AM_INIT_AUTOMAKE([1.10])
 

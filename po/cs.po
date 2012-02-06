@@ -1,5 +1,5 @@
 # Czech translation of infector
-# Copyright 2009 Philip Allison <sane@not.co.uk>
+# Copyright 2009 Philip Allison <mangobrain@googlemail.com>
 # This file is distributed under the same license as the infector package.
 # Originally contributed by Petr Pisar <petr.pisar@atlas.cz>, 2009.
 #

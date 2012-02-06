@@ -677,7 +677,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</property>
-    <property name="authors">Philip Allison &lt;sane@not.co.uk&gt;</property>
+    <property name="authors">Philip Allison &lt;mangobrain@googlemail.com&gt;</property>
     <property name="translator_credits">Petr Pisar &lt;petr.pisar@atlas.cz&gt;</property>
     <property name="logo_icon_name">infector</property>
     <child internal-child="vbox">

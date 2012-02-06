@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Copyright 2008 Philip Allison <sane@not.co.uk>
+# Copyright 2008 Philip Allison <mangobrain@googlemail.com>
 
 #    This file is part of Infector.
 #
