@@ -1,4 +1,4 @@
-dnl Copyright 2008-2009 Philip Allison <mangobrain@googlemail.com>
+dnl Copyright 2008-2009, 2012 Philip Allison <mangobrain@googlemail.com>
 
 dnl    This file is part of Infector.
 dnl
@@ -25,7 +25,11 @@ dnl # Also specify automake version requirements (again, the version used
 dnl # development will suffice for now).
 AC_INIT([infector], [0.4], [mangobrain@googlemail.com])
 AC_CONFIG_SRCDIR([src/infector.cxx])
-AM_INIT_AUTOMAKE([1.10])
+AC_CONFIG_MACRO_DIR([acinclude])
+AC_CONFIG_AUX_DIR([build-aux])
+
+AM_INIT_AUTOMAKE([1.11 silent-rules])
+AM_SILENT_RULES([yes])
 
 dnl # Infector is written in C++, of course.  :)
 AC_PROG_CXX

@@ -1,4 +1,4 @@
-# Copyright 2008 Philip Allison <mangobrain@googlemail.com>
+# Copyright 2008, 2012 Philip Allison <mangobrain@googlemail.com>
 
 #    This file is part of Infector.
 #
@@ -14,6 +14,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Infector.  If not, see <http://www.gnu.org/licenses/>.
+
+ACLOCAL_AMFLAGS = -I acinclude
 
 SUBDIRS = src data po #doc
 EXTRA_DIST = bootstrap.sh intltool-extract.in intltool-merge.in intltool-update.in
