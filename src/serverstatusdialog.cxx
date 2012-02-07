@@ -1,4 +1,4 @@
-// Copyright 2008-2009 Philip Allison <mangobrain@googlemail.com>
+// Copyright 2008-2009, 2012 Philip Allison <mangobrain@googlemail.com>
 
 //    This file is part of Infector.
 //
@@ -246,29 +246,29 @@ void ServerStatusDialog::setGameDetails(const GameType &gt)
 	redrow = -1; greenrow = -1; yellowrow = -1; bluerow = -1;
 	for (size_t i = 0; i < 4; ++i)
 	{
-		m_aClientComboBoxes[i].clear_items();
-		m_aClientComboBoxes[i].append_text(_("None"));
+		m_aClientComboBoxes[i].remove_all();
+		m_aClientComboBoxes[i].append(_("None"));
 		int currentrow = 1;
 		if (gt.player_1 == pt_remote)
 		{
-			m_aClientComboBoxes[i].append_text(_("Red"));
+			m_aClientComboBoxes[i].append(_("Red"));
 			redrow = currentrow++;
 		}
 		if (gt.player_2 == pt_remote)
 		{
-			m_aClientComboBoxes[i].append_text(_("Green"));
+			m_aClientComboBoxes[i].append(_("Green"));
 			greenrow = currentrow++;
 		}
 		if (gt.square)
 		{
 			if (gt.player_3 == pt_remote)
 			{
-				m_aClientComboBoxes[i].append_text(_("Blue"));
+				m_aClientComboBoxes[i].append(_("Blue"));
 				bluerow = currentrow++;
 			}
 			if (gt.player_4 == pt_remote)
 			{
-				m_aClientComboBoxes[i].append_text(_("Yellow"));
+				m_aClientComboBoxes[i].append(_("Yellow"));
 				yellowrow = currentrow++;
 			}
 		}

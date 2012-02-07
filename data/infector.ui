@@ -160,7 +160,6 @@
               <object class="GtkStatusbar" id="statusbar">
                 <property name="visible">True</property>
                 <property name="spacing">2</property>
-                <property name="has_resize_grip">False</property>
               </object>
               <packing>
                 <property name="position">0</property>
@@ -173,7 +172,6 @@
                   <object class="GtkStatusbar" id="redscorebar">
                     <property name="visible">True</property>
                     <property name="spacing">2</property>
-                    <property name="has_resize_grip">False</property>
                   </object>
                   <packing>
                     <property name="position">0</property>
@@ -183,7 +181,6 @@
                   <object class="GtkStatusbar" id="greenscorebar">
                     <property name="visible">True</property>
                     <property name="spacing">2</property>
-                    <property name="has_resize_grip">False</property>
                   </object>
                   <packing>
                     <property name="position">1</property>
@@ -193,7 +190,6 @@
                   <object class="GtkStatusbar" id="bluescorebar">
                     <property name="visible">True</property>
                     <property name="spacing">2</property>
-                    <property name="has_resize_grip">False</property>
                   </object>
                   <packing>
                     <property name="position">2</property>
@@ -232,7 +228,6 @@
     <property name="icon_name">infector</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">mainwindow</property>
-    <property name="has_separator">False</property>
     <child internal-child="vbox">
       <object class="GtkVBox" id="newgamedialog-vbox">
         <property name="visible">True</property>
@@ -660,10 +655,9 @@
     <property name="icon_name">infector</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">mainwindow</property>
-    <property name="has_separator">False</property>
     <property name="program_name">Infector</property>
     <property name="version">0.4</property>
-    <property name="copyright">Copyright &#xA9; 2008-2009 Philip Allison</property>
+    <property name="copyright">Copyright &#xA9; 2008-2009, 2012 Philip Allison</property>
     <property name="website">http://infector.mangobrain.co.uk/</property>
     <property name="license">Infector is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -711,7 +705,6 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
     <property name="icon_name">infector</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">mainwindow</property>
-    <property name="has_separator">False</property>
     <child internal-child="vbox">
       <object class="GtkVBox" id="serverstatus-vbox">
         <property name="visible">True</property>
@@ -1233,7 +1226,6 @@ along with Infector.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</propert
     <property name="icon_name">infector</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">mainwindow</property>
-    <property name="has_separator">False</property>
     <child internal-child="vbox">
       <object class="GtkVBox" id="clientstatus-vbox">
         <property name="visible">True</property>

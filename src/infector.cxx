@@ -1,4 +1,4 @@
-// Copyright 2008-2009 Philip Allison <mangobrain@googlemail.com>
+// Copyright 2008-2009, 2012 Philip Allison <mangobrain@googlemail.com>
 
 //    This file is part of Infector.
 //
@@ -58,29 +58,6 @@
 // Implementation
 //
 
-void onAboutURL(Gtk::AboutDialog &d, const Glib::ustring &url)
-{
-	// XXX This is really, really hackish.
-	// Try to open the clicked URL with xdg-open then gnome-open.
-	Glib::ustring command("xdg-open ");
-	command += url;
-	command += " || gnome-open ";
-	command += url;
-	system(command.c_str());
-}
-
-void onAboutEmail(Gtk::AboutDialog &d, const Glib::ustring &addr)
-{
-	// XXX This is also really, really hackish.
-	// Try to open an email client with xdg-email then gnome-open.
-	Glib::ustring command("xdg-email \"");
-	command += addr;
-	command += "\" || gnome-open \"mailto:";
-	command += addr;
-	command += "\"";
-	system(command.c_str());
-}
-
 // Entry point
 int main(int argc, char *argv[])
 {
@@ -108,10 +85,6 @@ int main(int argc, char *argv[])
 	Glib::RefPtr<Gtk::IconTheme> it(Gtk::IconTheme::get_default());
 	it->append_search_path(__INFECTOR_PKGDATADIR);
 #endif
-
-	// Install hooks for clicked URLs and email addresses in about dialogues
-	Gtk::AboutDialog::set_url_hook(sigc::ptr_fun(onAboutURL));
-	Gtk::AboutDialog::set_email_hook(sigc::ptr_fun(onAboutEmail));
 
 	// Load main GtkBuilder file
 	Glib::RefPtr<Gtk::Builder> refXml = Gtk::Builder::create_from_file(__INFECTOR_PKGDATADIR "/infector.ui");
@@ -432,10 +405,10 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 		if (localplayer)
 			msg.append("</b>");
 
-		// XXX BIG HACK to get at the label on the status bar directly.
-		// Status bars don't officially support Pango markup, but labels do.
-		Gtk::Bin *b = (Gtk::Bin*)(m_pStatusbar->children()[0].get_widget());
-		Gtk::Label *l = (Gtk::Label*)(b->get_child());
+		// Set the text on the status bar's label directly,
+		// so that the Pango markup takes effect.
+		Gtk::Box *b = (Gtk::Box*)(m_pStatusbar->get_message_area());
+		Gtk::Label *l = (Gtk::Label*)(b->get_children()[0]);
 		l->set_markup(msg);
 	}
 }

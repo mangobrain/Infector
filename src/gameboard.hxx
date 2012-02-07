@@ -1,4 +1,4 @@
-// Copyright 2008 Philip Allison <mangobrain@googlemail.com>
+// Copyright 2008-2009, 2012 Philip Allison <mangobrain@googlemail.com>
 
 //    This file is part of Infector.
 //
@@ -30,21 +30,21 @@ class GameBoard: public Gtk::DrawingArea
 		// Call this when a new game is started - will grab initial details
 		// and connect game event handlers to the instance's signals.
 		void newGame(Game *g, const BoardState *b, const GameType *gt);
-		
+
 		// Call this when a game has ended
 		void endGame();
 
 	private:
 		// Callbacks for GTK/GDK events
-		bool on_expose_event(GdkEventExpose *event);
+		bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr);
 		bool onClick(GdkEventButton *event);
 		bool onResize(GdkEventConfigure *event);
 
 		// Callbacks for various game events
 		void onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y, const bool gameover);
 		void onInvalidMove();
-		
-		// Set the background pixmap of the widget to the empty board
+
+		// Redraw the empty board background image and set it as widget background
 		void setBackground();
 
 		// Default & current state of game board

@@ -1,4 +1,4 @@
-// Copyright 2008 Philip Allison <mangobrain@googlemail.com>
+// Copyright 2008-2009, 2012 Philip Allison <mangobrain@googlemail.com>
 
 //    This file is part of Infector.
 //
@@ -57,16 +57,16 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &
 	// The widget is painted directly by us, but we'll leave the library
 	// to do its own double buffering, thanks.
 	set_app_paintable(true);
-	
+
 	// Set the widget's background to the emtpy checkerboard so that
 	// we don't have to redraw it in every single expose event.
 	// The widget needs to be realised before we can get its Gdk::Window as a
 	// drawable, so have setBackground called after signal_realize has fired.
 	signal_realize().connect_notify(sigc::mem_fun(this, &GameBoard::setBackground), true);
-	
+
 	// The background will need to be redrawn whenever the widget is resized
 	signal_configure_event().connect(sigc::mem_fun(this, &GameBoard::onResize), true);
-	
+
 	// Don't put pieces on the default board - it looks like a game is in play
 	m_DefaultBoardState.setPieceAt(0, 0, pc_player_none);
 	m_DefaultBoardState.setPieceAt(0, 7, pc_player_none);
@@ -75,133 +75,32 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &
 	m_DefaultBoardState.clearSelection();
 }
 
-// Expose (redraw) event handler
-bool GameBoard::on_expose_event(GdkEventExpose *event)
+// Redraw event handler
+bool GameBoard::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
 {
-	// Get the window associated with the display area widget
-	Glib::RefPtr<Gdk::Window> window = get_window();
-	if (window)
+	// Draw checkerboard pattern scaled up to widget's current size
+	Gtk::Allocation alloc = get_allocation();
+	int w(alloc.get_width());
+	int h(alloc.get_height());
+
+	const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
+	if (!((m_pGameType == NULL) ? m_DefaultGameType.square : m_pGameType->square))
 	{
-		// Create a Cairo context for drawing onto the window
-		Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
+		// Horrid hexagonal board
+		double x = 0;
+		double y = (double)h / 2;
+		double xinc = (double)w / ((bw - current->getInitialOffset()) * 2);
+		double yinc = xinc;
+		double hxinc = xinc / 2;
+		double hyinc = yinc / 2;
 
-		// Set clip region for the context so we only really repaint
-		// the area which needs to be redrawn
-		cr->rectangle(event->area.x, event->area.y, event->area.width, event->area.height);
-		cr->clip();
-
-		// Draw checkerboard pattern scaled up to widget's current size
-		Gtk::Allocation alloc = get_allocation();
-		int w(alloc.get_width());
-		int h(alloc.get_height());
-
-		const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
-		if (!((m_pGameType == NULL) ? m_DefaultGameType.square : m_pGameType->square))
+		for (int i = 0; i < bh; ++i)
 		{
-			// Horrid hexagonal board
-			double x = 0;
-			double y = (double)h / 2;
-			double xinc = (double)w / ((bw - current->getInitialOffset()) * 2);
-			double yinc = xinc;
-			double hxinc = xinc / 2;
-			double hyinc = yinc / 2;
-			
-			for (int i = 0; i < bh; ++i)
+			y = ((double) h / 2) + (i * hyinc);
+			x = ((hxinc * 2) * (i - current->getInitialOffset())) + (hxinc / 2);
+			for (int j = 0; j < bw; ++j)
 			{
-				y = ((double) h / 2) + (i * hyinc);
-				x = ((hxinc * 2) * (i - current->getInitialOffset())) + (hxinc / 2);
-				for (int j = 0; j < bw; ++j)
-				{
-					if (current->getPieceAt(j, i) != pc_no_such_square)
-					{
-						bool draw = true;
-						float r = 0, g = 0, b = 0;
-						switch (current->getPieceAt(j, i))
-						{
-							case pc_player_1:
-								cr->set_source_rgb(1, 0, 0);
-								r = 0.8;
-								break;
-							case pc_player_2:
-								cr->set_source_rgb(0, 1, 0);
-								g = 0.8;
-								break;
-							case pc_player_3:
-								cr->set_source_rgb(0, 0, 1);
-								b = 0.8;
-								break;
-							case pc_player_4:
-								cr->set_source_rgb(1, 1, 0);
-								r = 0.8; g = 0.8;
-								break;
-							default:
-								draw = false;
-						}
-						if (draw)
-						{
-							cr->move_to(x, y);
-							cr->rel_line_to(hxinc, hyinc);
-							cr->rel_line_to(hxinc, 0);
-							cr->rel_line_to(hxinc, -hyinc);
-							cr->rel_line_to(-hxinc, -hyinc);
-							cr->rel_line_to(-hxinc, 0);
-							
-							cr->close_path();
-							cr->fill_preserve();
-							cr->clip_preserve();
-							cr->set_source_rgb(r, g, b);
-							cr->unset_dash();
-							cr->stroke();
-							cr->reset_clip();
-						}
-						// Highlight currently selected square and possible moves
-						int xsel, ysel;
-						current->getSelectedSquare(xsel, ysel);
-						draw = false;
-						bool self = false;
-						if (i == ysel && j == xsel)
-						{
-							cr->set_source_rgb(1, 1, 1);
-							draw = true;
-							self = true;
-						}
-						else if (xsel != -1 && ysel != -1)
-						{
-							unsigned int distance = current->getAdjacency(xsel, ysel, j, i);
-							if (distance == 1)
-							{
-								cr->set_source_rgb(1, 0.5, 1);
-								draw = true;
-							}
-							else if (distance == 2)
-							{
-								cr->set_source_rgb(1, 0, 1);
-								draw = true;
-							}
-						}
-						if (self || (draw && (current->getPieceAt(j, i) == pc_player_none)))
-						{
-							std::vector<double> dashes;
-							dashes.push_back(2);
-							cr->set_dash(dashes, 0);
-							cr->arc(x + (hxinc * 1.5), y, hxinc / 2.0, 0, 2 * M_PI);
-							cr->stroke();
-						}
-					}
-					x += (hxinc * 2);
-					y -= hyinc;
-				}
-			}
-		} else {
-			// Traditional square board
-			double x = 0, y = 0;
-			double xinc = (double)w/bw;
-			double yinc = (double)h/bh;
-			double hxinc = xinc / 2.0;
-			double hyinc = yinc / 2.0;
-			for (int i = 0; i < bh; ++i)
-			{
-				for (int j = 0; j < bw; ++j)
+				if (current->getPieceAt(j, i) != pc_no_such_square)
 				{
 					bool draw = true;
 					float r = 0, g = 0, b = 0;
@@ -228,7 +127,14 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 					}
 					if (draw)
 					{
-						cr->rectangle(x, y, xinc, yinc);
+						cr->move_to(x, y);
+						cr->rel_line_to(hxinc, hyinc);
+						cr->rel_line_to(hxinc, 0);
+						cr->rel_line_to(hxinc, -hyinc);
+						cr->rel_line_to(-hxinc, -hyinc);
+						cr->rel_line_to(-hxinc, 0);
+
+						cr->close_path();
 						cr->fill_preserve();
 						cr->clip_preserve();
 						cr->set_source_rgb(r, g, b);
@@ -236,7 +142,6 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 						cr->stroke();
 						cr->reset_clip();
 					}
-					
 					// Highlight currently selected square and possible moves
 					int xsel, ysel;
 					current->getSelectedSquare(xsel, ysel);
@@ -267,15 +172,97 @@ bool GameBoard::on_expose_event(GdkEventExpose *event)
 						std::vector<double> dashes;
 						dashes.push_back(2);
 						cr->set_dash(dashes, 0);
-						cr->arc(x + hxinc, y + hyinc, hxinc / 2.0, 0, 2 * M_PI);
+						cr->arc(x + (hxinc * 1.5), y, hxinc / 2.0, 0, 2 * M_PI);
 						cr->stroke();
 					}
-					
-					x += xinc;
 				}
-				y += yinc;
-				x = 0;
+				x += (hxinc * 2);
+				y -= hyinc;
 			}
+		}
+	} else {
+		// Traditional square board
+		double x = 0, y = 0;
+		double xinc = (double)w/bw;
+		double yinc = (double)h/bh;
+		double hxinc = xinc / 2.0;
+		double hyinc = yinc / 2.0;
+		for (int i = 0; i < bh; ++i)
+		{
+			for (int j = 0; j < bw; ++j)
+			{
+				bool draw = true;
+				float r = 0, g = 0, b = 0;
+				switch (current->getPieceAt(j, i))
+				{
+					case pc_player_1:
+						cr->set_source_rgb(1, 0, 0);
+						r = 0.8;
+						break;
+					case pc_player_2:
+						cr->set_source_rgb(0, 1, 0);
+						g = 0.8;
+						break;
+					case pc_player_3:
+						cr->set_source_rgb(0, 0, 1);
+						b = 0.8;
+						break;
+					case pc_player_4:
+						cr->set_source_rgb(1, 1, 0);
+						r = 0.8; g = 0.8;
+						break;
+					default:
+						draw = false;
+				}
+				if (draw)
+				{
+					cr->rectangle(x, y, xinc, yinc);
+					cr->fill_preserve();
+					cr->clip_preserve();
+					cr->set_source_rgb(r, g, b);
+					cr->unset_dash();
+					cr->stroke();
+					cr->reset_clip();
+				}
+
+				// Highlight currently selected square and possible moves
+				int xsel, ysel;
+				current->getSelectedSquare(xsel, ysel);
+				draw = false;
+				bool self = false;
+				if (i == ysel && j == xsel)
+				{
+					cr->set_source_rgb(1, 1, 1);
+					draw = true;
+					self = true;
+				}
+				else if (xsel != -1 && ysel != -1)
+				{
+					unsigned int distance = current->getAdjacency(xsel, ysel, j, i);
+					if (distance == 1)
+					{
+						cr->set_source_rgb(1, 0.5, 1);
+						draw = true;
+					}
+					else if (distance == 2)
+					{
+						cr->set_source_rgb(1, 0, 1);
+						draw = true;
+					}
+				}
+				if (self || (draw && (current->getPieceAt(j, i) == pc_player_none)))
+				{
+					std::vector<double> dashes;
+					dashes.push_back(2);
+					cr->set_dash(dashes, 0);
+					cr->arc(x + hxinc, y + hyinc, hxinc / 2.0, 0, 2 * M_PI);
+					cr->stroke();
+				}
+
+				x += xinc;
+			}
+			y += yinc;
+			x = 0;
 		}
 	}
 	return true;
@@ -294,7 +281,7 @@ bool GameBoard::onClick(GdkEventButton *event)
 	Gtk::Allocation alloc = get_allocation();
 	const int w(alloc.get_width());
 	const int h(alloc.get_height());
-	
+
 	const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
 	if (!((m_pGameType == NULL) ? m_DefaultGameType.square : m_pGameType->square))
 	{
@@ -305,7 +292,7 @@ bool GameBoard::onClick(GdkEventButton *event)
 		double yinc = xinc;
 		double hxinc = xinc / 2;
 		double hyinc = yinc / 2;
-		
+
 		for (int i = 0; i < bh; ++i)
 		{
 			y = ((double) h / 2) + (i * hyinc);
@@ -361,7 +348,7 @@ bool GameBoard::onClick(GdkEventButton *event)
 		// Emit the square_clicked signal with these coordinates
 		square_clicked(x, y);
 	}
-	
+
 	return true;
 }
 
@@ -392,28 +379,28 @@ void GameBoard::newGame(Game *g, const BoardState *b, const GameType *gt)
 	queue_draw();
 }
 
-// Set the widget's background pixmap to the empty board
+// Set the widget's background pattern to the empty board
 void GameBoard::setBackground()
 {
 	// Get the window associated with the display area widget
-	Glib::RefPtr<Gdk::Window> window = get_window();
-	// Create a pixmap covering the size of the widget
+
+	// Create a Cairo surface covering the size of the widget
 	Gtk::Allocation alloc = get_allocation();
 	int w(alloc.get_width());
 	int h(alloc.get_height());
-	Glib::RefPtr<Gdk::Pixmap> pixmap = Gdk::Pixmap::create(window, w, h, -1);
-	// Get Cairo context for drawing on the pixmap
-	Cairo::RefPtr<Cairo::Context> cr = pixmap->create_cairo_context();
-	//cr->set_antialias(Cairo::ANTIALIAS_NONE);
+	Cairo::RefPtr<Cairo::ImageSurface> img = Cairo::ImageSurface::create(Cairo::FORMAT_RGB24, w, h);
 
-	// Draw board on pixmap
+	// Get Cairo context for drawing on the surface
+	Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(img);
+
+	// Draw board on context
 	const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
 	if (!((m_pGameType == NULL) ? m_DefaultGameType.square : m_pGameType->square))
 	{
 		// Horrid hexagonal board
-		Glib::RefPtr<const Gtk::Style> style = get_style();
-		Gdk::Color bg = style->get_bg(Gtk::STATE_NORMAL);
-		cr->set_source_rgb(bg.get_red_p(), bg.get_green_p(), bg.get_blue_p());
+		Glib::RefPtr<const Gtk::StyleContext> style = get_style_context();
+		Gdk::RGBA bg = style->get_background_color(Gtk::STATE_FLAG_NORMAL);
+		cr->set_source_rgb(bg.get_red(), bg.get_green(), bg.get_blue());
 		cr->rectangle(0, 0, w, h);
 		cr->fill();
 
@@ -423,7 +410,7 @@ void GameBoard::setBackground()
 		double yinc = xinc;
 		double hxinc = xinc / 2;
 		double hyinc = yinc / 2;
-		
+
 		for (int i = 0; i < bh; ++i)
 		{
 			y = ((double) h / 2) + (i * hyinc);
@@ -444,14 +431,14 @@ void GameBoard::setBackground()
 						else
 							cr->set_source_rgb(0.7, 0.7, 0.7);
 					}
-					
+
 					cr->move_to(x, y);
 					cr->rel_line_to(hxinc, hyinc);
 					cr->rel_line_to(hxinc, 0);
 					cr->rel_line_to(hxinc, -hyinc);
 					cr->rel_line_to(-hxinc, -hyinc);
 					cr->rel_line_to(-hxinc, 0);
-					
+
 					cr->close_path();
 					cr->fill();
 				}
@@ -460,11 +447,11 @@ void GameBoard::setBackground()
 			}
 		}
 	} else {
-		// Traditional square board	
+		// Traditional square board
 		double x = 0, y = 0;
 		double xinc = (double)w/bw;
 		double yinc = (double)h/bh;
-		
+
 		cr->set_source_rgb(0.8, 0.8, 0.8);
 		cr->rectangle(0, 0, w, h);
 		cr->fill();
@@ -497,9 +484,10 @@ void GameBoard::setBackground()
 			x = 0;
 		}
 	}
-	
-	// Set pixmap as widget background
-	window->set_back_pixmap(pixmap, false);
+
+	// Set pixbuf as widget background
+	Glib::RefPtr<Gdk::Window> window = get_window();
+	window->set_background(Cairo::SurfacePattern::create(img));
 }
 
 // Redraw the background at the current size when resized
@@ -521,7 +509,7 @@ void GameBoard::onMoveMade(const int start_x, const int start_y, const int end_x
 	queue_draw();
 	while (Gtk::Main::events_pending())
 		Gtk::Main::iteration();
-	
+
 	// Disable clicking when game is over or it's not a local player's turn - until next game starts
 	if (gameover)
 		endGame();

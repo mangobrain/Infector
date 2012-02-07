@@ -47,7 +47,7 @@ AC_PROG_INTLTOOL([0.23])
 
 dnl # Infector uses gtkmm.
 PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES([GTKMM], [gtkmm-2.4 >= 2.16])
+PKG_CHECK_MODULES([GTKMM], [gtkmm-3.0])
 
 dnl # Are we building on MinGW?
 AC_MSG_CHECKING(host os)
