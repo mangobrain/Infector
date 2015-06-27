@@ -1,4 +1,4 @@
-# Copyright 2008, 2012 Philip Allison <mangobrain@googlemail.com>
+# Copyright 2008, 2012, 2015 Philip Allison <mangobrain@googlemail.com>
 
 #    This file is part of Infector.
 #
@@ -17,5 +17,7 @@
 
 ACLOCAL_AMFLAGS = -I acinclude
 
-SUBDIRS = src data po #doc
-EXTRA_DIST = bootstrap.sh intltool-extract.in intltool-merge.in intltool-update.in
+SUBDIRS = src data po
+EXTRA_DIST = bootstrap.sh
+
+DISTCLEANFILES = intltool-extract intltool-merge intltool-update

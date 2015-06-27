@@ -1,4 +1,4 @@
-dnl Copyright 2008-2009, 2012 Philip Allison <mangobrain@googlemail.com>
+dnl Copyright 2008-2009, 2012, 2015 Philip Allison <mangobrain@googlemail.com>
 
 dnl    This file is part of Infector.
 dnl
@@ -18,17 +18,17 @@ dnl    along with Infector.  If not, see <http://www.gnu.org/licenses/>.
 dnl # Specify autoconf version requirements
 dnl # Not strictly necessary - but it's the version on my system,
 dnl # so for now, we'll pretend it's the required version.
-AC_PREREQ([2.61])
+AC_PREREQ([2.69])
 
 dnl # Initialise autoconf and automake
 dnl # Also specify automake version requirements (again, the version used
 dnl # development will suffice for now).
-AC_INIT([infector], [0.4], [mangobrain@googlemail.com])
+AC_INIT([infector],[0.4],[mangobrain@googlemail.com])
 AC_CONFIG_SRCDIR([src/infector.cxx])
 AC_CONFIG_MACRO_DIR([acinclude])
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE([1.11 silent-rules])
+AM_INIT_AUTOMAKE([1.15 silent-rules])
 AM_SILENT_RULES([yes])
 
 dnl # Infector is written in C++, of course.  :)
@@ -43,7 +43,7 @@ dnl # Output the command-line options given to this script
 AC_DEFINE_UNQUOTED([CONFIGURE_OPTS],["$ac_configure_args"],[Options given to ./configure])
 
 dnl # Use intltool for i18n.
-AC_PROG_INTLTOOL([0.23])
+IT_PROG_INTLTOOL([0.51])
 
 dnl # Infector uses gtkmm.
 PKG_PROG_PKG_CONFIG
