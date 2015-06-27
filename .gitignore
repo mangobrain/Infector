@@ -1,0 +1,13 @@
+configure
+autom4te.cache
+INSTALL
+Makefile
+config.*
+build-aux/*
+*.m4
+*.in
+po/POTFILES
+src/.deps
+stamp-*
+*.o
+*.gmo
