@@ -401,7 +401,7 @@ void ServerStatusDialog::onApply()
 #ifdef MINGW
 					closesocket(s);
 #else
-					close(s);
+					::close(s);
 #endif
 					break;
 				} else {
@@ -413,7 +413,7 @@ void ServerStatusDialog::onApply()
 #ifdef MINGW
 						closesocket(s);
 #else
-						close(s);
+						::close(s);
 #endif
 						break;
 					} else {
@@ -526,7 +526,7 @@ bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, const int s)
 #ifdef MINGW
 			closesocket(newsock);
 #else
-			close(newsock);
+			::close(newsock);
 #endif
 			return true;
 		}

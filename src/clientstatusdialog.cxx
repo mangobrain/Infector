@@ -186,7 +186,7 @@ void ClientStatusDialog::onConnect()
 #ifdef MINGW
 			closesocket(s);
 #else
-			close(s);
+			::close(s);
 #endif
 			return;
 		}
