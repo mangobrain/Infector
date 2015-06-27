@@ -7,7 +7,11 @@ build-aux/*
 *.m4
 *.in
 po/POTFILES
+po/.intltool-merge-cache
 src/.deps
+src/infector
+data/infector-*.png
+data/infector.desktop
 stamp-*
 *.o
 *.gmo
