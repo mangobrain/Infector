@@ -38,7 +38,7 @@ SIZES = 16 22 24 32 48 64 72 96 128
 # Also do this at distribution time so we don't depend on RSVG being
 # present on users' systems.
 infector-%.png: infector.svg
-	rsvg -w $* -h $* $< $@
+	rsvg-convert -w $* -h $* -o $@ $<
 
 # Rule for generating .desktop.in file from .desktop.in.in.
 # This converts the "bindir" placeholder in the ".in.in" file
