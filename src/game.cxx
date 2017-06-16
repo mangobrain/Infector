@@ -52,7 +52,7 @@
 // Constructor
 Game::Game(GameBoard* b, GameType &gt)
 	: m_GameType(gt), m_BoardState(&m_GameType), m_gameover(false),
-	m_pServerSocket(NULL), netbufsize(0), m_pAI(NULL)
+	m_pServerSocket(NULL), netbufsize(0)
 {
 	// All signals will be auto-disconnected on destruction, because
 	// this class inherits from sigc::trackable, so don't bother

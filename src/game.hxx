@@ -96,7 +96,7 @@ class Game: public sigc::trackable
 		size_t netbufsize;
 		
 		// AI player
-		std::auto_ptr<AI> m_pAI;
+		std::unique_ptr<AI> m_pAI;
 };
 
 #endif

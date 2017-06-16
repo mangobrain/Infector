@@ -171,8 +171,11 @@ piece BoardState::getPieceAt(const int x, const int y) const
 	if ((x < 0) || (x >= m_pGameType->w))
 		return pc_no_such_square;
 	int offset_y = y - pieces.at(x).first;
-	if ((offset_y < 0) || (offset_y >= pieces.at(x).second.size()))
+	if ((offset_y < 0)
+            || (offset_y >= static_cast<int>(pieces.at(x).second.size())))
+    {
 		return pc_no_such_square;
+    }
 
 	return pieces.at(x).second.at(offset_y);
 }
@@ -183,8 +186,11 @@ void BoardState::setPieceAt(const int x, const int y, const piece p)
 	if ((x < 0) || (x >= m_pGameType->w))
 		return;
 	int offset_y = y - pieces.at(x).first;
-	if ((offset_y < 0) || (offset_y >= pieces.at(x).second.size()))
+	if ((offset_y < 0)
+            || (offset_y >= static_cast<int>(pieces.at(x).second.size())))
+    {
 		return;
+    }
 	
 	if (p == pc_player_none)
 	{
@@ -299,8 +305,11 @@ void BoardState::setSelectedSquare(const int x, const int y)
 	if ((x < 0) || (x >= m_pGameType->w))
 		return;
 	int offset_y = y - pieces.at(x).first;
-	if ((offset_y < 0) || (offset_y >= pieces.at(x).second.size()))
+	if ((offset_y < 0)
+            || (offset_y >= static_cast<int>(pieces.at(x).second.size())))
+    {
 		return;
+    }
 
 	xsel = x;
 	ysel = y;
@@ -338,14 +347,20 @@ unsigned int BoardState::getAdjacency(const int ax, const int ay, const int bx, 
 	if ((ax < 0) || (ax >= m_pGameType->w))
 		return 0;
 	int offset_y = ay - pieces.at(ax).first;
-	if ((offset_y < 0) || (offset_y >= pieces.at(ax).second.size()))
+	if ((offset_y < 0)
+            || (offset_y >= static_cast<int>(pieces.at(ax).second.size())))
+    {
 		return 0;
+    }
 	
 	if ((bx < 0) || (bx >= m_pGameType->w))
 		return 0;
 	offset_y = by - pieces.at(bx).first;
-	if ((offset_y < 0) || (offset_y >= pieces.at(bx).second.size()))
+	if ((offset_y < 0)
+            || (offset_y >= static_cast<int>(pieces.at(bx).second.size())))
+    {
 		return 0;
+    }
 
 	// Now the actual shape-dependent adjacency test
 	if (!(m_pGameType->square))

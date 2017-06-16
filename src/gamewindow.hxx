@@ -28,16 +28,16 @@ class GameWindow: public Gtk::Window
 		Glib::RefPtr<Gtk::Builder> m_refXml;
 
 		// Pointers to various dialogues, instantiated as needed
-		std::auto_ptr<Gtk::AboutDialog> m_pAboutDialog;
-		std::auto_ptr<NewGameDialog> m_pNewGameDialog;
-		std::auto_ptr<ServerStatusDialog> m_pServerStatusDialog;
-		std::auto_ptr<ClientStatusDialog> m_pClientStatusDialog;
+		std::unique_ptr<Gtk::AboutDialog> m_pAboutDialog;
+		std::unique_ptr<NewGameDialog> m_pNewGameDialog;
+		std::unique_ptr<ServerStatusDialog> m_pServerStatusDialog;
+		std::unique_ptr<ClientStatusDialog> m_pClientStatusDialog;
 
 		// Game board display (derived widget)
 		GameBoard *m_pBoard;
 
 		// Current running game
-		std::auto_ptr<Game> m_pGame;
+		std::unique_ptr<Game> m_pGame;
 		
 		// Statusbars for game scores
 		Gtk::Statusbar *m_pRedStatusbar;

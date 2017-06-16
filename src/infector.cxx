@@ -112,8 +112,7 @@ int main(int argc, char *argv[])
 //
 
 GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refXml)
-	: Gtk::Window(cobject), m_refXml(refXml), m_pAboutDialog(NULL), m_pNewGameDialog(NULL),
-	m_pGame(NULL)
+	: Gtk::Window(cobject), m_refXml(refXml)
 {
 	// Create ActionGroup for menu & toolbar items and their actions
 	m_refActGrp = Gtk::ActionGroup::create();
