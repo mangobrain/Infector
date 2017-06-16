@@ -44,8 +44,8 @@ class GameBoard: public Gtk::DrawingArea
 		void onMoveMade(const int start_x, const int start_y, const int end_x, const int end_y, const bool gameover);
 		void onInvalidMove();
 
-		// Redraw the empty board background image and set it as widget background
-		void setBackground();
+		// Redraw the empty board background image and store it
+		void makeBackground();
 
 		// Default & current state of game board
 		GameType m_DefaultGameType;
@@ -53,6 +53,9 @@ class GameBoard: public Gtk::DrawingArea
 		const BoardState *m_pBoardState;
 		const GameType *m_pGameType;
 		int bw, bh;
+
+		// Stored background image
+		Cairo::RefPtr<Cairo::ImageSurface> m_bgImage;
 };
 
 #endif

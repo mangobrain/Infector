@@ -58,11 +58,9 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &
 	// to do its own double buffering, thanks.
 	set_app_paintable(true);
 
-	// Set the widget's background to the emtpy checkerboard so that
+	// Generate the emtpy checkerboard image and store it so that
 	// we don't have to redraw it in every single expose event.
-	// The widget needs to be realised before we can get its Gdk::Window as a
-	// drawable, so have setBackground called after signal_realize has fired.
-	signal_realize().connect_notify(sigc::mem_fun(this, &GameBoard::setBackground), true);
+	makeBackground();
 
 	// The background will need to be redrawn whenever the widget is resized
 	signal_configure_event().connect(sigc::mem_fun(this, &GameBoard::onResize), true);
@@ -78,10 +76,14 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &
 // Redraw event handler
 bool GameBoard::on_draw(const Cairo::RefPtr<Cairo::Context> &cr)
 {
-	// Draw checkerboard pattern scaled up to widget's current size
+	// Draw placed pieces & selection highlights scaled up to widget's current size
 	Gtk::Allocation alloc = get_allocation();
 	int w(alloc.get_width());
 	int h(alloc.get_height());
+
+	// Start by drawing the background
+	cr->set_source(m_bgImage, 0, 0);
+	cr->paint();
 
 	const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
 	if (!((m_pGameType == NULL) ? m_DefaultGameType.square : m_pGameType->square))
@@ -375,35 +377,27 @@ void GameBoard::newGame(Game *g, const BoardState *b, const GameType *gt)
 	m_DefaultGameType.square = m_pGameType->square;
 
 	// Refresh the board
-	setBackground();
+	makeBackground();
 	queue_draw();
 }
 
-// Set the widget's background pattern to the empty board
-void GameBoard::setBackground()
+// Make the empty board background pattern
+void GameBoard::makeBackground()
 {
-	// Get the window associated with the display area widget
-
 	// Create a Cairo surface covering the size of the widget
 	Gtk::Allocation alloc = get_allocation();
 	int w(alloc.get_width());
 	int h(alloc.get_height());
-	Cairo::RefPtr<Cairo::ImageSurface> img = Cairo::ImageSurface::create(Cairo::FORMAT_RGB24, w, h);
+	m_bgImage = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, w, h);
 
 	// Get Cairo context for drawing on the surface
-	Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(img);
+	Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_bgImage);
 
 	// Draw board on context
 	const BoardState *current = ((m_pBoardState == NULL) ? &m_DefaultBoardState : m_pBoardState);
 	if (!((m_pGameType == NULL) ? m_DefaultGameType.square : m_pGameType->square))
 	{
 		// Horrid hexagonal board
-		Glib::RefPtr<const Gtk::StyleContext> style = get_style_context();
-		Gdk::RGBA bg = style->get_background_color(Gtk::STATE_FLAG_NORMAL);
-		cr->set_source_rgb(bg.get_red(), bg.get_green(), bg.get_blue());
-		cr->rectangle(0, 0, w, h);
-		cr->fill();
-
 		double x = 0;
 		double y = (double)h / 2;
 		double xinc = (double)w / ((bw - current->getInitialOffset()) * 2);
@@ -484,16 +478,12 @@ void GameBoard::setBackground()
 			x = 0;
 		}
 	}
-
-	// Set pixbuf as widget background
-	Glib::RefPtr<Gdk::Window> window = get_window();
-	window->set_background(Cairo::SurfacePattern::create(img));
 }
 
 // Redraw the background at the current size when resized
 bool GameBoard::onResize(GdkEventConfigure *event)
 {
-	setBackground();
+	makeBackground();
 	return true;
 }
 
