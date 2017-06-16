@@ -391,8 +391,16 @@ void ServerStatusDialog::onApply()
 				int val = 1;
 #ifdef MINGW
 				setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char*)(&val), sizeof(int));
+				if (current->ai_family == AF_INET6)
+				{
+					setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (char*)(&val), sizeof(int));
+				}
 #else
 				setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(int));
+				if (current->ai_family == AF_INET6)
+				{
+					setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(int));
+				}
 #endif
 				if (bind(s, current->ai_addr, current->ai_addrlen) < 0)
 				{
