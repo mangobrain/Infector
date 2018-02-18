@@ -15,8 +15,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Infector.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef __INFECTOR_I18N_HXX__
-#define __INFECTOR_I18N_HXX__
+#ifndef INFECTOR_I18N_HXX
+#define INFECTOR_I18N_HXX
 
 // If native language support is enabled, include libintl.h;
 // otherwise, define various functions/macros to no-ops to ease

@@ -15,8 +15,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Infector.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef __INFECTOR_SOCKET_HXX__
-#define __INFECTOR_SOCKET_HXX__
+#ifndef INFECTOR_SOCKET_HXX
+#define INFECTOR_SOCKET_HXX
 
 class Socket : public Glib::Object
 {

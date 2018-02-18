@@ -15,8 +15,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Infector.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef __INFECTOR_GAME_HXX__
-#define __INFECTOR_GAME_HXX__
+#ifndef INFECTOR_GAME_HXX
+#define INFECTOR_GAME_HXX
 
 class GameBoard;
 class AI;

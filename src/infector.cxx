@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 {
 #ifdef ENABLE_NLS
 	// Tell gettext where to find messages for our application's domain
-	bindtextdomain(GETTEXT_PACKAGE, __INFECTOR_LOCALEDIR);
+	bindtextdomain(GETTEXT_PACKAGE, INFECTOR_LOCALEDIR);
 	// Messages are all in UTF-8
 	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
 	// Switch to our application's domain for string retrieval
@@ -83,18 +83,18 @@ int main(int argc, char *argv[])
 	// Find "people" icon for server status dialogue,
 	// and "infector" icon for about dialogue
 	Glib::RefPtr<Gtk::IconTheme> it(Gtk::IconTheme::get_default());
-	it->append_search_path(__INFECTOR_PKGDATADIR);
+	it->append_search_path(INFECTOR_PKGDATADIR);
 #endif
 
 	// Load main GtkBuilder file
-	Glib::RefPtr<Gtk::Builder> refXml = Gtk::Builder::create_from_file(__INFECTOR_PKGDATADIR "/infector.ui");
+	Glib::RefPtr<Gtk::Builder> refXml = Gtk::Builder::create_from_file(INFECTOR_PKGDATADIR "/infector.ui");
 	
 	// Instantiate main window & run Glib main loop
 	GameWindow *pGw;
 	refXml->get_widget_derived("mainwindow", pGw);
 #ifdef MINGW
 	// Set window icon
-	pGw->set_icon_from_file(__INFECTOR_PKGDATADIR "/infector.ico");
+	pGw->set_icon_from_file(INFECTOR_PKGDATADIR "/infector.ico");
 #endif
 	kit.run(*pGw);
 
@@ -131,7 +131,7 @@ GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
 	m_refUIMan = Gtk::UIManager::create();
 	m_refUIMan->insert_action_group(m_refActGrp);
 	add_accel_group(m_refUIMan->get_accel_group());
-	m_refUIMan->add_ui_from_file(__INFECTOR_PKGDATADIR "/menu.ui");
+	m_refUIMan->add_ui_from_file(INFECTOR_PKGDATADIR "/menu.ui");
 	
 	// Add menu & toolbar to main window vbox
 	Gtk::Widget *pMenubar = m_refUIMan->get_widget("/MenuBar");

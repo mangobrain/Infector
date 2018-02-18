@@ -15,8 +15,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Infector.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef __INFECTOR_GAMETYPE_HXX__
-#define __INFECTOR_GAMETYPE_HXX__
+#ifndef INFECTOR_GAMETYPE_HXX
+#define INFECTOR_GAMETYPE_HXX
 
 // Enumerated type for players
 enum playertype

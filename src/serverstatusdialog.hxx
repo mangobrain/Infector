@@ -15,8 +15,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Infector.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef __INFECTOR_SERVERSTATUSDIALOG_HXX__
-#define __INFECTOR_SERVERSTATUSDIALOG_HXX__
+#ifndef INFECTOR_SERVERSTATUSDIALOG_HXX
+#define INFECTOR_SERVERSTATUSDIALOG_HXX
 
 class ServerStatusDialog: public Gtk::Dialog
 {

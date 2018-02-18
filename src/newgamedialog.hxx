@@ -15,8 +15,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Infector.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef __INFECTOR_NEWGAMEDIALOG_HXX__
-#define __INFECTOR_NEWGAMEDIALOG_HXX__
+#ifndef INFECTOR_NEWGAMEDIALOG_HXX
+#define INFECTOR_NEWGAMEDIALOG_HXX
 
 class NewGameDialog: public Gtk::Dialog
 {

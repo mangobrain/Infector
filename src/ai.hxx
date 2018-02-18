@@ -15,8 +15,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Infector.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef __INFECTOR_AI_HXX__
-#define __INFECTOR_AI_HXX__
+#ifndef INFECTOR_AI_HXX
+#define INFECTOR_AI_HXX
 
 class Game;
 class BoardState;
