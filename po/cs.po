@@ -336,14 +336,14 @@ msgstr "Chyba zápisu klienta: "
 msgid "Error on listening socket"
 msgstr "Chyba na naslouchajícím socketu"
 
-#: ../data/infector.desktop.in.in.h:1
+#: ../data/infector.desktop.in.h:1
 msgid "Ataxx Board Game"
 msgstr "Desková hra Ataxx"
 
-#: ../data/infector.desktop.in.in.h:2
+#: ../data/infector.desktop.in.h:2
 msgid "Infector"
 msgstr "Infector"
 
-#: ../data/infector.desktop.in.in.h:3
+#: ../data/infector.desktop.in.h:3
 msgid "Play the classic two- to four-player board game Ataxx"
 msgstr "Zahrát si klasickou deskovou hru Attax pro dvou nebo čtyři hráče"

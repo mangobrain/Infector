@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Infector
+GenericName=Ataxx Board Game
+Comment=Play the classic two- to four-player board game Ataxx
+Icon=infector
+Exec=infector
+Terminal=false
+Categories=Game;BoardGame;
