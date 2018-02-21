@@ -1,4 +1,5 @@
 project('infector', 'cpp', license: 'GPL3+', version: '0.5')
+i18n = import('i18n')
 subdir('src')
 subdir('data')
 subdir('po')
