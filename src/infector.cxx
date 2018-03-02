@@ -77,12 +77,10 @@ int main(int argc, char *argv[])
 
 	Gtk::Main kit(argc, argv);
 
-#ifdef MINGW
 	// Find "people" icon for server status dialogue,
 	// and "infector" icon for about dialogue
 	Glib::RefPtr<Gtk::IconTheme> it(Gtk::IconTheme::get_default());
 	it->append_search_path(INFECTOR_PKGDATADIR);
-#endif
 
 	// Load main GtkBuilder file
 	Glib::RefPtr<Gtk::Builder> refXml = Gtk::Builder::create_from_file(INFECTOR_PKGDATADIR "/infector.ui");
