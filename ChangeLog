@@ -1,3 +1,9 @@
+2018-03-12  Philip Allison <mangobrain@googlemail.com>
+
+	* ChangeLog: Many things! Updated to C++11, networking fixed on dual-
+	stack machines, ported to GTK 3.22, and replaced build system with
+	Meson.
+
 2009-10-06  Philip Allison <mangobrain@googlemail.com>
 
 	* ChangeLog: Update ChangeLog for 0.4 and reflow properly

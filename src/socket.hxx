@@ -1,4 +1,4 @@
-// Copyright 2008-2009 Philip Allison <mangobrain@googlemail.com>
+// Copyright 2008-2009, 2012, 2018 Philip Allison <mangobrain@googlemail.com>
 
 //    This file is part of Infector.
 //
