@@ -1,4 +1,5 @@
 gtkmm = dependency('gtkmm-3.0', version: '>=3.22')
+sigc = dependency('sigc++-2.0', version: '>=2.10')
 
 cfg = configuration_data()
 
@@ -23,6 +24,6 @@ exe = executable('infector',
     'ai.cxx', 'boardstate.cxx', 'clientstatusdialog.cxx', 'gameboard.cxx',
     'game.cxx','infector.cxx', 'newgamedialog.cxx', 'serverstatusdialog.cxx',
     'socket.cxx',
-    dependencies: gtkmm,
+    dependencies: [gtkmm, sigc],
     install: true
 )

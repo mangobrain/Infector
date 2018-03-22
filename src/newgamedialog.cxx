@@ -40,12 +40,12 @@ NewGameDialog::NewGameDialog(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Bu
 {
 	// When the number of players is changed, show/hide the player 3 & 4 type controls
 	refXml->get_widget("numplayerscombo", m_pNumPlayers);
-	m_pNumPlayers->signal_changed().connect(sigc::mem_fun(this, &NewGameDialog::onChangePlayers));
+	m_pNumPlayers->signal_changed().connect(sigc::mem_fun(*this, &NewGameDialog::onChangePlayers));
 	
 	// When the board shape is changed, show/hide the player 3 & 4 type controls
 	// and the number-of-players controls
 	refXml->get_widget("boardshapecombo", m_pBoardShape);
-	m_pBoardShape->signal_changed().connect(sigc::mem_fun(this, &NewGameDialog::onChangeShape));	
+	m_pBoardShape->signal_changed().connect(sigc::mem_fun(*this, &NewGameDialog::onChangeShape));	
 	
 	refXml->get_widget("bluelabel", m_pPlayer3Label);
 	refXml->get_widget("yellowlabel", m_pPlayer4Label);

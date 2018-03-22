@@ -98,7 +98,7 @@ ServerStatusDialog::ServerStatusDialog(BaseObjectType *cobject, const Glib::RefP
 	refXml->get_widget("ssyellowclient", m_pYellowClient);
 	
 	// Link the Apply button with the onApply method for opening a listen port
-	m_pApplyButton->signal_clicked().connect(sigc::mem_fun(this, &ServerStatusDialog::onApply));
+	m_pApplyButton->signal_clicked().connect(sigc::mem_fun(*this, &ServerStatusDialog::onApply));
 	
 	// XXX Set default value of server port spin button
 	// - doesn't seem to work from within Glade
@@ -430,7 +430,7 @@ void ServerStatusDialog::onApply()
 						Glib::RefPtr<Glib::IOChannel> ioc = Glib::IOChannel::create_from_win32_socket(s);
 #endif
 						// Bind the socket as one of the event handler's arguments, or we can't call accept()
-						servereventconns.push_back(Glib::signal_io().connect(sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::handleServerSocks), s),
+						servereventconns.push_back(Glib::signal_io().connect(sigc::bind(sigc::mem_fun(*this, &ServerStatusDialog::handleServerSocks), s),
 							ioc, Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL));
 
 						// Close underlying socket automatically when IOChannel is destroyed,
@@ -574,7 +574,7 @@ bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, const int s)
 		// Connect the socket to an event handler, listening to see if the client disconnects
 		std::pair<const int, sigc::connection> eventconn(newsock,
 			Glib::signal_io().connect(
-				sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::handleClientSocks), newsock),
+				sigc::bind(sigc::mem_fun(*this, &ServerStatusDialog::handleClientSocks), newsock),
 					newclient->getChannel(), Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL)
 		);
 		clienteventconns.push_back(eventconn);
@@ -582,7 +582,7 @@ bool ServerStatusDialog::handleServerSocks(Glib::IOCondition cond, const int s)
 		// Also connect to the socket's write error signal, to catch
 		// errors during asynchronous writes
 		clienterrconns.push_back(newclient->write_error.connect(
-			sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::clientWriteError), newsock)
+			sigc::bind(sigc::mem_fun(*this, &ServerStatusDialog::clientWriteError), newsock)
 		));
 		
 		setGUIFromClientState();
@@ -678,7 +678,7 @@ void ServerStatusDialog::setGUIFromClientState()
 
 	// Reconnect client combo box event handlers
 	for (size_t i = 0; i < 4; ++i)
-		clientcomboconns.push_back(m_aClientComboBoxes[i].signal_changed().connect(sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::onClientComboChange), i)));
+		clientcomboconns.push_back(m_aClientComboBoxes[i].signal_changed().connect(sigc::bind(sigc::mem_fun(*this, &ServerStatusDialog::onClientComboChange), i)));
 	
 	// Disconnect & reconnect all client kick button event handlers
 	for (std::list<sigc::connection>::iterator i = clientkickconns.begin(); i != clientkickconns.end(); ++i)
@@ -689,7 +689,7 @@ void ServerStatusDialog::setGUIFromClientState()
 	for (std::deque<ClientSocket*>::const_iterator i = clientsockets.begin(); i != clientsockets.end(); ++i)
 		clientkickconns.push_back(
 			m_paClientKickButtons[buttonindex++]->signal_clicked().connect(
-				sigc::bind(sigc::mem_fun(this, &ServerStatusDialog::onKickClient), (*i)->getSocket())
+				sigc::bind(sigc::mem_fun(*this, &ServerStatusDialog::onKickClient), (*i)->getSocket())
 			)
 		);
 }

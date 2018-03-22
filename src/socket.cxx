@@ -125,7 +125,7 @@ bool Socket::handleIOOut(Glib::IOCondition cond)
 				// Sending more data would block.  Monitor the IOChannel to see
 				// when it next would not, and call this function again.
 				output_handler_connection = Glib::signal_io().connect(
-					sigc::mem_fun(this, &ClientSocket::handleIOOut),
+					sigc::mem_fun(*this, &ClientSocket::handleIOOut),
 					m_pIOChannel, Glib::IO_OUT);
 				return true;
 			}

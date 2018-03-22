@@ -57,7 +57,7 @@ Game::Game(GameBoard* b, GameType &gt)
 	// storing returned connection objects.
 
 	// Connect square clicked handler to game board instance
-	b->square_clicked.connect(sigc::mem_fun(this, &Game::onSquareClicked));
+	b->square_clicked.connect(sigc::mem_fun(*this, &Game::onSquareClicked));
 	
 	// Clear the board and set its initial state for this game
 	b->newGame(this, &m_BoardState, &m_GameType);
@@ -66,7 +66,7 @@ Game::Game(GameBoard* b, GameType &gt)
 	if (gt.anyPlayersOfType(pt_ai))
 	{
 		m_pAI.reset(new AI(this, &m_BoardState, &m_GameType));
-		m_pAI->square_clicked.connect(sigc::mem_fun(this, &Game::onSquareClicked));
+		m_pAI->square_clicked.connect(sigc::mem_fun(*this, &Game::onSquareClicked));
 	}
 }
 
@@ -86,9 +86,9 @@ void Game::giveClientSockets(const std::deque<ClientSocket*> &clientsocks)
 	{
 		m_pClientSockets.push_back(*i);
 		clientsockeventconns.push_back(Glib::signal_io().connect(
-			sigc::bind(sigc::mem_fun(this, &Game::handleClientSocks), *i),
+			sigc::bind(sigc::mem_fun(*this, &Game::handleClientSocks), *i),
 				(*i)->getChannel(), Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL));
-		(*i)->write_error.connect(sigc::mem_fun(this, &Game::clientWriteError));
+		(*i)->write_error.connect(sigc::mem_fun(*this, &Game::clientWriteError));
 	}
 }
 
@@ -100,9 +100,9 @@ void Game::giveServerSocket(Socket *serversock)
 
 	// Set up network event handlers
 	serversockeventconn = Glib::signal_io().connect(
-		sigc::mem_fun(this, &Game::handleServerSock), m_pServerSocket->getChannel(),
+		sigc::mem_fun(*this, &Game::handleServerSock), m_pServerSocket->getChannel(),
 			Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL);
-	m_pServerSocket->write_error.connect(sigc::mem_fun(this, &Game::serverWriteError));
+	m_pServerSocket->write_error.connect(sigc::mem_fun(*this, &Game::serverWriteError));
 }
 
 // Write error occurred on client socket

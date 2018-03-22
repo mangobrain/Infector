@@ -113,13 +113,13 @@ GameWindow::GameWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
 	// Create ActionGroup for menu & toolbar items and their actions
 	m_refActGrp = Gtk::ActionGroup::create();
 	m_refActGrp->add(Gtk::Action::create("NewGame", Gtk::Stock::NEW),
-		sigc::mem_fun(this, &GameWindow::onNewGame));
+		sigc::mem_fun(*this, &GameWindow::onNewGame));
 	m_refActGrp->add(Gtk::Action::create("Connect", Gtk::Stock::CONNECT),
-		sigc::mem_fun(this, &GameWindow::onConnect));
+		sigc::mem_fun(*this, &GameWindow::onConnect));
 	m_refActGrp->add(Gtk::Action::create("Quit", Gtk::Stock::QUIT),
 		sigc::ptr_fun(&Gtk::Main::quit));
 	m_refActGrp->add(Gtk::Action::create("About", Gtk::Stock::ABOUT),
-		sigc::mem_fun(this, &GameWindow::onAbout));
+		sigc::mem_fun(*this, &GameWindow::onAbout));
 	m_refActGrp->add(Gtk::Action::create("GameMenu", _("_Game")));
 	m_refActGrp->add(Gtk::Action::create("HelpMenu", Gtk::Stock::HELP));
 
@@ -219,8 +219,8 @@ void GameWindow::onNewGame()
 		onMoveMade(0, 0, 0, 0, false);
 		
 		// Connect game event handlers
-		m_pGame->move_made.connect(sigc::mem_fun(this, &GameWindow::onMoveMade));
-		m_pGame->network_error.connect(sigc::mem_fun(this, &GameWindow::onNetworkError));
+		m_pGame->move_made.connect(sigc::mem_fun(*this, &GameWindow::onMoveMade));
+		m_pGame->network_error.connect(sigc::mem_fun(*this, &GameWindow::onNetworkError));
 	}
 }
 
@@ -259,7 +259,7 @@ void GameWindow::onConnect()
 
 		// Queue display of message dialogue
 		Glib::signal_idle().connect_once(
-			sigc::bind(sigc::mem_fun(this, &GameWindow::infoDialog), msg));
+			sigc::bind(sigc::mem_fun(*this, &GameWindow::infoDialog), msg));
 		
 		m_pGame.reset(new Game(m_pBoard, gt));
 		m_pGame->giveServerSocket(m_pClientStatusDialog->getServerSocket());
@@ -268,8 +268,8 @@ void GameWindow::onConnect()
 		onMoveMade(0, 0, 0, 0, false);
 		
 		// Connect game event handlers
-		m_pGame->move_made.connect(sigc::mem_fun(this, &GameWindow::onMoveMade));
-		m_pGame->network_error.connect(sigc::mem_fun(this, &GameWindow::onNetworkError));
+		m_pGame->move_made.connect(sigc::mem_fun(*this, &GameWindow::onMoveMade));
+		m_pGame->network_error.connect(sigc::mem_fun(*this, &GameWindow::onNetworkError));
 	}
 }
 
@@ -365,7 +365,7 @@ void GameWindow::onMoveMade(const int ax, const int ay, const int bx, const int 
 		// assigned to the move_made signal.  Queue it for next time the main
 		// loop is idle.
 		Glib::signal_idle().connect_once(
-			sigc::bind(sigc::mem_fun(this, &GameWindow::infoDialog), message));
+			sigc::bind(sigc::mem_fun(*this, &GameWindow::infoDialog), message));
 	}
 	else
 	{

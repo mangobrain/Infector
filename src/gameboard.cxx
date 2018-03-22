@@ -49,7 +49,7 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &
 		m_pBoardState(NULL), m_pGameType(NULL), bw(m_DefaultGameType.w), bh(m_DefaultGameType.h)
 {
 	// Connect mouse click events to the onClick handler
-	signal_button_press_event().connect(sigc::mem_fun(this, &GameBoard::onClick));
+	signal_button_press_event().connect(sigc::mem_fun(*this, &GameBoard::onClick));
 	set_sensitive(true);
 
 	// The widget is painted directly by us, but we'll leave the library
@@ -61,7 +61,7 @@ GameBoard::GameBoard(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &
 	makeBackground();
 
 	// The background will need to be redrawn whenever the widget is resized
-	signal_configure_event().connect(sigc::mem_fun(this, &GameBoard::onResize), true);
+	signal_configure_event().connect(sigc::mem_fun(*this, &GameBoard::onResize), true);
 
 	// Don't put pieces on the default board - it looks like a game is in play
 	m_DefaultBoardState.setPieceAt(0, 0, pc_player_none);
@@ -357,9 +357,9 @@ bool GameBoard::onClick(GdkEventButton *event)
 void GameBoard::newGame(Game *g, const BoardState *b, const GameType *gt)
 {
 	// TODO - Implement signal handlers and uncomment this
-	g->move_made.connect(sigc::mem_fun(this, &GameBoard::onMoveMade));
-	//g->invalid_move.connect(sigc::mem_fun(this, &GameBoard::onInvalidMove));
-	g->select_piece.connect(sigc::mem_fun(this, &GameBoard::queue_draw));
+	g->move_made.connect(sigc::mem_fun(*this, &GameBoard::onMoveMade));
+	//g->invalid_move.connect(sigc::mem_fun(*this, &GameBoard::onInvalidMove));
+	g->select_piece.connect(sigc::mem_fun(*this, &GameBoard::queue_draw));
 
 	// Store pointer to shared board state
 	m_pBoardState = b;

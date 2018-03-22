@@ -1,0 +1,30 @@
+{
+    "app-id": "uk.co.mangobrain.Infector",
+    "runtime": "org.gnome.Platform",
+    "sdk": "org.gnome.Sdk",
+    "command": "infector",
+    "finish-args":
+    [
+        "--socket=wayland",
+        "--share=ipc", "--socket-x11",
+        "--share=network"
+    ],
+    "build-options":
+    {
+        "cxxflags": "-O2 -g"
+    },
+    "modules":
+    {
+        "name": "infector",
+        "buildsystem": "meson",
+        "builddir": "true",
+        "sources":
+        [
+            {
+                "type": "archive",
+                "url": "http://infector.mangobrain.co.uk/downloads/infector-0.5.tar.xz",
+                "sha256": "1a4b173eccb50c8b77c9b991cae82784bc62de984e3a0db27b8ca9110740b8fd"
+            }
+        ]
+    }
+}

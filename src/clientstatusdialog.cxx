@@ -98,7 +98,7 @@ ClientStatusDialog::ClientStatusDialog(BaseObjectType *cobject, const Glib::RefP
 	m_pPortSpin->set_value(49152);
 
 	// Link the Connect button with the onConnect method for connecting to specified server
-	m_pConnectButton->signal_clicked().connect(sigc::mem_fun(this, &ClientStatusDialog::onConnect));
+	m_pConnectButton->signal_clicked().connect(sigc::mem_fun(*this, &ClientStatusDialog::onConnect));
 
 	setDefaults();
 }
@@ -192,7 +192,7 @@ void ClientStatusDialog::onConnect()
 		serversock = new Socket(s);
 		// Attach the underlying IOChannel to our event handler
 		sockeventconn = Glib::signal_io().connect(
-			sigc::mem_fun(this, &ClientStatusDialog::handleServerSock),
+			sigc::mem_fun(*this, &ClientStatusDialog::handleServerSock),
 				 serversock->getChannel(),
 				 	Glib::IO_IN | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL);
 	}
