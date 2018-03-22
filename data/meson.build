@@ -13,4 +13,4 @@ i18n.merge_file(
     type: 'desktop'
 )
 
-install_subdir('icons', install_dir: join_paths(datadir, 'icons'))
+install_subdir('icons', install_dir: datadir)
